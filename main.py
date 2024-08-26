@@ -8,6 +8,7 @@ import logging
 import threading
 import json
 import requests
+import socket
 
 global process
 global localStorage
@@ -18,18 +19,29 @@ localStorage = {
     "messages": []
 }
 
+def portIsOpen(port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = sock.connect_ex(('127.0.0.1', port))
+    if result == 0:
+        return False
+    else:
+        return True
+
+
 def setupTor():
     global process
     global localStorage
 
+    print("Configurando o tor...")
+
     # find 2 free ports between 5000 and 35000
-    for i in range(5000, 35000):
-        if not os.system(f"lsof -i:{i}"):
+    for i in range(5876, 35000):
+        if portIsOpen(i):
             localStorage["localSocksPort"] = i
             break
 
-    for i in range(5000, 35000):
-        if not os.system(f"lsof -i:{i}"):
+    for i in range(localStorage["localSocksPort"] + 1, 35000):
+        if portIsOpen(i):
             localStorage["localHttpPort"] = i
             break
     
@@ -45,14 +57,16 @@ def setupTor():
         os.mkdir("./tor")
         os.mkdir("./tor/data")
         os.mkdir("./tor/data/hidden-service")
+        os.mkdir("./logs")
         os.system("chmod -R 700 tor")
 
         torrc = open("./tor/torrc", "w")
-        torrc.write("DataDirectory tor/data\nHiddenServiceDir tor/data/hidden-service\nHiddenServicePort 80 127.0.0.1:9666\nSocksPort 9665\nHTTPTunnelPort 0\n")
+        torrc.write("DataDirectory tor/data\nHiddenServiceDir tor/data/hidden-service\nHiddenServicePort 80 127.0.0.1:" + str(localStorage["localHttpPort"]) + "\nSocksPort " + str(localStorage["localSocksPort"]) + "\nHTTPTunnelPort 0\n")
         torrc.close()
 
     # create log file
-    log = open("log.txt", "a")
+    os.system("touch logs/tor.log")
+    log = open("logs/tor.log", "w")
     
     # start tor
     process = subprocess.Popen(["tor", "-f", "tor/torrc"], stdout=log, stderr=log)
@@ -77,6 +91,8 @@ def setupTor():
         localStorage["address"] = f.read()
 
 def runServer():
+    global localStorage
+
     app = flask.Flask(__name__)
 
     # Suppress the Flask server startup messages
@@ -84,7 +100,7 @@ def runServer():
     log.setLevel(logging.ERROR)
 
     # Set up logging to a file for Flask
-    handler = logging.FileHandler('flask.log')
+    handler = logging.FileHandler('logs/flask.log')
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
 
@@ -118,7 +134,7 @@ def runServer():
         return "Message received!"
 
     # Run the Flask server
-    app.run(host="localhost", port=9666)
+    app.run(host="localhost", port=localStorage["localHttpPort"], debug=False)
 
 def signal_handler(sig, frame):
     print("\nRecebido SIGINT, terminando processo...")
@@ -147,7 +163,7 @@ def sendMessage():
 
     # send the message to the server
     proxies = {
-        'http': 'socks5h://localhost:9665'
+        'http': 'socks5h://localhost:' + str(localStorage["localSocksPort"]),
     }
     response = requests.post(f"http://{address}/receiveMessage", data={"message": message}, proxies=proxies)
     print(response.text)

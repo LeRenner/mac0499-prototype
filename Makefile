@@ -2,7 +2,7 @@
 
 #cleaning the directory
 clean:
-	rm -rf log.txt tor flask.log
+	rm -rf logs tor
 
 #running the python script
 run:
