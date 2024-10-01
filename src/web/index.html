@@ -7,19 +7,23 @@
     <link rel="stylesheet" href="web/main.css">
 </head>
 <body>
-
     <div class="container">
-        <h2>Send a Message</h2>
-        <input type="text" id="address" placeholder="Enter Address">
-        <input type="text" id="message" placeholder="Enter Message">
-        <button onclick="sendMessage()">Send Message</button>
-
-        <h2>Received Message</h2>
-        <button onclick="receiveMessages()">Receive Message</button>
-        <pre id="receivedMessages">No message received yet.</pre>
+        <pre>Your address is <pre id="address"></pre></pre>
+        <div id="senderList">
+            <h2>Chats</h2>
+            <div id="senders"><p>No senders yet.</p></div>
+        </div>
+        <div class="container" id="chat">
+            <pre>Current status: <pre id="status">NOT STARTED</pre></pre>
+            <h2>Send a Message</h2>
+            <input type="text" id="destAddress" placeholder="Enter Address">
+            <input type="text" id="message" placeholder="Enter Message">
+            <button onclick="sendMessage()">Send Message</button>
+    
+            <h2>Received Messages</h2>
+            <pre id="receivedMessages">No message received yet.</pre>
+        </div>
     </div>
-
     <script src="web/main.js"></script>
-
 </body>
 </html>

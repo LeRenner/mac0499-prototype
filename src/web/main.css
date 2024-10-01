@@ -3,21 +3,67 @@ body {
 }
 
 .container {
-    max-width: 500px;
+    max-width: 600px;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 5px;
 }
 
-input, button {
+input {
     margin-bottom: 10px;
     padding: 8px;
-    width: 100%;
+    width: calc(100% - 20px);
+}
+
+button {
+    padding: 8px;
 }
 
 pre {
     background: #f4f4f4;
     padding: 10px;
     border: 1px solid #ddd;
+}
+
+.contact {
+    border-radius: 4px;
+    background-color: #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.address {
+    color: #444;
+    margin-left: 20px;
+    margin-bottom: 0px;
+}
+
+.latest-message {
+    color: #666;
+    margin-left: 20px;
+}
+
+.timestamp {
+    margin-left: auto;
+    color: #666;
+    margin-right: 20px;
+}
+
+.message-bottom {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* make id address change when hovered */
+#address:hover {
+    color: grey;
+    cursor: pointer;
+}
+
+.contact:hover {
+    background-color: #f5f5f5;
+    cursor: pointer;
 }

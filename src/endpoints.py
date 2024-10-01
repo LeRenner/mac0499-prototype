@@ -2,6 +2,7 @@ import flask
 import logging
 import requests
 import json
+import datetime
 
 global localHttpPort
 global localSocksPort
@@ -27,7 +28,8 @@ def receiveMessage():
 
     message = {
         "sender": sender,
-        "content": content
+        "content": content,
+        "timestamp": int(datetime.datetime.now().timestamp())
     }
 
     # append message to "messages.txt"
@@ -45,6 +47,9 @@ def sendMessage():
 
     # get message and address from the post request
     decodedMessage = json.loads(flask.request.form.get("message"))
+
+    print(f"Decoded message: {decodedMessage}")
+
     destination = decodedMessage["address"]
     messageContent = decodedMessage["message"]
 
@@ -65,10 +70,20 @@ def sendMessage():
         'http': 'socks5h://localhost:{}'.format(localSocksPort)
     }
 
-    response = requests.post(f"http://{destination}/receiveMessage", data={"message": packagedMessage}, proxies=proxies)
-    print(response.text)
+    for i in range(3):
+        try:
+            response = requests.post(f"http://{destination}/receiveMessage", data={"message": packagedMessage}, proxies=proxies)
+            break
+        except requests.exceptions.ConnectionError:
+            print(f"Erro. Tentando novamente em 5 segundos...")
+            sleep(5)
+            continue
 
-    print("Mensagem enviada!")
+    if response.status_code != 200:
+        print(f"Erro ao enviar mensagem: {response.text}")
+        return "Error sending message!"
+
+    print(response.text)
 
     return "Message sent!"
 
@@ -82,10 +97,7 @@ def getMessages():
     messageList = messageFile.readlines()
     messageFile.close()
 
-    print(messageList)
-
     for line in messageList:
-        print(f"Reading line: {line}")
         if line.strip() == "" or line.strip() == "\n":
             continue
         else:
@@ -95,13 +107,34 @@ def getMessages():
             except json.JSONDecodeError:
                 print(f"Error decoding message: {line}")
 
-    print(f"Returning messages: {messages}")
-
     response = {
-        "messages": messages
+        "messages": messages,
+        "address": address
     }
 
     return json.dumps(response)
+
+
+def getSenders():
+    # read all messages from "messages.txt"
+    senders = []
+
+    messageFile = open("messages.txt", "r")
+    messageList = messageFile.readlines()
+    messageFile.close()
+
+    for line in messageList:
+        if line.strip() == "" or line.strip() == "\n":
+            continue
+        else:
+            try:
+                message = json.loads(line)
+                if message["sender"] not in senders:
+                    senders.append(message["sender"])
+            except json.JSONDecodeError:
+                print(f"Error decoding message: {line}")
+
+    return json.dumps(senders)
 
 
 def webInterface(filename):
@@ -123,6 +156,9 @@ def initializeFlask():
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
 
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+
     # create messages.txt file
     with open("messages.txt", "a") as f:
         pass
@@ -135,6 +171,7 @@ def setupEndpoints(app, address, localSocksPort):
     app.add_url_rule("/receiveMessage", "receiveMessage", receiveMessage, methods=["POST"])
     app.add_url_rule("/sendMessage", "sendMessage", sendMessage, methods=["POST"])
     app.add_url_rule("/getMessages", "getMessages", getMessages)
+    app.add_url_rule("/getSenders", "getSenders", getSenders)
     app.add_url_rule("/web", "webInterface", webInterface, defaults={'filename': ''})
     app.add_url_rule("/web/", "webInterface", webInterface, defaults={'filename': ''})
     app.add_url_rule("/web/<path:filename>", "webInterface", webInterface)
