@@ -119,13 +119,13 @@ pre {
     border-radius: 4px;
 }
 
-.chats-top, .new-chat {
+.chats-top, .new-chat, .friends-top, .new-friend {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
-#new-chat-button {
+#new-chat-button, #new-friend-button {
     margin: 20px;
 }
 
@@ -137,4 +137,23 @@ pre {
     margin-right: 20px;
     color: white;
     text-align: right;
+}
+
+.friend {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.header {
+    font-size: 16px;
+    font-weight:100;
+    text-align: center;
+}
+
+#address {
+    text-decoration: underline;
 }

@@ -10,7 +10,7 @@ function updateUI() {
     } else if (interfaceState === 1) {
         generateMessageList();
     } else if (interfaceState === 2) {
-        getFriends();
+        updateFriends();
     }
 }
 
@@ -19,15 +19,15 @@ function changeInterfaceState(newState) {
     interfaceState = newState;
     
     if (newState === 0) {
-        document.getElementById('senders').style.display = 'block';
+        document.getElementById('senderList').style.display = 'block';
         document.getElementById('chat').style.display = 'none';
         document.getElementById('friends').style.display = 'none';
     } else if (newState === 1) {
-        document.getElementById('senders').style.display = 'none';
+        document.getElementById('senderList').style.display = 'none';
         document.getElementById('chat').style.display = 'block';
         document.getElementById('friends').style.display = 'none';
     } else if (newState === 2) {
-        document.getElementById('senders').style.display = 'none';
+        document.getElementById('senderList').style.display = 'none';
         document.getElementById('chat').style.display = 'none';
         document.getElementById('friends').style.display = 'block';
     }
@@ -41,10 +41,10 @@ document.getElementById('address').addEventListener('click', function() {
     const addressElement = document.getElementById('address');
     const address = addressElement.innerText;
     navigator.clipboard.writeText(address);
-    document.getElementById('status').innerHTML = 'Address copied to clipboard!';
 
     const originalText = addressElement.innerHTML;
     addressElement.innerHTML += ' (copied)';
+    console.log('address copied');
     setTimeout(() => {
         addressElement.innerHTML = originalText;
     }, 1000);
@@ -52,17 +52,42 @@ document.getElementById('address').addEventListener('click', function() {
 
 
 // when clicking on anything with the class contact, set address and show chat
-document.getElementById('senders').addEventListener('click', function(event) {
+document.getElementById('senders').addEventListener('click', async function(event) {
     if (event.target.classList.contains('contact') || 
         event.target.classList.contains('message-bottom') || 
         event.target.classList.contains('latest-message') || 
         event.target.classList.contains('timestamp') || 
         event.target.classList.contains('address')) {
         currentChatAddress = event.target.closest('.contact').querySelector('.address').innerText;
+
+        // if current chat address starts and ends with []
+        if (currentChatAddress.startsWith('[') && currentChatAddress.endsWith(']')) {
+            let friends = await getFriends();
+            // find friend with this alias
+            friends.forEach(friend => {
+                if (friend.alias === currentChatAddress.slice(1, -1)) {
+                    currentChatAddress = friend.address;
+                }
+            });
+        }
+
         console.log('Clicked on address: ' + currentChatAddress);
         changeInterfaceState(1);
     }
 });
+
+
+// then clicking on item with ID friends-tab, show friends
+document.getElementById('friends-tab').addEventListener('click', function() {
+    changeInterfaceState(2);
+});
+
+
+// when clicking on item with ID senders-tab, show senders
+document.getElementById('chats-tab').addEventListener('click', function() {
+    changeInterfaceState(0);
+});
+
 
 // when on chat an esc is pressed, go back to senders
 document.addEventListener('keydown', function(event) {

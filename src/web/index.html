@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <pre>Your address is <pre id="address"></pre></pre>
+        <h2 class="header">Logged as <span id="address"></span></h2>
         <div class="tabs">
             <button class="tablinks" id="chats-tab">Chats</button>
             <button class="tablinks" id="friends-tab">Friends</button>
@@ -25,8 +25,7 @@
             <div id="senders"><p>No senders yet.</p></div>
         </div>
         <div class="container" id="chat">
-            <h2>Messages with:</h2>
-            <pre id="sender-address">UNDEFINED</pre>
+            <h2>Messages with: <span id="sender-address">UNDEFINED</span></h2>
             <div id="receivedMessages">No message received yet.</div>
             <div id="message-sender-container"></div>
                 <input type="text" id="message" placeholder="Enter Message">
@@ -36,10 +35,24 @@
             </div>
         </div>
         <div class="container" id="friends">
-            <h2>Add alias for friend</h2>
-            <input type="text" id="friendAddress" placeholder="Enter Address">
-            <input type="text" id="alias" placeholder="Enter Alias">
-            <button onclick="addFriend()">Add Friend</button>
+            <div class="friends-top">
+                <h2>Friends</h2>
+                <button onclick="showNewFriend()" id="new-friend-button">Options</button>
+            </div>
+            <div class="new-friend" style="display: none;">
+                <h3>Friends Options</h3>
+                <hr/>
+                <h4>Add Friend</h4>
+                <input type="text" id="new-friend" placeholder="Enter friend nickname">
+                <input type="text" id="new-friend-address" placeholder="Enter friend address">
+                <button onclick="addFriend()">Add Friend</button>
+                <hr/>
+                <h4>Remove Friend</h4>
+                <input type="text" id="remove-friend" placeholder="Enter friend nickname">
+                <button onclick="removeFriend()">Remove Friend</button>
+                <hr/>
+                <h3>Friends list</h3>
+            </div>
             <div id="friendsList"><p>No friends yet.</p></div>
         </div>
     </div>

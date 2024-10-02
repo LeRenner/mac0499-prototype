@@ -83,7 +83,59 @@ async function getFriends() {
 
         const data = await response.json();
 
-        return data.friends;
+        return data;
+    } catch (error) {
+        return {};
+    }
+}
+
+// adds request for new friend
+async function addFriend() {
+    const address = document.getElementById('new-friend-address').value;
+    const alias = document.getElementById('new-friend').value;
+
+    try {
+        const response = await fetch('/addFriend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                address: address,
+                alias: alias
+            })
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        return data;
+    } catch (error) {
+        return {};
+    }
+}
+
+// removes friend
+async function removeFriend() {
+    const alias = document.getElementById('remove-friend').value;
+
+    try {
+        const response = await fetch('/removeFriend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                alias: alias
+            })
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        return data;
     } catch (error) {
         return {};
     }

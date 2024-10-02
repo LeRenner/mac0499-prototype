@@ -15,6 +15,12 @@
                 "content": "and ",
                 "timestamp": 1727840209
             }
+        ],
+        "mgvj7q6lcqbbscu722pc7mml6hblwdq6m4z2pwjec2knbassgwuhylyd.onion": [
+            {
+                "content": "Hello",
+                "timestamp": 1727844462
+            }
         ]
     },
     "sentMessages": {
@@ -33,6 +39,18 @@
                 "content": "I like to eat soup",
                 "timestamp": 1727840192
             }
+        ],
+        "mgvj7q6lcqbbscu722pc7mml6hblwdq6m4z2pwjec2knbassgwuhylyd.onion": [
+            {
+                "content": "Omg omg hiiiii",
+                "timestamp": 1727844477
+            }
         ]
-    }
+    },
+    "friends": [
+        {
+            "address": "ntsczsnqj4ehk5tix7xikqfnnk2ke3qe25fmr7zmyvhmxvt3p2rsa4ad.onion",
+            "alias": "viado"
+        }
+    ]
 }

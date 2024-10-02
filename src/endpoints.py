@@ -205,8 +205,6 @@ def getLatestMessages():
         "messages": latestMessagesList
     }
 
-    print(f"Latest messages: {response}")
-
     return json.dumps(response)
 
 
@@ -225,6 +223,73 @@ def getSenders():
     senders = list(receivedMessages.keys())
 
     return json.dumps(senders)
+
+
+def getFriends():
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        return json.dumps([])
+
+    friends = storage.get("friends", [])
+
+    return json.dumps(friends)
+
+
+def addFriend():
+    friend = flask.request.get_json()
+
+    print(friend)
+
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        storage = {"friends": []}
+
+    friends = storage.get("friends", [])
+    if not any(f["address"] == friend["address"] for f in friends):
+        friends.append(friend)
+        storage["friends"] = friends
+
+        with open("storage.json", "w") as f:
+            json.dump(storage, f, indent=4)
+
+        return json.dumps({"message": "Friend added!"})
+    else:
+        return json.dumps({"message": "Friend already exists!"})
+
+
+def removeFriend():
+    friend_nickname = flask.request.get_json().get("alias")
+
+    print(friend_nickname)
+
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        return json.dumps({"error": "Friend not found!"})
+
+    friends = storage.get("friends", [])
+
+    print(friends)
+
+    friend_to_remove = next((f for f in friends if f["alias"] == friend_nickname), None)
+
+
+
+    if friend_to_remove:
+        friends.remove(friend_to_remove)
+        storage["friends"] = friends
+
+        with open("storage.json", "w") as f:
+            json.dump(storage, f, indent=4)
+
+        return json.dumps({"message": "Friend removed!"})
+    else:
+        return json.dumps({"error": "Friend not found!"})
 
 
 def webInterface(filename):
@@ -260,6 +325,9 @@ def setupEndpoints(app, address, localSocksPort):
     app.add_url_rule("/getLatestMessages", "getLatestMessages", getLatestMessages)
     app.add_url_rule("/getSenders", "getSenders", getSenders)
     app.add_url_rule("/getAddress", "getAddress", getAddress)
+    app.add_url_rule("/getFriends", "getFriends", getFriends)
+    app.add_url_rule("/addFriend", "addFriend", addFriend, methods=["POST"])
+    app.add_url_rule("/removeFriend", "removeFriend", removeFriend, methods=["POST"])
     app.add_url_rule("/web", "webInterface", webInterface, defaults={'filename': ''})
     app.add_url_rule("/web/", "webInterface", webInterface, defaults={'filename': ''})
     app.add_url_rule("/web/<path:filename>", "webInterface", webInterface)

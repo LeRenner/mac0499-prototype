@@ -8,8 +8,13 @@ let previousChatListHash = '';
 async function generateChatList() {
     try {
         const messages = await getLatestMessages();
+        const friends = await getFriends();
 
-        console.log('Received messages: ' + JSON.stringify(messages));
+        // Create a map of addresses to aliases
+        const addressToAlias = new Map();
+        friends.forEach(friend => {
+            addressToAlias.set(friend.address, friend.alias);
+        });
 
         // Hash the messages content
         const messagesString = JSON.stringify(messages);
@@ -18,7 +23,6 @@ async function generateChatList() {
 
         // Check if the hash has changed
         if (currentMessagesHashHex === previousChatListHash) {
-            console.log('No new messages, skipping update.');
             return;
         }
 
@@ -33,11 +37,15 @@ async function generateChatList() {
 
             messages.forEach(message => {
                 const formattedTimestamp = convertTimestamp(message.timestamp);
+                let senderAlias = addressToAlias.get(message.sender) || message.sender;
+                if (addressToAlias.has(message.sender)) {
+                    senderAlias = `[${senderAlias}]`;
+                }
 
                 chatList += `
                     <div class="contact">
                         <p class="address">
-                            ${message.sender}
+                            ${senderAlias}
                         </p>
                         <p class="message-bottom">
                             <span class="latest-message">${message.content}</span>
@@ -51,7 +59,6 @@ async function generateChatList() {
         }
     } catch (error) {
         console.log('Error receiving messages: ' + error.message);
-        document.getElementById('status').innerHTML = 'Error receiving messages';
     }
 }
 
@@ -60,11 +67,7 @@ let previousMessagesHash = '';
 
 async function generateMessageList() {
     try {
-        console.log(currentChatAddress);
-
         const messages = await getMessagesFromSender(currentChatAddress);
-
-        console.log('Received messages: ' + JSON.stringify(messages));
 
         // Combine receivedMessages and sentMessages
         const allMessages = [...messages.receivedMessages, ...messages.sentMessages];
@@ -121,7 +124,7 @@ async function generateMessageList() {
 
 let previousFriendsHash = '';
 
-async function getFriends() {
+async function updateFriends() {
     try {
         const response = await fetch('/getFriends', {
             method: 'GET'
@@ -129,8 +132,10 @@ async function getFriends() {
 
         const data = await response.json();
 
+        console.log(data);
+
         // Hash the friends content
-        const friendsString = JSON.stringify(data.friends);
+        const friendsString = JSON.stringify(data);
         const currentFriendsHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(friendsString));
         const currentFriendsHashHex = Array.from(new Uint8Array(currentFriendsHash)).map(b => b.toString(16).padStart(2, '0')).join('');
 
@@ -144,15 +149,15 @@ async function getFriends() {
         previousFriendsHash = currentFriendsHashHex;
 
         // check data.friends length
-        if (data.friends.length === 0) {
-            document.getElementById('friends').innerHTML = 'No friends yet...';
+        if (data.length === 0) {
+            document.getElementById('friendsList').innerHTML = 'No friends yet...';
         } else {
             let friendsList = '';
-            data.friends.forEach(friend => {
+            data.forEach(friend => {
                 friendsList += `
                     <div class="friend">
                         <p class="friend-name">
-                            ${friend.name}
+                            ${friend.alias}
                         </p>
                         <p class="friend-address">
                             ${friend.address}
@@ -161,11 +166,10 @@ async function getFriends() {
                 `;
             });
 
-            document.getElementById('friends').innerHTML = friendsList;
+            document.getElementById('friendsList').innerHTML = friendsList;
         }
     } catch (error) {
         console.log('Error receiving friends: ' + error.message);
-        document.getElementById('status').innerHTML = 'Error receiving friends';
     }
 }
 
@@ -175,6 +179,15 @@ async function showNewChat() {
     const newChat = document.querySelector('.new-chat');
     const newChatDisplay = newChat.style.display;
     newChat.style.display = newChatDisplay === 'block' ? 'none' : 'block';
+}
+
+
+async function showNewFriend() {
+    // switch between showing and hiding objects with class friends
+    const newFriend = document.querySelector('.new-friend');
+    const newFriendDisplay = newFriend.style.display;
+    newFriend.style.display = newFriendDisplay === 'block' ? 'none' : 'block';
+
 }
 
 
@@ -203,3 +216,4 @@ async function updateAddress() {
         document.getElementById('status').innerHTML = 'Error receiving address';
     }
 }
+
