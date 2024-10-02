@@ -1,11 +1,15 @@
 {
     "receivedMessages": {
-        "mkl2b3hxadsfza2k3u554s5w6hpth2zgkakbd5ydern6h57dcvggbiyd.onion\n": [
+        "mkl2b3hxadsfza2k3u554s5w6hpth2zgkakbd5ydern6h57dcvggbiyd.onion": [
             {
-                "sender": "mkl2b3hxadsfza2k3u554s5w6hpth2zgkakbd5ydern6h57dcvggbiyd.onion\n",
-                "content": "sdasdiaoshdioahsidsd",
-                "timestamp": 1727831783
+                "content": "Hello, world!",
+                "timestamp": 1727833167
+            },
+            {
+                "content": "Lmao I like dick",
+                "timestamp": 1727833361
             }
         ]
-    }
+    },
+    "sentMessages": {}
 }

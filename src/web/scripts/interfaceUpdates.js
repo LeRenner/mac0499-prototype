@@ -60,6 +60,8 @@ async function generateMessageList() {
     try {
         const messages = await getMessagesFromSender(currentChatAddress);
 
+        console.log('Messages from ' + currentChatAddress + ': ' + JSON.stringify(messages));
+
         // Hash the messages content
         const messagesString = JSON.stringify(messages);
         const currentMessagesHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(messagesString));
@@ -67,7 +69,6 @@ async function generateMessageList() {
 
         // Check if the hash has changed
         if (currentMessagesHashHex === previousMessagesHash) {
-            console.log('No new messages, skipping update.');
             return;
         }
 

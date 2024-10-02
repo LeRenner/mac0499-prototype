@@ -59,6 +59,7 @@ document.getElementById('senders').addEventListener('click', function(event) {
         event.target.classList.contains('timestamp') || 
         event.target.classList.contains('address')) {
         currentChatAddress = event.target.closest('.contact').querySelector('.address').innerText;
+        console.log('Clicked on address: ' + currentChatAddress);
         changeInterfaceState(1);
     }
 });

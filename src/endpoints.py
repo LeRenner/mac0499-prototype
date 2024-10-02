@@ -3,6 +3,7 @@ import logging
 import requests
 import json
 import datetime
+import hashlib
 
 global localHttpPort
 global localSocksPort
@@ -23,11 +24,10 @@ def receiveMessage():
     print(f"Received message: {message}")
 
     decodedMessage = json.loads(message)
-    sender = decodedMessage["sender"]
+    sender = decodedMessage["sender"].replace("\n", "")
     content = decodedMessage["content"]
 
     message = {
-        "sender": sender,
         "content": content,
         "timestamp": int(datetime.datetime.now().timestamp())
     }
@@ -37,7 +37,7 @@ def receiveMessage():
         with open("storage.json", "r") as f:
             storage = json.load(f)
     except FileNotFoundError:
-        storage = {"receivedMessages": {}}
+        storage = {"receivedMessages": {}, "sentMessages": {}}
 
     if "receivedMessages" not in storage:
         storage["receivedMessages"] = {}
@@ -52,7 +52,10 @@ def receiveMessage():
 
     print(f"Message received from {sender}: {content}")
 
-    return "Message received!"
+    # Calculate SHA256 of the message content
+    sha256_hash = hashlib.sha256(content.encode()).hexdigest()
+
+    return json.dumps({"message": "Message received!", "sha256": sha256_hash})
 
 
 def sendMessage():
@@ -83,24 +86,31 @@ def sendMessage():
     for i in range(3):
         try:
             response = requests.post(f"http://{destination}/receiveMessage", data={"message": packagedMessage}, proxies=proxies)
-            break
+            if response.status_code == 200:
+                response_data = response.json()
+                received_sha256 = response_data.get("sha256")
+                calculated_sha256 = hashlib.sha256(messageContent.encode()).hexdigest()
+                if received_sha256 == calculated_sha256:
+                    print("Message sent and verified successfully!")
+                    break
+                else:
+                    print("SHA256 mismatch! Message verification failed.")
+            else:
+                print(f"Erro ao enviar mensagem: {response.text}")
+                return "Error sending message!"
         except requests.exceptions.ConnectionError:
             print(f"Erro. Tentando novamente em 5 segundos...")
             sleep(5)
             continue
-
-    if response.status_code != 200:
-        print(f"Erro ao enviar mensagem: {response.text}")
-        return "Error sending message!"
-
-    print(response.text)
+    else:
+        return "Error sending message after multiple attempts!"
 
     # Store the message in storage.json
     try:
         with open("storage.json", "r") as f:
             storage = json.load(f)
     except FileNotFoundError:
-        storage = {"sentMessages": {}}
+        storage = {"receivedMessages": {}, "sentMessages": {}}
 
     if "sentMessages" not in storage:
         storage["sentMessages"] = {}
@@ -108,7 +118,10 @@ def sendMessage():
     if destination not in storage["sentMessages"]:
         storage["sentMessages"][destination] = []
 
-    storage["sentMessages"][destination].append(message)
+    # Create a copy of the message without the sender field
+    message_to_store = {key: value for key, value in message.items() if key != "sender"}
+
+    storage["sentMessages"][destination].append(message_to_store)
 
     with open("storage.json", "w") as f:
         json.dump(storage, f, indent=4)
@@ -125,12 +138,16 @@ def getMessagesFromSender():
     except FileNotFoundError:
         return json.dumps({"messages": []})
 
+    print(storage)
+
     receivedMessages = storage.get("receivedMessages", {})
     messages = receivedMessages.get(sender, [])
 
     response = {
         "messages": messages
     }
+
+    print(f"Messages from {sender}: {messages}")
 
     return json.dumps(response)
 
@@ -147,11 +164,16 @@ def getLatestMessages():
 
     for sender, messages in receivedMessages.items():
         if messages:
-            latestMessages.append(max(messages, key=lambda msg: msg["timestamp"]))
+            latest_message = max(messages, key=lambda msg: msg["timestamp"])
+            latest_message_with_sender = latest_message.copy()
+            latest_message_with_sender["sender"] = sender
+            latestMessages.append(latest_message_with_sender)
 
     response = {
         "messages": latestMessages
     }
+
+    print(f"Latest messages: {latestMessages}")
 
     return json.dumps(response)
 
