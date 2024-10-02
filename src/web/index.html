@@ -9,6 +9,10 @@
 <body>
     <div class="container">
         <pre>Your address is <pre id="address"></pre></pre>
+        <div class="tabs">
+            <button class="tablinks" id="chats-tab">Chats</button>
+            <button class="tablinks" id="friends-tab">Friends</button>
+        </div>
         <div id="senderList">
             <h2>Chats</h2>
             <div id="senders"><p>No senders yet.</p></div>
@@ -23,7 +27,17 @@
             <h2>Received Messages</h2>
             <pre id="receivedMessages">No message received yet.</pre>
         </div>
+        <div class="container" id="friends">
+            <h2>Add alias for friend</h2>
+            <input type="text" id="friendAddress" placeholder="Enter Address">
+            <input type="text" id="alias" placeholder="Enter Alias">
+            <button onclick="addFriend()">Add Friend</button>
+            <div id="friendsList"><p>No friends yet.</p></div>
+        </div>
     </div>
-    <script src="web/main.js"></script>
+    <script src="web/scripts/aux.js"></script>
+    <script src="web/scripts/requests.js"></script>
+    <script src="web/scripts/interfaceUpdates.js"></script>
+    <script src="web/scripts/interfaceLoop.js"></script>
 </body>
 </html>

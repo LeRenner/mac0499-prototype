@@ -32,9 +32,23 @@ def receiveMessage():
         "timestamp": int(datetime.datetime.now().timestamp())
     }
 
-    # append message to "messages.txt"
-    with open("messages.txt", "a") as f:
-        f.write(json.dumps(message) + "\n")
+    # Store the message in storage.json
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        storage = {"receivedMessages": {}}
+
+    if "receivedMessages" not in storage:
+        storage["receivedMessages"] = {}
+
+    if sender not in storage["receivedMessages"]:
+        storage["receivedMessages"][sender] = []
+
+    storage["receivedMessages"][sender].append(message)
+
+    with open("storage.json", "w") as f:
+        json.dump(storage, f, indent=4)
 
     print(f"Message received from {sender}: {content}")
 
@@ -48,17 +62,13 @@ def sendMessage():
     # get message and address from the post request
     decodedMessage = json.loads(flask.request.form.get("message"))
 
-    print(f"Decoded message: {decodedMessage}")
-
     destination = decodedMessage["address"]
     messageContent = decodedMessage["message"]
 
-    print(f"Enviando mensagem para {destination}...")
-    print(f"Conteúdo: {messageContent}")
-
     message = {
         "sender": address,
-        "content": messageContent
+        "content": messageContent,
+        "timestamp": int(datetime.datetime.now().timestamp())
     }
 
     packagedMessage = json.dumps(message)
@@ -85,7 +95,65 @@ def sendMessage():
 
     print(response.text)
 
+    # Store the message in storage.json
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        storage = {"sentMessages": {}}
+
+    if "sentMessages" not in storage:
+        storage["sentMessages"] = {}
+
+    if destination not in storage["sentMessages"]:
+        storage["sentMessages"][destination] = []
+
+    storage["sentMessages"][destination].append(message)
+
+    with open("storage.json", "w") as f:
+        json.dump(storage, f, indent=4)
+
     return "Message sent!"
+
+
+def getMessagesFromSender():
+    sender = flask.request.data.decode('utf-8')
+
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        return json.dumps({"messages": []})
+
+    receivedMessages = storage.get("receivedMessages", {})
+    messages = receivedMessages.get(sender, [])
+
+    response = {
+        "messages": messages
+    }
+
+    return json.dumps(response)
+
+
+def getLatestMessages():
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        return json.dumps({"messages": []})
+
+    receivedMessages = storage.get("receivedMessages", {})
+    latestMessages = []
+
+    for sender, messages in receivedMessages.items():
+        if messages:
+            latestMessages.append(max(messages, key=lambda msg: msg["timestamp"]))
+
+    response = {
+        "messages": latestMessages
+    }
+
+    return json.dumps(response)
 
 
 # generates json and returns request
@@ -116,23 +184,14 @@ def getMessages():
 
 
 def getSenders():
-    # read all messages from "messages.txt"
-    senders = []
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        return json.dumps([])
 
-    messageFile = open("messages.txt", "r")
-    messageList = messageFile.readlines()
-    messageFile.close()
-
-    for line in messageList:
-        if line.strip() == "" or line.strip() == "\n":
-            continue
-        else:
-            try:
-                message = json.loads(line)
-                if message["sender"] not in senders:
-                    senders.append(message["sender"])
-            except json.JSONDecodeError:
-                print(f"Error decoding message: {line}")
+    receivedMessages = storage.get("receivedMessages", {})
+    senders = list(receivedMessages.keys())
 
     return json.dumps(senders)
 
@@ -169,7 +228,9 @@ def initializeFlask():
 def setupEndpoints(app, address, localSocksPort):
     app.add_url_rule("/", "root", root)
     app.add_url_rule("/receiveMessage", "receiveMessage", receiveMessage, methods=["POST"])
+    app.add_url_rule("/getMessagesFromSender", "getMessagesFromSender", getMessagesFromSender, methods=["POST"])
     app.add_url_rule("/sendMessage", "sendMessage", sendMessage, methods=["POST"])
+    app.add_url_rule("/getLatestMessages", "getLatestMessages", getLatestMessages)
     app.add_url_rule("/getMessages", "getMessages", getMessages)
     app.add_url_rule("/getSenders", "getSenders", getSenders)
     app.add_url_rule("/web", "webInterface", webInterface, defaults={'filename': ''})
