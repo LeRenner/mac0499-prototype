@@ -1,19 +1,11 @@
-Oct 01 22:42:06.720 [notice] Tor 0.4.8.12 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.3.2, Zlib 1.3.1, Liblzma 5.6.2, Libzstd 1.5.6 and Glibc 2.40 as libc.
-Oct 01 22:42:06.720 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
-Oct 01 22:42:06.720 [notice] Read configuration file "/home/renner/special/mac0499-prototype/src/tor/torrc".
-Oct 01 22:42:06.720 [warn] Path for DataDirectory (tor/data) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data. Is this what you wanted?
-Oct 01 22:42:06.720 [warn] Path for HiddenServiceDir (tor/data/hidden-service) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data/hidden-service. Is this what you wanted?
-Oct 01 22:42:06.721 [notice] Opening Socks listener on 127.0.0.1:5877
-Oct 01 22:42:06.721 [notice] Opened Socks listener connection (ready) on 127.0.0.1:5877
-Oct 01 22:42:06.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
-Oct 01 22:42:06.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
-Oct 01 22:42:06.000 [notice] Bootstrapped 0% (starting): Starting
-Oct 01 22:42:07.000 [notice] Starting with guard context "default"
-Oct 01 22:42:08.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
-Oct 01 22:42:08.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
-Oct 01 22:42:08.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
-Oct 01 22:42:09.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
-Oct 01 22:42:09.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough directory info to build circuits
-Oct 01 22:42:09.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
-Oct 01 22:42:09.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
-Oct 01 22:42:09.000 [notice] Bootstrapped 100% (done): Done
+Oct 02 00:23:22.044 [notice] Tor 0.4.8.12 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.3.2, Zlib 1.3.1, Liblzma 5.6.2, Libzstd 1.5.6 and Glibc 2.40 as libc.
+Oct 02 00:23:22.044 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Oct 02 00:23:22.044 [notice] Read configuration file "/home/renner/special/mac0499-prototype/src/tor/torrc".
+Oct 02 00:23:22.044 [warn] Path for DataDirectory (tor/data) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data. Is this what you wanted?
+Oct 02 00:23:22.044 [warn] Path for HiddenServiceDir (tor/data/hidden-service) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data/hidden-service. Is this what you wanted?
+Oct 02 00:23:22.045 [notice] Opening Socks listener on 127.0.0.1:5878
+Oct 02 00:23:22.045 [notice] Opened Socks listener connection (ready) on 127.0.0.1:5878
+Oct 02 00:23:22.000 [warn] It looks like another Tor process is running with the same data directory.  Waiting 5 seconds to see if it goes away.
+Oct 02 00:23:27.000 [err] No, it's still there.  Exiting.
+Oct 02 00:23:27.000 [err] set_options(): Bug: Acting on config options left us in a broken state. Dying. (on Tor 0.4.8.12 )
+Oct 02 00:23:27.000 [err] Reading config failed--see warnings above.

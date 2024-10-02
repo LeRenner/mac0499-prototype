@@ -91,3 +91,49 @@ pre {
     background-color: #ccc;
     border-bottom: 2px solid #000;
 }
+
+#message-sender-container {
+    display: flex;
+    align-items: center;
+}
+
+#message-sender-container input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+#message-sender-container button {
+    flex-shrink: 0;
+}
+
+
+
+.message-timestamp, .message-content {
+    display: inline-block;
+    max-width: calc(100% - 20px);
+}
+
+.message {
+    background-color: #e5e5e5;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.chats-top, .new-chat {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#new-chat-button {
+    margin: 20px;
+}
+
+.sentMessage {
+    background-color: #52a6ff;
+    border-radius: 4px;
+    padding: 8px;
+    margin-left: auto;
+    margin-right: 20px;
+    color: white;
+}

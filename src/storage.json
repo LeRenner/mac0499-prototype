@@ -11,5 +11,12 @@
             }
         ]
     },
-    "sentMessages": {}
+    "sentMessages": {
+        "bmqk3imjw3ytjejbfj77wjxvxy3dls6r7hdpf42tio7ovlmjlwgt25yd.onion": [
+            {
+                "content": "lol xd",
+                "timestamp": 1727838168
+            }
+        ]
+    }
 }

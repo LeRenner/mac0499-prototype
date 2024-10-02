@@ -4,6 +4,7 @@ import requests
 import json
 import datetime
 import hashlib
+from time import sleep
 
 global localHttpPort
 global localSocksPort
@@ -63,7 +64,9 @@ def sendMessage():
     global address
 
     # get message and address from the post request
-    decodedMessage = json.loads(flask.request.form.get("message"))
+    decodedMessage = flask.request.get_json()
+
+    print(f"Decoded message: {decodedMessage}")
 
     destination = decodedMessage["address"]
     messageContent = decodedMessage["message"]
@@ -83,8 +86,12 @@ def sendMessage():
         'http': 'socks5h://localhost:{}'.format(localSocksPort)
     }
 
+    print("Destination: ", destination)
+    print("Proxies: ", proxies)
+    print("Message: ", packagedMessage)
+
     for i in range(3):
-        try:
+        if 1:
             response = requests.post(f"http://{destination}/receiveMessage", data={"message": packagedMessage}, proxies=proxies)
             if response.status_code == 200:
                 response_data = response.json()
@@ -97,13 +104,13 @@ def sendMessage():
                     print("SHA256 mismatch! Message verification failed.")
             else:
                 print(f"Erro ao enviar mensagem: {response.text}")
-                return "Error sending message!"
-        except requests.exceptions.ConnectionError:
-            print(f"Erro. Tentando novamente em 5 segundos...")
-            sleep(5)
-            continue
+                return json.dumps({"error": "Error sending message!"})
+        # except requests.exceptions.ConnectionError:
+        #     print(f"Erro. Tentando novamente em 5 segundos...")
+        #     sleep(5)
+        #     continue
     else:
-        return "Error sending message after multiple attempts!"
+        return json.dumps({"error": "Error sending message after multiple attempts!"})
 
     # Store the message in storage.json
     try:
@@ -126,7 +133,7 @@ def sendMessage():
     with open("storage.json", "w") as f:
         json.dump(storage, f, indent=4)
 
-    return "Message sent!"
+    return json.dumps({"message": "Message sent!"})
 
 
 def getMessagesFromSender():
@@ -136,18 +143,29 @@ def getMessagesFromSender():
         with open("storage.json", "r") as f:
             storage = json.load(f)
     except FileNotFoundError:
-        return json.dumps({"messages": []})
+        return json.dumps({"receivedMessages": [], "sentMessages": []})
 
-    print(storage)
+    receivedMessages = storage.get("receivedMessages", {}).get(sender, [])
+    sentMessages = storage.get("sentMessages", {}).get(sender, [])
 
-    receivedMessages = storage.get("receivedMessages", {})
-    messages = receivedMessages.get(sender, [])
+    # Add sender field to each received message
+    for message in receivedMessages:
+        message["sender"] = sender
+
+    # Add sender field to each sent message
+    for message in sentMessages:
+        message["sender"] = address
+
+    # Sort messages by timestamp
+    receivedMessages.sort(key=lambda msg: msg["timestamp"])
+    sentMessages.sort(key=lambda msg: msg["timestamp"])
 
     response = {
-        "messages": messages
+        "receivedMessages": receivedMessages,
+        "sentMessages": sentMessages
     }
 
-    print(f"Messages from {sender}: {messages}")
+    print(f"Messages from {sender}: {response}")
 
     return json.dumps(response)
 
@@ -160,8 +178,10 @@ def getLatestMessages():
         return json.dumps({"messages": []})
 
     receivedMessages = storage.get("receivedMessages", {})
+    sentMessages = storage.get("sentMessages", {})
     latestMessages = []
 
+    # Get the latest received messages
     for sender, messages in receivedMessages.items():
         if messages:
             latest_message = max(messages, key=lambda msg: msg["timestamp"])
@@ -169,38 +189,22 @@ def getLatestMessages():
             latest_message_with_sender["sender"] = sender
             latestMessages.append(latest_message_with_sender)
 
+    # Get the latest sent messages
+    for recipient, messages in sentMessages.items():
+        if messages:
+            latest_message = max(messages, key=lambda msg: msg["timestamp"])
+            latest_message_with_sender = latest_message.copy()
+            latest_message_with_sender["sender"] = recipient  # Use the recipient address
+            latestMessages.append(latest_message_with_sender)
+
+    # Sort all latest messages by timestamp
+    latestMessages.sort(key=lambda msg: msg["timestamp"], reverse=True)
+
     response = {
         "messages": latestMessages
     }
 
-    print(f"Latest messages: {latestMessages}")
-
-    return json.dumps(response)
-
-
-# generates json and returns request
-def getMessages():
-    # read all messages from "messages.txt"
-    messages = []
-
-    messageFile = open("messages.txt", "r")
-    messageList = messageFile.readlines()
-    messageFile.close()
-
-    for line in messageList:
-        if line.strip() == "" or line.strip() == "\n":
-            continue
-        else:
-            try:
-                message = json.loads(line)
-                messages.append(message)
-            except json.JSONDecodeError:
-                print(f"Error decoding message: {line}")
-
-    response = {
-        "messages": messages,
-        "address": address
-    }
+    print(f"Latest messages: {response}")
 
     return json.dumps(response)
 
@@ -253,7 +257,6 @@ def setupEndpoints(app, address, localSocksPort):
     app.add_url_rule("/getMessagesFromSender", "getMessagesFromSender", getMessagesFromSender, methods=["POST"])
     app.add_url_rule("/sendMessage", "sendMessage", sendMessage, methods=["POST"])
     app.add_url_rule("/getLatestMessages", "getLatestMessages", getLatestMessages)
-    app.add_url_rule("/getMessages", "getMessages", getMessages)
     app.add_url_rule("/getSenders", "getSenders", getSenders)
     app.add_url_rule("/web", "webInterface", webInterface, defaults={'filename': ''})
     app.add_url_rule("/web/", "webInterface", webInterface, defaults={'filename': ''})

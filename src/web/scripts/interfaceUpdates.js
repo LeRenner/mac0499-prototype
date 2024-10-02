@@ -9,6 +9,8 @@ async function generateChatList() {
     try {
         const messages = await getLatestMessages();
 
+        console.log('Received messages: ' + JSON.stringify(messages));
+
         // Hash the messages content
         const messagesString = JSON.stringify(messages);
         const currentMessagesHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(messagesString));
@@ -58,12 +60,20 @@ let previousMessagesHash = '';
 
 async function generateMessageList() {
     try {
+        console.log(currentChatAddress);
+
         const messages = await getMessagesFromSender(currentChatAddress);
 
-        console.log('Messages from ' + currentChatAddress + ': ' + JSON.stringify(messages));
+        console.log('Received messages: ' + JSON.stringify(messages));
+
+        // Combine receivedMessages and sentMessages
+        const allMessages = [...messages.receivedMessages, ...messages.sentMessages];
+
+        // Sort messages chronologically by timestamp
+        allMessages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
         // Hash the messages content
-        const messagesString = JSON.stringify(messages);
+        const messagesString = JSON.stringify(allMessages);
         const currentMessagesHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(messagesString));
         const currentMessagesHashHex = Array.from(new Uint8Array(currentMessagesHash)).map(b => b.toString(16).padStart(2, '0')).join('');
 
@@ -76,16 +86,17 @@ async function generateMessageList() {
         previousMessagesHash = currentMessagesHashHex;
 
         // check messages length
-        if (messages.length === 0) {
-            document.getElementById('chat').innerHTML = 'No messages received yet...';
+        if (allMessages.length === 0) {
+            document.getElementById('receivedMessages').innerHTML = 'No messages received yet...';
         } else {
             let chatList = '';
 
-            messages.forEach(message => {
+            allMessages.forEach(message => {
                 const formattedTimestamp = convertTimestamp(message.timestamp);
+                const messageClass = message.sender === currentChatAddress ? 'receivedMessage' : 'sentMessage';
 
                 chatList += `
-                    <div class="message">
+                    <div class="message ${messageClass}">
                         <p class="message-content">
                             ${message.content}
                         </p>
@@ -96,7 +107,10 @@ async function generateMessageList() {
                 `;
             });
 
-            document.getElementById('chat').innerHTML = chatList;
+            document.getElementById('receivedMessages').innerHTML = chatList;
+
+            // update sender-address with currentChatAddress
+            document.getElementById('sender-address').innerHTML = currentChatAddress;
         }
     } catch (error) {
         console.log('Error receiving messages: ' + error.message);
@@ -153,4 +167,22 @@ async function getFriends() {
         console.log('Error receiving friends: ' + error.message);
         document.getElementById('status').innerHTML = 'Error receiving friends';
     }
+}
+
+
+async function showNewChat() {
+    // switch between showing and hiding objects with class new-chat
+    const newChat = document.querySelector('.new-chat');
+    const newChatDisplay = newChat.style.display;
+    newChat.style.display = newChatDisplay === 'block' ? 'none' : 'block';
+}
+
+
+async function addChat() {
+    currentChatAddress = document.getElementById('new-chat-address').value;
+
+    // clear the input field
+    document.getElementById('new-chat-address').value = '';
+
+    changeInterfaceState(1);
 }

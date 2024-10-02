@@ -13,7 +13,7 @@ async function getMessagesFromSender(sender) {
 
         const data = await response.json();
 
-        return data.messages;
+        return data;
     } catch (error) {
         return {};
     }
@@ -37,10 +37,13 @@ async function getLatestMessages() {
 
 
 // returns list of messages from specific sender
-async function sendMessage(messageContent, address) {
+async function requestSendMessage(messageContent, address) {
     try {
         const response = await fetch('/sendMessage', {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 address: address,
                 message: messageContent
@@ -54,6 +57,7 @@ async function sendMessage(messageContent, address) {
         return {};
     }
 }
+
 
 // returns list with the latest message from each sender
 async function getLatestMessages() {
@@ -93,19 +97,14 @@ async function getFriends() {
 async function sendMessage() {
     const messageCont = document.getElementById('message').value;
 
-    document.getElementById('status').innerHTML = 'Sending message...';
-
     try {
-        const result = await sendMessage(messageCont, currentChatAddress);
+        const result = await requestSendMessage(messageCont, currentChatAddress);
 
         if (result.success) {
-            document.getElementById('status').innerHTML = 'Message sent successfully!';
             document.getElementById('message').value = '';
         } else {
-            document.getElementById('status').innerHTML = 'Error sending message';
         }
     } catch (error) {
         console.log('Error sending message: ' + error.message);
-        document.getElementById('status').innerHTML = 'Error sending message';
     }
 }

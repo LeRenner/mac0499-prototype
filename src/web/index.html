@@ -14,18 +14,26 @@
             <button class="tablinks" id="friends-tab">Friends</button>
         </div>
         <div id="senderList">
-            <h2>Chats</h2>
+            <div class="chats-top">
+                <h2>Chats</h2>
+                <button onclick="showNewChat()" id="new-chat-button">New Chat</button>
+            </div>
+            <div class="new-chat" style="display: none;">
+                <input type="text" id="new-chat-address" placeholder="Enter Address">
+                <button onclick="addChat()">Add Chat</button>
+            </div>
             <div id="senders"><p>No senders yet.</p></div>
         </div>
         <div class="container" id="chat">
-            <pre>Current status: <pre id="status">NOT STARTED</pre></pre>
-            <h2>Send a Message</h2>
-            <input type="text" id="destAddress" placeholder="Enter Address">
-            <input type="text" id="message" placeholder="Enter Message">
-            <button onclick="sendMessage()">Send Message</button>
-    
-            <h2>Received Messages</h2>
-            <pre id="receivedMessages">No message received yet.</pre>
+            <h2>Messages with:</h2>
+            <pre id="sender-address">UNDEFINED</pre>
+            <div id="receivedMessages">No message received yet.</div>
+            <div id="message-sender-container"></div>
+                <input type="text" id="message" placeholder="Enter Message">
+                <button onclick="sendMessage()">
+                    Ʌ
+                </button>
+            </div>
         </div>
         <div class="container" id="friends">
             <h2>Add alias for friend</h2>
