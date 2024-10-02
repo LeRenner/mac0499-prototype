@@ -186,3 +186,20 @@ async function addChat() {
 
     changeInterfaceState(1);
 }
+
+
+async function updateAddress() {
+    // gets address from the server and updates the address element
+    try {
+        const response = await fetch('/getAddress', {
+            method: 'GET'
+        });
+
+        const data = await response.json();
+
+        document.getElementById('address').innerHTML = data.address;
+    } catch (error) {
+        console.log('Error receiving address: ' + error.message);
+        document.getElementById('status').innerHTML = 'Error receiving address';
+    }
+}

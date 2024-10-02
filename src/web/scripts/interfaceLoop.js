@@ -79,3 +79,5 @@ document.getElementById('senders').style.display = 'block';
 document.getElementById('chat').style.display = 'none';
 document.getElementById('friends').style.display = 'none';
 interfaceState = 0;
+
+updateAddress();

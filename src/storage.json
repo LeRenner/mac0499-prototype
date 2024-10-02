@@ -1,21 +1,37 @@
 {
     "receivedMessages": {
-        "mkl2b3hxadsfza2k3u554s5w6hpth2zgkakbd5ydern6h57dcvggbiyd.onion": [
+        "k7s7vzvnlzsijkbzeatq2k75d3ov5mq5xupxt3rifouiwquxnbmzcsqd.onion": [
             {
-                "content": "Hello, world!",
-                "timestamp": 1727833167
+                "content": "yoooooooo wtf",
+                "timestamp": 1727839737
+            }
+        ],
+        "ntsczsnqj4ehk5tix7xikqfnnk2ke3qe25fmr7zmyvhmxvt3p2rsa4ad.onion": [
+            {
+                "content": "hwlllo, ",
+                "timestamp": 1727840167
             },
             {
-                "content": "Lmao I like dick",
-                "timestamp": 1727833361
+                "content": "and ",
+                "timestamp": 1727840209
             }
         ]
     },
     "sentMessages": {
-        "bmqk3imjw3ytjejbfj77wjxvxy3dls6r7hdpf42tio7ovlmjlwgt25yd.onion": [
+        "k7s7vzvnlzsijkbzeatq2k75d3ov5mq5xupxt3rifouiwquxnbmzcsqd.onion": [
             {
-                "content": "lol xd",
-                "timestamp": 1727838168
+                "content": "heyyyy, lmao",
+                "timestamp": 1727839715
+            }
+        ],
+        "ntsczsnqj4ehk5tix7xikqfnnk2ke3qe25fmr7zmyvhmxvt3p2rsa4ad.onion": [
+            {
+                "content": "lmao hiiiiiii",
+                "timestamp": 1727840134
+            },
+            {
+                "content": "I like to eat soup",
+                "timestamp": 1727840192
             }
         ]
     }

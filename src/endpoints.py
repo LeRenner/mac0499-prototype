@@ -169,7 +169,6 @@ def getMessagesFromSender():
 
     return json.dumps(response)
 
-
 def getLatestMessages():
     try:
         with open("storage.json", "r") as f:
@@ -179,7 +178,7 @@ def getLatestMessages():
 
     receivedMessages = storage.get("receivedMessages", {})
     sentMessages = storage.get("sentMessages", {})
-    latestMessages = []
+    latestMessages = {}
 
     # Get the latest received messages
     for sender, messages in receivedMessages.items():
@@ -187,7 +186,7 @@ def getLatestMessages():
             latest_message = max(messages, key=lambda msg: msg["timestamp"])
             latest_message_with_sender = latest_message.copy()
             latest_message_with_sender["sender"] = sender
-            latestMessages.append(latest_message_with_sender)
+            latestMessages[sender] = latest_message_with_sender
 
     # Get the latest sent messages
     for recipient, messages in sentMessages.items():
@@ -195,18 +194,24 @@ def getLatestMessages():
             latest_message = max(messages, key=lambda msg: msg["timestamp"])
             latest_message_with_sender = latest_message.copy()
             latest_message_with_sender["sender"] = recipient  # Use the recipient address
-            latestMessages.append(latest_message_with_sender)
+            if recipient not in latestMessages or latest_message_with_sender["timestamp"] > latestMessages[recipient]["timestamp"]:
+                latestMessages[recipient] = latest_message_with_sender
 
-    # Sort all latest messages by timestamp
-    latestMessages.sort(key=lambda msg: msg["timestamp"], reverse=True)
+    # Convert the dictionary to a list and sort by timestamp
+    latestMessagesList = list(latestMessages.values())
+    latestMessagesList.sort(key=lambda msg: msg["timestamp"], reverse=True)
 
     response = {
-        "messages": latestMessages
+        "messages": latestMessagesList
     }
 
     print(f"Latest messages: {response}")
 
     return json.dumps(response)
+
+
+def getAddress():
+    return json.dumps({"address": address})
 
 
 def getSenders():
@@ -244,10 +249,6 @@ def initializeFlask():
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
 
-    # create messages.txt file
-    with open("messages.txt", "a") as f:
-        pass
-
     return app
 
 
@@ -258,6 +259,7 @@ def setupEndpoints(app, address, localSocksPort):
     app.add_url_rule("/sendMessage", "sendMessage", sendMessage, methods=["POST"])
     app.add_url_rule("/getLatestMessages", "getLatestMessages", getLatestMessages)
     app.add_url_rule("/getSenders", "getSenders", getSenders)
+    app.add_url_rule("/getAddress", "getAddress", getAddress)
     app.add_url_rule("/web", "webInterface", webInterface, defaults={'filename': ''})
     app.add_url_rule("/web/", "webInterface", webInterface, defaults={'filename': ''})
     app.add_url_rule("/web/<path:filename>", "webInterface", webInterface)
