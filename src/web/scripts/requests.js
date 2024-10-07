@@ -52,9 +52,11 @@ async function requestSendMessage(messageContent, address) {
 
         const data = await response.json();
 
+        console.log(data);
+
         return data;
     } catch (error) {
-        return {};
+        return {"error": "Local request failed"};
     }
 }
 
@@ -147,14 +149,33 @@ async function removeFriend() {
 ///////////////////////////////////////////////
 
 async function sendMessage() {
+    document.querySelector('.sending-message').style.display = 'block';
+    document.querySelector('.message-sent').style.display = 'none';
+    document.querySelector('.message-error').style.display = 'none';
+
     const messageCont = document.getElementById('message').value;
 
     try {
         const result = await requestSendMessage(messageCont, currentChatAddress);
 
-        if (result.success) {
+        if (!result.error) {
+            document.querySelector('.sending-message').style.display = 'none';
+            document.querySelector('.message-sent').style.display = 'block';
+
+            setTimeout(() => {
+                document.querySelector('.message-sent').style.display = 'none';
+            }, 3000);
+
             document.getElementById('message').value = '';
         } else {
+            document.querySelector('.message-error').textContent = result.error;
+
+            document.querySelector('.sending-message').style.display = 'none';
+            document.querySelector('.message-error').style.display = 'block';
+
+            setTimeout(() => {
+                document.querySelector('.message-error').style.display = 'none';
+            }, 10000);
         }
     } catch (error) {
         console.log('Error sending message: ' + error.message);

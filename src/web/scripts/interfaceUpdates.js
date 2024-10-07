@@ -95,25 +95,57 @@ async function generateMessageList() {
             let chatList = '';
 
             allMessages.forEach(message => {
-                const formattedTimestamp = convertTimestamp(message.timestamp);
-                const messageClass = message.sender === currentChatAddress ? 'receivedMessage' : 'sentMessage';
+            const formattedTimestamp = convertTimestamp(message.timestamp);
+            const messageClass = message.sender === currentChatAddress ? 'receivedMessage' : 'sentMessage';
 
+            if (message.sender === currentChatAddress) {
                 chatList += `
+                <div class="message-container">
                     <div class="message ${messageClass}">
-                        <p class="message-content">
-                            ${message.content}
-                        </p>
-                        <p class="message-timestamp">
-                            ${formattedTimestamp}
-                        </p>
-                    </div><br/>
+                    <p class="message-content">
+                        ${message.content}
+                    </p>
+                    <p class="message-timestamp">
+                        ${formattedTimestamp}
+                    </p>
+                    </div>
+                    <div class="spacer"></div>
+                </div>
+                <div class="messageSpacer"></div>
                 `;
+            } else {
+                chatList += `
+                <div class="message-container">
+                    <div class="spacer"></div>
+                    <div class="message ${messageClass}">
+                    <p class="message-content">
+                        ${message.content}
+                    </p>
+                    <p class="message-timestamp">
+                        ${formattedTimestamp}
+                    </p>
+                    </div>
+                </div>
+                <div class="messageSpacer"></div>
+                `;
+            }
             });
 
             document.getElementById('receivedMessages').innerHTML = chatList;
 
             // update sender-address with currentChatAddress
-            document.getElementById('sender-address').innerHTML = currentChatAddress;
+            let senderAlias = currentChatAddress;
+            const friends = await getFriends();
+            friends.forEach(friend => {
+                if (friend.address === currentChatAddress) {
+                    senderAlias = friend.alias;
+                }
+            });
+            document.getElementById('sender-address').innerHTML = senderAlias;
+
+            // Scroll to the end of the div with ID receivedMessages
+            const receivedMessagesDiv = document.getElementById('receivedMessages');
+            receivedMessagesDiv.scrollTop = receivedMessagesDiv.scrollHeight;
         }
     } catch (error) {
         console.log('Error receiving messages: ' + error.message);

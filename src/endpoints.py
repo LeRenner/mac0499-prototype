@@ -66,8 +66,6 @@ def sendMessage():
     # get message and address from the post request
     decodedMessage = flask.request.get_json()
 
-    print(f"Decoded message: {decodedMessage}")
-
     destination = decodedMessage["address"]
     messageContent = decodedMessage["message"]
 
@@ -86,31 +84,28 @@ def sendMessage():
         'http': 'socks5h://localhost:{}'.format(localSocksPort)
     }
 
-    print("Destination: ", destination)
-    print("Proxies: ", proxies)
-    print("Message: ", packagedMessage)
-
     for i in range(3):
-        if 1:
+        try:
             response = requests.post(f"http://{destination}/receiveMessage", data={"message": packagedMessage}, proxies=proxies)
             if response.status_code == 200:
                 response_data = response.json()
                 received_sha256 = response_data.get("sha256")
                 calculated_sha256 = hashlib.sha256(messageContent.encode()).hexdigest()
                 if received_sha256 == calculated_sha256:
-                    print("Message sent and verified successfully!")
                     break
                 else:
                     print("SHA256 mismatch! Message verification failed.")
+                    continue
             else:
-                print(f"Erro ao enviar mensagem: {response.text}")
-                return json.dumps({"error": "Error sending message!"})
-        # except requests.exceptions.ConnectionError:
-        #     print(f"Erro. Tentando novamente em 5 segundos...")
-        #     sleep(5)
-        #     continue
+                print(f"Erro. Tentando novamente em 5 segundos...")
+                sleep(5)
+                continue
+        except requests.exceptions.ConnectionError:
+            print(f"Erro. Tentando novamente em 5 segundos...")
+            sleep(5)
+            continue
     else:
-        return json.dumps({"error": "Error sending message after multiple attempts!"})
+        return json.dumps({"error": "Failed to send message after three tries!"})
 
     # Store the message in storage.json
     try:
@@ -164,8 +159,6 @@ def getMessagesFromSender():
         "receivedMessages": receivedMessages,
         "sentMessages": sentMessages
     }
-
-    print(f"Messages from {sender}: {response}")
 
     return json.dumps(response)
 

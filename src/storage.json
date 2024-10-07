@@ -1,56 +1,108 @@
 {
     "receivedMessages": {
-        "k7s7vzvnlzsijkbzeatq2k75d3ov5mq5xupxt3rifouiwquxnbmzcsqd.onion": [
+        "mlzkxqm2aypmyorru2gdr77cl2hfkzuii5thmiydvqvovve7zgspd7qd.onion": [
             {
-                "content": "yoooooooo wtf",
-                "timestamp": 1727839737
-            }
-        ],
-        "ntsczsnqj4ehk5tix7xikqfnnk2ke3qe25fmr7zmyvhmxvt3p2rsa4ad.onion": [
-            {
-                "content": "hwlllo, ",
-                "timestamp": 1727840167
+                "content": "Ol\u00e1",
+                "timestamp": 1728068865
             },
             {
-                "content": "and ",
-                "timestamp": 1727840209
-            }
-        ],
-        "mgvj7q6lcqbbscu722pc7mml6hblwdq6m4z2pwjec2knbassgwuhylyd.onion": [
+                "content": "Ol\u00e1",
+                "timestamp": 1728069148
+            },
             {
-                "content": "Hello",
-                "timestamp": 1727844462
+                "content": "Ol\u00e1",
+                "timestamp": 1728069148
+            },
+            {
+                "content": "Isso \u00e9 um teste",
+                "timestamp": 1728069211
+            },
+            {
+                "content": "111",
+                "timestamp": 1728069261
+            },
+            {
+                "content": "asidioas",
+                "timestamp": 1728322938
+            },
+            {
+                "content": "asidioas",
+                "timestamp": 1728322938
+            },
+            {
+                "content": "oisahdoiashdohasiodhasd",
+                "timestamp": 1728322947
+            },
+            {
+                "content": "oisahdoiashdohasiodhasd",
+                "timestamp": 1728322947
+            },
+            {
+                "content": "Batatas haisodhiaoshdoiasd",
+                "timestamp": 1728322955
+            },
+            {
+                "content": "Batatas haisodhiaoshdoiasd",
+                "timestamp": 1728322955
             }
         ]
     },
     "sentMessages": {
-        "k7s7vzvnlzsijkbzeatq2k75d3ov5mq5xupxt3rifouiwquxnbmzcsqd.onion": [
+        "mlzkxqm2aypmyorru2gdr77cl2hfkzuii5thmiydvqvovve7zgspd7qd.onion": [
             {
-                "content": "heyyyy, lmao",
-                "timestamp": 1727839715
-            }
-        ],
-        "ntsczsnqj4ehk5tix7xikqfnnk2ke3qe25fmr7zmyvhmxvt3p2rsa4ad.onion": [
-            {
-                "content": "lmao hiiiiiii",
-                "timestamp": 1727840134
+                "content": "Bom dia",
+                "timestamp": 1728068897
             },
             {
-                "content": "I like to eat soup",
-                "timestamp": 1727840192
-            }
-        ],
-        "mgvj7q6lcqbbscu722pc7mml6hblwdq6m4z2pwjec2knbassgwuhylyd.onion": [
+                "content": "eu gost ahsoidahdiohsaoida asdiaos hdiaoshdosahdiaosh dioasidao isoa do doiaoda idsoa soida ds",
+                "timestamp": 1728322156
+            },
             {
-                "content": "Omg omg hiiiii",
-                "timestamp": 1727844477
+                "content": "bom dia eu gosto de nutella",
+                "timestamp": 1728324368
+            },
+            {
+                "content": "bom dia eu gosto de nutella",
+                "timestamp": 1728324398
+            },
+            {
+                "content": "bom dia eu gosto de nutella",
+                "timestamp": 1728324399
+            },
+            {
+                "content": "bom dia eu gosto de nutella",
+                "timestamp": 1728324399
+            },
+            {
+                "content": "baata",
+                "timestamp": 1728325138
+            },
+            {
+                "content": "oahidohsidoasd",
+                "timestamp": 1728325466
+            },
+            {
+                "content": "lmao hiiii",
+                "timestamp": 1728325812
+            },
+            {
+                "content": "oaisdoahs",
+                "timestamp": 1728326088
+            },
+            {
+                "content": "hehehehehhe",
+                "timestamp": 1728326136
+            },
+            {
+                "content": "heheheheh",
+                "timestamp": 1728326170
             }
         ]
     },
     "friends": [
         {
-            "address": "ntsczsnqj4ehk5tix7xikqfnnk2ke3qe25fmr7zmyvhmxvt3p2rsa4ad.onion",
-            "alias": "viado"
+            "address": "mlzkxqm2aypmyorru2gdr77cl2hfkzuii5thmiydvqvovve7zgspd7qd.onion",
+            "alias": "lmao"
         }
     ]
 }

@@ -1,19 +1,19 @@
-Oct 02 01:30:55.599 [notice] Tor 0.4.8.12 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.3.2, Zlib 1.3.1, Liblzma 5.6.2, Libzstd 1.5.6 and Glibc 2.40 as libc.
-Oct 02 01:30:55.599 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
-Oct 02 01:30:55.599 [notice] Read configuration file "/home/renner/special/mac0499-prototype/src/tor/torrc".
-Oct 02 01:30:55.600 [warn] Path for DataDirectory (tor/data) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data. Is this what you wanted?
-Oct 02 01:30:55.600 [warn] Path for HiddenServiceDir (tor/data/hidden-service) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data/hidden-service. Is this what you wanted?
-Oct 02 01:30:55.600 [notice] Opening Socks listener on 127.0.0.1:5878
-Oct 02 01:30:55.600 [notice] Opened Socks listener connection (ready) on 127.0.0.1:5878
-Oct 02 01:30:55.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
-Oct 02 01:30:55.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
-Oct 02 01:30:55.000 [notice] Bootstrapped 0% (starting): Starting
-Oct 02 01:30:56.000 [notice] Starting with guard context "default"
-Oct 02 01:30:57.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
-Oct 02 01:30:57.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
-Oct 02 01:30:57.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
-Oct 02 01:30:58.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
-Oct 02 01:30:58.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough directory info to build circuits
-Oct 02 01:30:58.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
-Oct 02 01:30:58.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
-Oct 02 01:30:58.000 [notice] Bootstrapped 100% (done): Done
+Oct 07 15:41:43.692 [notice] Tor 0.4.8.12 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.3.2, Zlib 1.3.1, Liblzma 5.6.2, Libzstd 1.5.6 and Glibc 2.40 as libc.
+Oct 07 15:41:43.692 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Oct 07 15:41:43.692 [notice] Read configuration file "/home/renner/special/mac0499-prototype/src/tor/torrc".
+Oct 07 15:41:43.692 [warn] Path for DataDirectory (tor/data) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data. Is this what you wanted?
+Oct 07 15:41:43.692 [warn] Path for HiddenServiceDir (tor/data/hidden-service) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data/hidden-service. Is this what you wanted?
+Oct 07 15:41:43.693 [notice] Opening Socks listener on 127.0.0.1:5876
+Oct 07 15:41:43.693 [notice] Opened Socks listener connection (ready) on 127.0.0.1:5876
+Oct 07 15:41:43.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
+Oct 07 15:41:43.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
+Oct 07 15:41:43.000 [notice] Bootstrapped 0% (starting): Starting
+Oct 07 15:41:44.000 [notice] Starting with guard context "default"
+Oct 07 15:41:45.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
+Oct 07 15:41:45.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
+Oct 07 15:41:45.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
+Oct 07 15:41:46.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
+Oct 07 15:41:46.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough directory info to build circuits
+Oct 07 15:41:46.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
+Oct 07 15:41:46.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
+Oct 07 15:41:47.000 [notice] Bootstrapped 100% (done): Done

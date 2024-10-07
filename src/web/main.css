@@ -3,7 +3,7 @@ body {
 }
 
 .container {
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
@@ -70,7 +70,6 @@ pre {
 
 .tabs {
     display: flex;
-    border-bottom: 1px solid #ddd;
 }
 
 .tablinks {
@@ -92,6 +91,11 @@ pre {
     border-bottom: 2px solid #000;
 }
 
+#message {
+    width: 600px;
+    margin-top: 20px;
+}
+
 #message-sender-container {
     display: flex;
     align-items: center;
@@ -100,10 +104,24 @@ pre {
 #message-sender-container input {
     flex: 1;
     margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
-#message-sender-container button {
+.sendMessageButton {
     flex-shrink: 0;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ebebeb;
+    color: black;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.sendMessageButton:hover {
+    background-color: #ddd;
 }
 
 
@@ -117,6 +135,9 @@ pre {
     background-color: #e5e5e5;
     padding: 8px;
     border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .chats-top, .new-chat, .friends-top, .new-friend {
@@ -133,10 +154,30 @@ pre {
     background-color: #52a6ff;
     border-radius: 4px;
     padding: 8px;
-    margin-left: auto;
-    margin-right: 20px;
     color: white;
     text-align: right;
+
+    margin: 0;
+    margin-left: 50px;
+}
+
+.receivedMessage {
+    margin: 0;
+    margin-right: 50px;
+}
+
+#receivedMessages {
+    max-height: 550px;
+    overflow-y: auto;
+    display:flex;
+    flex-direction: column;
+    justify-content: 20px;
+    padding-right: 10px;
+}
+
+.messageSpacer {
+    height: 10px;
+    min-height: 10px;
 }
 
 .friend {
@@ -154,6 +195,35 @@ pre {
     text-align: center;
 }
 
+.chat-hr {
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+}
+
+
 #address {
     text-decoration: underline;
+}
+.message-container {
+    display: flex;
+    align-items: flex-start;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.message-content {
+    margin: 0;
+    margin-right: 20px;
+}
+
+.message-timestamp {
+    font-size: 12px;
+    color: #999;
+    margin: 0px;
+}
+
+.sentMessage .message-timestamp {
+    color: white;
 }
