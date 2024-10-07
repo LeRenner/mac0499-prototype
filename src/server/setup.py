@@ -18,6 +18,7 @@ def setupTor():
     torAddress = ""
     localSocksPort = 0
     localHttpPort = 0
+    torMiddlewarePort = 0
 
     # find 3 free ports between 5000 and 35000
     for i in range(5876, 35000):
@@ -30,8 +31,13 @@ def setupTor():
             localHttpPort = i
             break
     
+    for i in range(localHttpPort + 1, 35000):
+        if portIsOpen(i):
+            torMiddlewarePort = i
+            break
+    
     # pretty print the ports
-    print(f"Usando SOCKS5 na porta {localSocksPort}, HTTP na porta {localHttpPort}")
+    print(f"Usando SOCKS5 na porta {localSocksPort}, HTTP na porta {localHttpPort} e middleware na porta {torMiddlewarePort}.")
     os.sys.stdout.flush()
 
     # check if ./tor already exists
@@ -48,7 +54,7 @@ def setupTor():
 
     # overwrite torrc file with the correct ports
     torrc = open("./tor/torrc", "w")
-    torrc.write("DataDirectory tor/data\nHiddenServiceDir tor/data/hidden-service\nHiddenServicePort 80 127.0.0.1:" + str(localHttpPort) + "\nSocksPort " + str(localSocksPort) + "\nHTTPTunnelPort 0\n")
+    torrc.write("DataDirectory tor/data\nHiddenServiceDir tor/data/hidden-service\nHiddenServicePort 80 127.0.0.1:" + str(torMiddlewarePort) + "\nSocksPort " + str(localSocksPort) + "\nHTTPTunnelPort 0\n")
     torrc.close()
 
     # create log file
@@ -77,4 +83,4 @@ def setupTor():
     with open("./tor/data/hidden-service/hostname") as f:
         torAddress = f.read()
     
-    return (process, torAddress, localSocksPort, localHttpPort)
+    return (process, torAddress, localSocksPort, localHttpPort, torMiddlewarePort)

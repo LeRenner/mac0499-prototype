@@ -2,107 +2,21 @@
     "receivedMessages": {
         "mlzkxqm2aypmyorru2gdr77cl2hfkzuii5thmiydvqvovve7zgspd7qd.onion": [
             {
-                "content": "Ol\u00e1",
-                "timestamp": 1728068865
-            },
-            {
-                "content": "Ol\u00e1",
-                "timestamp": 1728069148
-            },
-            {
-                "content": "Ol\u00e1",
-                "timestamp": 1728069148
-            },
-            {
-                "content": "Isso \u00e9 um teste",
-                "timestamp": 1728069211
-            },
-            {
-                "content": "111",
-                "timestamp": 1728069261
-            },
-            {
-                "content": "asidioas",
-                "timestamp": 1728322938
-            },
-            {
-                "content": "asidioas",
-                "timestamp": 1728322938
-            },
-            {
-                "content": "oisahdoiashdohasiodhasd",
-                "timestamp": 1728322947
-            },
-            {
-                "content": "oisahdoiashdohasiodhasd",
-                "timestamp": 1728322947
-            },
-            {
-                "content": "Batatas haisodhiaoshdoiasd",
-                "timestamp": 1728322955
-            },
-            {
-                "content": "Batatas haisodhiaoshdoiasd",
-                "timestamp": 1728322955
+                "content": "hahahaha",
+                "timestamp": 1728337600
             }
         ]
     },
     "sentMessages": {
         "mlzkxqm2aypmyorru2gdr77cl2hfkzuii5thmiydvqvovve7zgspd7qd.onion": [
             {
-                "content": "Bom dia",
-                "timestamp": 1728068897
+                "content": "omg hiiiiii",
+                "timestamp": 1728337612
             },
             {
-                "content": "eu gost ahsoidahdiohsaoida asdiaos hdiaoshdosahdiaosh dioasidao isoa do doiaoda idsoa soida ds",
-                "timestamp": 1728322156
-            },
-            {
-                "content": "bom dia eu gosto de nutella",
-                "timestamp": 1728324368
-            },
-            {
-                "content": "bom dia eu gosto de nutella",
-                "timestamp": 1728324398
-            },
-            {
-                "content": "bom dia eu gosto de nutella",
-                "timestamp": 1728324399
-            },
-            {
-                "content": "bom dia eu gosto de nutella",
-                "timestamp": 1728324399
-            },
-            {
-                "content": "baata",
-                "timestamp": 1728325138
-            },
-            {
-                "content": "oahidohsidoasd",
-                "timestamp": 1728325466
-            },
-            {
-                "content": "lmao hiiii",
-                "timestamp": 1728325812
-            },
-            {
-                "content": "oaisdoahs",
-                "timestamp": 1728326088
-            },
-            {
-                "content": "hehehehehhe",
-                "timestamp": 1728326136
-            },
-            {
-                "content": "heheheheh",
-                "timestamp": 1728326170
+                "content": "helloooooo",
+                "timestamp": 1728338018
             }
         ]
-    },
-    "friends": [
-        {
-            "address": "mlzkxqm2aypmyorru2gdr77cl2hfkzuii5thmiydvqvovve7zgspd7qd.onion",
-            "alias": "lmao"
-        }
-    ]
+    }
 }

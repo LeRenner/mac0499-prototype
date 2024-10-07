@@ -1,62 +1,32 @@
-import flask
-import logging
-import requests
 import json
-import datetime
+import flask
 import hashlib
+import requests
+import datetime
 from time import sleep
 
-global localHttpPort
 global localSocksPort
 global address
 
-#############################################################
-######## ENDPOINTS ##########################################
-#############################################################
 
+def setupPrivateEndpointVariables(argAddress, argLocalSocksPort):
+    global localSocksPort
+    global address
+
+    localSocksPort = argLocalSocksPort
+    address = argAddress
+
+
+#############################################################
+######## PRIVATE ENDPOINTS ##################################
+#############################################################
 
 def root():
-    return "Hello, world!"
+    headers = flask.request.headers
+    for header, value in headers.items():
+        print(f"{header}: {value}")
 
-
-def receiveMessage():
-    # get the message from the post request
-    message = flask.request.form.get("message")
-    print(f"Received message: {message}")
-
-    decodedMessage = json.loads(message)
-    sender = decodedMessage["sender"].replace("\n", "")
-    content = decodedMessage["content"]
-
-    message = {
-        "content": content,
-        "timestamp": int(datetime.datetime.now().timestamp())
-    }
-
-    # Store the message in storage.json
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        storage = {"receivedMessages": {}, "sentMessages": {}}
-
-    if "receivedMessages" not in storage:
-        storage["receivedMessages"] = {}
-
-    if sender not in storage["receivedMessages"]:
-        storage["receivedMessages"][sender] = []
-
-    storage["receivedMessages"][sender].append(message)
-
-    with open("storage.json", "w") as f:
-        json.dump(storage, f, indent=4)
-
-    print(f"Message received from {sender}: {content}")
-
-    # Calculate SHA256 of the message content
-    sha256_hash = hashlib.sha256(content.encode()).hexdigest()
-
-    return json.dumps({"message": "Message received!", "sha256": sha256_hash})
+    return "Hello, World!"
 
 
 def sendMessage():
@@ -132,6 +102,8 @@ def sendMessage():
 
 
 def getMessagesFromSender():
+    global address
+
     sender = flask.request.data.decode('utf-8')
 
     try:
@@ -161,6 +133,7 @@ def getMessagesFromSender():
     }
 
     return json.dumps(response)
+
 
 def getLatestMessages():
     try:
@@ -289,52 +262,4 @@ def webInterface(filename):
     if filename == "":
         filename = "index.html"
 
-    return flask.send_from_directory("web", filename)
-
-
-#############################################################
-######## INITIALIZE SERVER ##################################
-#############################################################
-
-def initializeFlask():
-    app = flask.Flask(__name__)
-
-    # Set up logging to a file for Flask
-    handler = logging.FileHandler('logs/flask.log')
-    handler.setLevel(logging.INFO)
-    app.logger.addHandler(handler)
-
-    log = logging.getLogger('werkzeug')
-    log.setLevel(logging.ERROR)
-
-    return app
-
-
-def setupEndpoints(app, address, localSocksPort):
-    app.add_url_rule("/", "root", root)
-    app.add_url_rule("/receiveMessage", "receiveMessage", receiveMessage, methods=["POST"])
-    app.add_url_rule("/getMessagesFromSender", "getMessagesFromSender", getMessagesFromSender, methods=["POST"])
-    app.add_url_rule("/sendMessage", "sendMessage", sendMessage, methods=["POST"])
-    app.add_url_rule("/getLatestMessages", "getLatestMessages", getLatestMessages)
-    app.add_url_rule("/getSenders", "getSenders", getSenders)
-    app.add_url_rule("/getAddress", "getAddress", getAddress)
-    app.add_url_rule("/getFriends", "getFriends", getFriends)
-    app.add_url_rule("/addFriend", "addFriend", addFriend, methods=["POST"])
-    app.add_url_rule("/removeFriend", "removeFriend", removeFriend, methods=["POST"])
-    app.add_url_rule("/web", "webInterface", webInterface, defaults={'filename': ''})
-    app.add_url_rule("/web/", "webInterface", webInterface, defaults={'filename': ''})
-    app.add_url_rule("/web/<path:filename>", "webInterface", webInterface)
-
-
-def runServer(argAddress, argHttpPort, argSocksPort):
-    global localHttpPort
-    global localSocksPort
-    global address
-
-    localHttpPort = argHttpPort
-    localSocksPort = argSocksPort
-    address = argAddress
-
-    app = initializeFlask()
-    setupEndpoints(app, address, localSocksPort)
-    app.run(host="localhost", port=localHttpPort)
+    return flask.send_from_directory("../web", filename)

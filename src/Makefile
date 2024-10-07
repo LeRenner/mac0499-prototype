@@ -2,7 +2,7 @@
 
 #cleaning the directory
 clean:
-	rm -rf logs tor
+	rm -rf logs tor storage.json __pycache__
 
 #running the python script
 run:

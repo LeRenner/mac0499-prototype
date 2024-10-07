@@ -1,0 +1,84 @@
+Exception on /receiveMessage [POST]
+Traceback (most recent call last):
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 878, in full_dispatch_request
+    rv = self.preprocess_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 1253, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/src/server/middleware.py", line 25, in strip_headers
+    request.headers.pop(header)
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/werkzeug/datastructures/mixins.py", line 186, in pop
+    is_immutable(self)
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/werkzeug/datastructures/mixins.py", line 9, in is_immutable
+    raise TypeError(f"{type(self).__name__!r} objects are immutable")
+TypeError: 'EnvironHeaders' objects are immutable
+Exception on /receiveMessage [POST]
+Traceback (most recent call last):
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 878, in full_dispatch_request
+    rv = self.preprocess_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 1253, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/src/server/middleware.py", line 25, in strip_headers
+    request.headers.pop(header)
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/werkzeug/datastructures/mixins.py", line 186, in pop
+    is_immutable(self)
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/werkzeug/datastructures/mixins.py", line 9, in is_immutable
+    raise TypeError(f"{type(self).__name__!r} objects are immutable")
+TypeError: 'EnvironHeaders' objects are immutable
+Exception on /receiveMessage [POST]
+Traceback (most recent call last):
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/src/server/middleware.py", line 40, in proxy
+    headers = {key: value for key, value in request.headers if key in essential_headers}
+                              ^^^^^^^^^^
+ValueError: too many values to unpack (expected 2)
+Exception on /receiveMessage [POST]
+Traceback (most recent call last):
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/src/server/middleware.py", line 46, in proxy
+    cookies=request.cookies,
+            ^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/werkzeug/utils.py", line 107, in __get__
+    value = self.fget(obj)  # type: ignore
+            ^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/werkzeug/sansio/request.py", line 244, in cookies
+    wsgi_combined_cookie = ";".join(self.headers.getlist("Cookie"))
+                                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'getlist'
