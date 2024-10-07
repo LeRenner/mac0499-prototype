@@ -25,7 +25,7 @@ def root():
     headers = flask.request.headers
     for header, value in headers.items():
         print(f"{header}: {value}")
-
+    
     return "Hello, World!"
 
 

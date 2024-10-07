@@ -14,18 +14,6 @@ def runMiddleware(torMiddlewarePort, localRequestsPort):
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
 
-    # List of essential headers to keep
-    essential_headers = ['Content-Type', 'Authorization']
-
-    @app.before_request
-    def strip_headers():
-        # Keep only essential headers
-        request_headers = dict(request.headers)
-        for header in list(request_headers.keys()):
-            if header not in essential_headers:
-                request_headers.pop(header)
-        request.headers = request_headers
-
     @app.after_request
     def add_custom_header(response):
         # Add a custom header
@@ -37,11 +25,18 @@ def runMiddleware(torMiddlewarePort, localRequestsPort):
     def proxy(path):
         # Forward the request to the local server
         url = f'http://localhost:{localRequestsPort}/{path}'
-        headers = {key: value for key, value in request.headers.items() if key in essential_headers}
+
+        forwardHeaders = {
+            'Tor-Middleware-Header': 'True'
+        }
+
+        print(f"Proxying request to {url} with headers: {forwardHeaders}")
+        
+        # Forward the request with filtered headers
         response = requests.request(
             method=request.method,
             url=url,
-            headers=headers,
+            headers=forwardHeaders,
             data=request.get_data(),
             allow_redirects=False
         )
@@ -55,4 +50,5 @@ def runMiddleware(torMiddlewarePort, localRequestsPort):
         return proxy_response
 
     app.run(host="localhost", port=torMiddlewarePort)
+
 

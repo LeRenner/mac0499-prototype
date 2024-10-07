@@ -82,3 +82,21 @@ Traceback (most recent call last):
     wsgi_combined_cookie = ";".join(self.headers.getlist("Cookie"))
                                     ^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'dict' object has no attribute 'getlist'
+Exception on / [GET]
+Traceback (most recent call last):
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/venv/lib/python3.12/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/renner/special/mac0499-prototype/src/server/middleware.py", line 33, in proxy
+    print(f"Proxying request to {url} with headers: {headers}")
+                                                     ^^^^^^^
+NameError: name 'headers' is not defined
