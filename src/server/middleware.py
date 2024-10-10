@@ -26,9 +26,8 @@ def runMiddleware(torMiddlewarePort, localRequestsPort):
         # Forward the request to the local server
         url = f'http://localhost:{localRequestsPort}/{path}'
 
-        forwardHeaders = {
-            'Tor-Middleware-Header': 'True'
-        }
+        forwardHeaders = {key: value for key, value in request.headers if key != 'Host'}
+        forwardHeaders['Tor-Middleware-Header'] = 'True'
 
         print(f"Proxying request to {url} with headers: {forwardHeaders}")
         

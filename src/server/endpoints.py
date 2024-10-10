@@ -29,7 +29,7 @@ def setupEndpoints(app, address, localSocksPort):
     setupPrivateEndpointVariables(address, localSocksPort)
 
     def check_tor_middleware_header():
-        if flask.request.headers.get('Tor-Middleware-Header') == 'True':
+        if flask.request.endpoint != 'receiveMessage' and flask.request.headers.get('Tor-Middleware-Header') == 'True':
             flask.abort(403)
 
     # Public endpoints
