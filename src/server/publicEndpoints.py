@@ -3,6 +3,8 @@ import flask
 import datetime
 import hashlib
 
+from .serverCrypto import *
+
 
 #############################################################
 ######## PUBLIC ENDPOINTS ###################################
@@ -46,3 +48,7 @@ def receiveMessage():
     sha256_hash = hashlib.sha256(content.encode()).hexdigest()
 
     return json.dumps({"message": "Message received!", "sha256": sha256_hash})
+
+
+def getPublicKey():
+    return json.dumps({"publicKey": publicKeyInBase64()})

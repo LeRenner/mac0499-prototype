@@ -5,6 +5,7 @@ import logging
 
 from .privateEndpoints import *
 from .publicEndpoints import *
+from .serverCrypto import *
 
 
 #############################################################
@@ -27,28 +28,51 @@ def initializeFlask():
 
 def setupEndpoints(app, address, localSocksPort):
     setupPrivateEndpointVariables(address, localSocksPort)
+    initializeTorKeys()
 
+    publicEndpoints = [
+        ["receiveMessage", "POST"],
+        ["getPublicKey", "GET"]
+    ]
+    
+    privateEndpoints = [
+        ["root", "GET"],
+        ["getMessagesFromSender", "POST"],
+        ["sendMessage", "POST"],
+        ["getLatestMessages", "GET"],
+        ["getSenders", "GET"],
+        ["getAddress", "GET"],
+        ["getFriends", "GET"],
+        ["addFriend", "POST"],
+        ["removeFriend", "POST"]
+    ]
+    
     def check_tor_middleware_header():
-        if flask.request.endpoint != 'receiveMessage' and flask.request.headers.get('Tor-Middleware-Header') == 'True':
+        endpoint = flask.request.url.split("/")[-1]
+        endpointInPublicEndpoints = False
+
+        for publicEndpoint in publicEndpoints:
+            if publicEndpoint[0] == endpoint:
+                endpointInPublicEndpoints = True
+                break
+
+        hasTorExternalHeader = flask.request.headers.get('Tor-Middleware-Header') == 'True'
+
+        if not endpointInPublicEndpoints and hasTorExternalHeader:
             flask.abort(403)
 
     # Public endpoints
-    app.add_url_rule("/receiveMessage", "receiveMessage", receiveMessage, methods=["POST"])
+    for endpoint, method in publicEndpoints:
+        app.add_url_rule(f"/{endpoint}", endpoint, globals()[endpoint], methods=[method])
 
     # Private endpoints with middleware check
     app.before_request(check_tor_middleware_header)
-    app.add_url_rule("/", "root", root)
-    app.add_url_rule("/getMessagesFromSender", "getMessagesFromSender", getMessagesFromSender, methods=["POST"])
-    app.add_url_rule("/sendMessage", "sendMessage", sendMessage, methods=["POST"])
-    app.add_url_rule("/getLatestMessages", "getLatestMessages", getLatestMessages)
-    app.add_url_rule("/getSenders", "getSenders", getSenders)
-    app.add_url_rule("/getAddress", "getAddress", getAddress)
-    app.add_url_rule("/getFriends", "getFriends", getFriends)
-    app.add_url_rule("/addFriend", "addFriend", addFriend, methods=["POST"])
-    app.add_url_rule("/removeFriend", "removeFriend", removeFriend, methods=["POST"])
-    app.add_url_rule("/web", "webInterface", webInterface, defaults={'filename': ''})
-    app.add_url_rule("/web/", "webInterface", webInterface, defaults={'filename': ''})
-    app.add_url_rule("/web/<path:filename>", "webInterface", webInterface)
+    for endpoint, method in privateEndpoints:
+        app.add_url_rule(f"/{endpoint}", endpoint, globals()[endpoint], methods=[method])
+
+    app.add_url_rule("/web", "webInterface", webInterface, defaults={'filename': ''}, methods=["GET"])
+    app.add_url_rule("/web/", "webInterface", webInterface, defaults={'filename': ''}, methods=["GET"])
+    app.add_url_rule("/web/<path:filename>", "webInterface", webInterface, methods=["GET"])
 
 
 def runServer(argAddress, argHttpPort, argSocksPort):
