@@ -7,6 +7,23 @@ TOR_PUBLIC_KEY_FILE = "tor/data/hidden-service/hs_ed25519_public_key"
 
 global public_key
 global private_key
+global address
+
+def getOwnPublicKey():
+    global public_key
+    if public_key is None:
+        raise ValueError("Public key is not initialized.")
+
+    return public_key
+
+
+def getOwnAddress():
+    global address
+    if address is None:
+        raise ValueError("Address is not initialized.")
+
+    return address
+
 
 def signMessage(message: str) -> str:
     global private_key
@@ -83,7 +100,16 @@ def publicKeyInBase64() -> str:
     # Encode the public key in base64
     public_key_base64 = base64.b64encode(public_key).decode('utf-8')
 
+    print("Will return public key in base64: ", public_key_base64)
+
     return public_key_base64
+
+
+def generateTorAddressFromBase64(public_key_base64: str) -> str:
+    # Decode the public key from base64
+    public_key = base64.b64decode(public_key_base64)
+
+    return generateTorAddress(public_key)
 
 
 def generateTorAddress(public_key: bytes) -> str:
@@ -109,7 +135,7 @@ def generateTorAddress(public_key: bytes) -> str:
 
 # Function to read the hs_ed25519_public_key and hs_ed25519_secret_key files and return the onion address
 def initializeTorKeys():
-    global public_key, private_key
+    global public_key, private_key, address
     try:
         # Read the public key
         with open(TOR_PUBLIC_KEY_FILE, 'rb') as f:
@@ -133,7 +159,9 @@ def initializeTorKeys():
                 raise ValueError("Invalid private key length in the file.")
             private_key = privkey_bytes
 
-        return generateTorAddress(public_key)
+        address = generateTorAddress(public_key)
+
+        return address
     except Exception as e:
         print(f"Error: {e}")
         return None

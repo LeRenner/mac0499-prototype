@@ -182,11 +182,30 @@ pre {
 
 .friend {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
     padding: 10px;
     border-bottom: 1px solid #ddd;
+}
+
+.friend-name {
+    margin: 0;
+}
+
+.friend-address {
+    margin: 0;
+    color: #666;
+}
+
+.friend-key {
+    margin: 0;
+    color: #666;
+}
+
+#new-chat-address {
+    width: 85%;
+    margin-bottom: 10px;
 }
 
 .header {

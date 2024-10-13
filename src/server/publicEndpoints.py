@@ -4,6 +4,8 @@ import datetime
 import hashlib
 
 from .serverCrypto import *
+from .friendRequests import *
+from .p2p import *
 
 
 #############################################################
@@ -51,4 +53,19 @@ def receiveMessage():
 
 
 def getPublicKey():
+    print("Received request for public key.")
     return json.dumps({"publicKey": publicKeyInBase64()})
+
+
+def checkFriendRequest():
+    request = flask.request.form.get("request")
+    return processCheckFriendRequest(request)
+
+
+def getFriendIP():
+    request = flask.request.form.get("request")
+    return getFriendIPHandler(request)
+
+
+def p2pRequest():
+    return p2pRequestHandler()

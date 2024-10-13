@@ -8,6 +8,8 @@ from time import sleep
 global localSocksPort
 global address
 
+from .serverCrypto import *
+
 
 def setupPrivateEndpointVariables(argAddress, argLocalSocksPort):
     global localSocksPort
@@ -175,7 +177,10 @@ def getLatestMessages():
 
 
 def getAddress():
-    return json.dumps({"address": address})
+    result = {
+        "address": address
+    }
+    return json.dumps(result)
 
 
 def getSenders():
@@ -203,28 +208,89 @@ def getFriends():
     return json.dumps(friends)
 
 
+def startChat():
+    destinationAddress = flask.request.get_json().get("address")
+
+    #check if the user is already in the known keys
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        storage = {"keyList": []}
+
+    keyList = storage.get("keyList", [])
+
+    if len(keyList) > 0 and any(torAddressFromBase64(k["publicKey"]) == destinationAddress for k in keyList):
+        return json.dumps({"message": "User added!"})
+        
+
+    # try to get the user's public key
+    proxies = {
+        'http': 'socks5h://localhost:{}'.format(localSocksPort)
+    }
+
+    publicKey = None
+
+    for i in range(3):
+        try:
+            response = requests.get(f"http://{destinationAddress}/getPublicKey", proxies=proxies)
+            if response.status_code == 200:
+                publicKey = response.json().get("publicKey")
+                break
+            else:
+                print(f"Failed to fetch friend's public key. Retrying in 5 seconds...")
+                sleep(5)
+                continue
+        except requests.exceptions.RequestException as e:
+            print(f"Request exception: {str(e)}. Retrying in 5 seconds...")
+            sleep(5)
+            continue
+    else:
+        return json.dumps({"error": "Failed to fetch friend's public key after three tries!"})
+    
+    # save the user's public key
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        storage = {"keyList": []}
+    
+    keyList = storage.get("keyList", [])
+
+    if len(keyList) > 0 and any(torAddressFromBase64(k["publicKey"]) == destinationAddress for k in keyList):
+        return json.dumps({"error": "User already added!"})
+    
+    keyList.append({"publicKey": publicKey})
+    storage["keyList"] = keyList
+
+    with open("storage.json", "w") as f:
+        json.dump(storage, f, indent=4)
+
+    return json.dumps({"message": "User added!"})
+
+
 def addFriend():
     friend = flask.request.get_json()
 
-    print(friend)
-
+    # check if the friend is already a friend
     try:
         with open("storage.json", "r") as f:
             storage = json.load(f)
     except FileNotFoundError:
         storage = {"friends": []}
-
+    
     friends = storage.get("friends", [])
-    if not any(f["address"] == friend["address"] for f in friends):
-        friends.append(friend)
-        storage["friends"] = friends
 
-        with open("storage.json", "w") as f:
-            json.dump(storage, f, indent=4)
+    if any(f["address"] == friend["address"] for f in friends):
+        return json.dumps({"error": "Friend already added!"})
+    
+    friends.append(friend)
+    storage["friends"] = friends
 
-        return json.dumps({"message": "Friend added!"})
-    else:
-        return json.dumps({"message": "Friend already exists!"})
+    with open("storage.json", "w") as f:
+        json.dump(storage, f, indent=4)
+
+    return json.dumps({"message": "Friend added!"})
 
 
 def removeFriend():

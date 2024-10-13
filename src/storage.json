@@ -1,30 +1,42 @@
 {
-    "receivedMessages": {
-        "4bbinsfne3dxt4a24senaneowwogwwd7zatn7u2ozqkgj4uht42qahad.onion": [
+    "keyList": [
+        {
+            "publicKey": "Qz5/uIUkGuWquJZTCJR+u22i2zn/dNu7E6oTXhf32DA="
+        },
+        {
+            "publicKey": "zFVMrunox7tq8Uzg/anisdLq2LNHzxqKZcD+ABoTlek="
+        }
+    ],
+    "sentMessages": {
+        "im7h7oefeqnolkvyszjqrfd6xnw2fwzz752nxoytvijv4f7x3ayekuyd.onion": [
             {
-                "content": "haiiiii",
-                "timestamp": 1728600041
-            },
+                "content": "yooooooo",
+                "timestamp": 1728842545
+            }
+        ],
+        "zrkuzlxj5dd3w2xrjtqp3kpcwhjovwfti7hrvctfyd7aagqtsxuv7rid.onion": [
             {
-                "content": "omg omg omg",
-                "timestamp": 1728601330
+                "content": "heeeeeey",
+                "timestamp": 1728844203
             }
         ]
     },
-    "sentMessages": {
-        "4bbinsfne3dxt4a24senaneowwogwwd7zatn7u2ozqkgj4uht42qahad.onion": [
+    "receivedMessages": {
+        "im7h7oefeqnolkvyszjqrfd6xnw2fwzz752nxoytvijv4f7x3ayekuyd.onion": [
             {
-                "content": "bom dia",
-                "timestamp": 1728600009
-            },
-            {
-                "content": "omg omg hiii",
-                "timestamp": 1728600050
-            },
-            {
-                "content": "heya",
-                "timestamp": 1728601103
+                "content": "omg omg omg",
+                "timestamp": 1728842573
             }
         ]
-    }
+    },
+    "friends": [
+        {
+            "address": "im7h7oefeqnolkvyszjqrfd6xnw2fwzz752nxoytvijv4f7x3ayekuyd.onion",
+            "alias": "Garry"
+        },
+        {
+            "address": "zrkuzlxj5dd3w2xrjtqp3kpcwhjovwfti7hrvctfyd7aagqtsxuv7rid.onion",
+            "alias": "Harrison"
+        }
+    ]
 }

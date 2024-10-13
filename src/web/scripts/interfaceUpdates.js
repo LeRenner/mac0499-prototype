@@ -66,6 +66,7 @@ async function generateChatList() {
 let previousMessagesHash = '';
 
 async function generateMessageList() {
+    console.log('Generating message list...');
     try {
         const messages = await getMessagesFromSender(currentChatAddress);
 
@@ -133,23 +134,22 @@ async function generateMessageList() {
 
             document.getElementById('receivedMessages').innerHTML = chatList;
 
-            // update sender-address with currentChatAddress
-            let senderAlias = currentChatAddress;
-            const friends = await getFriends();
-            friends.forEach(friend => {
-                if (friend.address === currentChatAddress) {
-                    senderAlias = friend.alias;
-                }
-            });
-            document.getElementById('sender-address').innerHTML = senderAlias;
-
             // Scroll to the end of the div with ID receivedMessages
             const receivedMessagesDiv = document.getElementById('receivedMessages');
             receivedMessagesDiv.scrollTop = receivedMessagesDiv.scrollHeight;
         }
+        // update sender-address with currentChatAddress
+        let senderAlias = currentChatAddress;
+        const friends = await getFriends();
+        friends.forEach(friend => {
+            if (friend.address === currentChatAddress) {
+                senderAlias = friend.alias;
+            }
+        });
+        console.log(senderAlias);
+        document.getElementById('sender-address').innerHTML = senderAlias;
     } catch (error) {
         console.log('Error receiving messages: ' + error.message);
-        document.getElementById('status').innerHTML = 'Error receiving messages';
     }
 }
 
@@ -187,12 +187,16 @@ async function updateFriends() {
             let friendsList = '';
             data.forEach(friend => {
                 friendsList += `
+                    <hr/>
                     <div class="friend">
                         <p class="friend-name">
                             ${friend.alias}
                         </p>
                         <p class="friend-address">
                             ${friend.address}
+                        </p>
+                        <p class="friend-key">
+                            ${friend.publickey}
                         </p>
                     </div><br/>
                 `;
@@ -224,12 +228,26 @@ async function showNewFriend() {
 
 
 async function addChat() {
+    document.querySelector('.add-friend-status').innerHTML = 'Adding friend... (will try for 20s)';
+    document.querySelector('.add-friend-status').style.display = 'block';
+
     currentChatAddress = document.getElementById('new-chat-address').value;
+
+    const chatStarted = await startChat(currentChatAddress);
+
+    if (!chatStarted) {
+        document.querySelector('.add-friend-status').innerHTML = "Couldn't get friend public key. Check if they are online!";
+        return;
+    }
 
     // clear the input field
     document.getElementById('new-chat-address').value = '';
 
-    changeInterfaceState(1);
+    document.querySelector('.add-friend-status').innerHTML = 'Friend added successfully!';
+
+    setTimeout(() => {
+        changeInterfaceState(1);
+    }, 1000);
 }
 
 
@@ -239,13 +257,14 @@ async function updateAddress() {
         const response = await fetch('/getAddress', {
             method: 'GET'
         });
-
+        
         const data = await response.json();
 
+        console.log(data);
+
         document.getElementById('address').innerHTML = data.address;
-    } catch (error) {
+    }
+    catch (error) {
         console.log('Error receiving address: ' + error.message);
-        document.getElementById('status').innerHTML = 'Error receiving address';
     }
 }
-

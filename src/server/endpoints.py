@@ -42,6 +42,7 @@ def setupEndpoints(app, address, localSocksPort):
         ["getLatestMessages", "GET"],
         ["getSenders", "GET"],
         ["getAddress", "GET"],
+        ["startChat", "POST"],
         ["getFriends", "GET"],
         ["addFriend", "POST"],
         ["removeFriend", "POST"]

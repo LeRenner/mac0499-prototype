@@ -143,6 +143,31 @@ async function removeFriend() {
     }
 }
 
+// starts new chat with friend
+async function startChat(address) {
+    try {
+        const response = await fetch('/startChat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                address: address
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            return false;
+        }
+
+        return true
+    } catch (error) {
+        return false;
+    }
+}
+
 
 ///////////////////////////////////////////////
 //////// Buttons //////////////////////////////
