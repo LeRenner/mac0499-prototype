@@ -6,6 +6,7 @@ import logging
 from .privateEndpoints import *
 from .publicEndpoints import *
 from .serverCrypto import *
+from .jsonOperator import *
 
 
 #############################################################
@@ -29,6 +30,7 @@ def initializeFlask():
 def setupEndpoints(app, address, localSocksPort):
     setupPrivateEndpointVariables(address, localSocksPort)
     setupPublicEndpointlVariables(localSocksPort)
+    operator_setupVariables(address)
     initializeTorKeys()
 
     publicEndpoints = [

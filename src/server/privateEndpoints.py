@@ -87,7 +87,9 @@ def sendMessage():
     # Create a copy of the message without the sender field
     message_to_store = {key: value for key, value in message.items() if key != "sender"}
 
-    operator_storeSentMessage(message_to_store)
+    operator_storeSentMessage(json.dumps(message_to_store), destination)
+
+    return json.dumps({"message": "Message sent!"})
 
 
 def getMessagesFromSender():
@@ -125,19 +127,15 @@ def getFriends():
 
 def updatePublicKeyRecords(peerAddress: str) -> bool:
     global localSocksPort
-    print("Update Public Key Records with peerAddress: ", peerAddress)
-
-    print(localSocksPort)
 
     proxies = {
         'http': 'socks5h://localhost:{}'.format(localSocksPort)
     }
 
-    print(proxies)
-
     for attempt in range(3):
         try:
-            response = requests.get(f"http://{peerAddress}/getPublicKeyBase64", proxies=proxies)
+            print("Starting request...")
+            response = requests.get(f"http://{peerAddress}/getPublicKeyBase64", proxies=proxies, timeout=15)
 
             print(response.json())
 
@@ -160,8 +158,6 @@ def updatePublicKeyRecords(peerAddress: str) -> bool:
 
 def startChat():
     friend_address = flask.request.get_json().get("address")
-
-    print(f"Starting chat with {friend_address}...")
 
     if operator_getPublicKeyFromAddress(friend_address) is None:
         if not updatePublicKeyRecords(friend_address):

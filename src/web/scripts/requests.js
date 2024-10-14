@@ -181,7 +181,7 @@ async function sendMessage() {
     const messageCont = document.getElementById('message').value;
 
     try {
-        const result = await requestSendMessage(messageCont, currentChatAddress);
+        let result = await requestSendMessage(messageCont, currentChatAddress);
 
         if (result.message == "processing") {
             document.querySelector('.sending-message').style.display = 'block';
@@ -190,9 +190,10 @@ async function sendMessage() {
             result = await requestSendMessage(messageCont, currentChatAddress);
         }
 
+        document.querySelector('.sending-message').innerHTML = 'Sending message...';
+        document.querySelector('.sending-message').style.display = 'none';
+
         if (!result.error) {
-            document.querySelector('.sending-message').innerHTML = 'Sending message...';
-            document.querySelector('.sending-message').style.display = 'none';
             document.querySelector('.message-sent').style.display = 'block';
 
             setTimeout(() => {
@@ -203,7 +204,6 @@ async function sendMessage() {
         } else {
             document.querySelector('.message-error').textContent = result.error;
 
-            document.querySelector('.sending-message').style.display = 'none';
             document.querySelector('.message-error').style.display = 'block';
 
             setTimeout(() => {

@@ -184,10 +184,9 @@ async function updateFriends() {
         if (data.length === 0) {
             document.getElementById('friendsList').innerHTML = 'No friends yet...';
         } else {
-            let friendsList = '';
+            let friendsList = '<hr/>';
             data.forEach(friend => {
                 friendsList += `
-                    <hr/>
                     <div class="friend">
                         <p class="friend-name">
                             ${friend.alias}
@@ -195,10 +194,7 @@ async function updateFriends() {
                         <p class="friend-address">
                             ${friend.address}
                         </p>
-                        <p class="friend-key">
-                            ${friend.publickey}
-                        </p>
-                    </div><br/>
+                    </div><hr/>
                 `;
             });
 
@@ -228,10 +224,25 @@ async function showNewFriend() {
 
 
 async function addChat() {
-    document.querySelector('.add-friend-status').innerHTML = 'Adding friend... (will try for 20s)';
+    currentChatAddress = document.getElementById('new-chat-address').value;
+
+    // check if is tor address (length of 56 random characters followed by .onion)
+    // first, separate the address by the . character
+    const addressParts = currentChatAddress.split('.');
+    // then, check if the first part has 56 characters
+    if (addressParts[0].length !== 56 || addressParts[1] !== 'onion') {
+        document.querySelector('.add-friend-status').innerHTML = 'Invalid address!';
+        document.querySelector('.add-friend-status').style.display = 'block';
+
+        setTimeout(() => {
+            document.querySelector('.add-friend-status').style.display = 'none';
+        }, 3000);
+        return;
+    }
+
+    document.querySelector('.add-friend-status').innerHTML = 'Getting user public key... (will try for up to 45s)';
     document.querySelector('.add-friend-status').style.display = 'block';
 
-    currentChatAddress = document.getElementById('new-chat-address').value;
 
     const chatStarted = await startChat(currentChatAddress);
 
@@ -243,7 +254,7 @@ async function addChat() {
     // clear the input field
     document.getElementById('new-chat-address').value = '';
 
-    document.querySelector('.add-friend-status').innerHTML = 'Friend added successfully!';
+    document.querySelector('.add-friend-status').innerHTML = 'Successfully retrieved public key!';
 
     setTimeout(() => {
         changeInterfaceState(1);

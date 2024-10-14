@@ -20,8 +20,14 @@ class WriteLock:
 
 global writeLock
 global defaultStorage
+global ownAddress
 writeLock = WriteLock()
 defaultStorage = {"receivedMessages": {}, "sentMessages": {}, "friends": [], "peerList": [], "firstContact": []}
+
+
+def operator_setupVariables(address: str):
+    global ownAddress
+    ownAddress = address
 
 
 def operator_getCurrentStorage():
@@ -140,17 +146,11 @@ def operator_storeReceivedMessage(message: str):
     return
 
 
-def operator_storeSentMessage(message: str):
+def operator_storeSentMessage(message: str, destination: str):
     global writeLock
     storage = operator_getCurrentStorage()
 
-    parsedMessageContainer = json.loads(message)
-    parsedMessage = json.loads(parsedMessageContainer["message"])
-
-    destination = parsedMessage["destination"].replace("\n", "")
-
-    parsedMessage["destination"] = destination
-    parsedMessageContainer["message"] = json.dumps(parsedMessage)
+    parsedMessage = json.loads(message)
 
     if "sentMessages" not in storage:
         storage["sentMessages"] = []
@@ -158,7 +158,7 @@ def operator_storeSentMessage(message: str):
     if destination not in storage["sentMessages"]:
         storage["sentMessages"][destination] = []
     
-    storage["sentMessages"][destination].append(parsedMessageContainer)
+    storage["sentMessages"][destination].append(parsedMessage)
 
     with open("storage.json", "w") as f:
         json.dump(storage, f)
@@ -194,6 +194,7 @@ def operator_storePeerPublicKey(address: str, publicKey: str):
 
 
 def operator_getMessagesFromSender(sender: str):
+    global ownAddress
     global writeLock
     storage = operator_getCurrentStorage()
     writeLock.release()
@@ -210,10 +211,10 @@ def operator_getMessagesFromSender(sender: str):
 
     # Add sender field to each sent message
     for message in sentMessages:
-        message["sender"] = address
+        message["sender"] = ownAddress
 
     # Sort messages by timestamp
-    receivedMessages.sort(key=lambda msg: msg["timestamp"])
+    parsedReceivedMessages.sort(key=lambda msg: msg["timestamp"])
     sentMessages.sort(key=lambda msg: msg["timestamp"])
 
     response = {
@@ -254,14 +255,12 @@ def operator_getLatestMessages():
 
             for message in messages:
                 parsedMessage = json.loads(message["message"])
-                print("Parsed message: ", parsedMessage)
                 if parsedMessage["timestamp"] > latest_message["timestamp"]:
                     latest_message = message
 
             latest_message_with_sender = latest_message.copy()
             latest_message_with_sender["sender"] = sender
             latestMessages[sender] = latest_message_with_sender
-            print("Current latest messages: ", latestMessages)
 
     # Get the latest sent messages
     for recipient, messages in sentMessages.items():
@@ -304,7 +303,7 @@ def operator_getFriends():
     return json.dumps(friends)
 
 
-def operator_addFriend(address: str):
+def operator_addFriend(friend: dict):
     global writeLock
     storage = operator_getCurrentStorage()
     
@@ -345,7 +344,7 @@ def operator_removeFriend(address: str):
     return json.dumps({"message": "Friend not found!"})
 
 
-def getPublicKeyFromAddress(address: str) -> str:
+def operator_getPublicKeyFromAddress(address: str) -> str:
     # open storage.json and get key peerList
     try:
         with open("storage.json", "r") as f:
