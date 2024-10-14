@@ -5,7 +5,41 @@ import hashlib
 
 from .serverCrypto import *
 from .friendRequests import *
+from .jsonOperator import *
 from .p2p import *
+import threading
+import requests
+from time import sleep
+
+global threads
+global localSocksPort
+threads = []
+
+def setupPublicEndpointlVariables(socksPort):
+    global localSocksPort
+    localSocksPort = socksPort
+
+def processFirstContact(address):
+    proxies = {
+        'http': 'socks5h://localhost:{}'.format(localSocksPort)
+    }
+
+    for i in range(3):
+        try:
+            response = requests.get(f"http://{address}/getPublicKeyBase64", proxies=proxies, timeout=15)
+            if response.status_code == 200:
+                response_data = response.json()
+                public_key = response_data.get("public_key")
+                if public_key:
+                    operator_storePeerPublicKey(address, public_key)
+                    operator_successFirstContact(address)
+                    return
+        except requests.RequestException as e:
+            print(f"Attempt {i+1} failed: {e}")
+        sleep(1)
+
+    operator_removeFirstContact(address)
+    print("Failed to retrieve public key after 3 attempts.")
 
 
 #############################################################
@@ -31,51 +65,45 @@ def receiveMessage():
 
     # verify the signature
     signature = parsedMessageContainer["signature"]
-    pubKey = parsedMessageContainer["public_key"]
-    localPubKey = getPublicKeyFromAddress(sender)
+    localPubKey = operator_getPublicKeyFromAddress(sender)
 
-    # check if the public key is the same as the one in storage.json
-    if pubKey != localPubKey:
-        return json.dumps({"message": "Invalid public key."})
+    if operator_checkFirstContact(sender) != None:
+        # Wait for firstContact object to be successful or to disappear from list
+        while operator_checkFirstContact(sender) == False:
+            sleep(1)
+        
+        localPubKey = operator_getPublicKeyFromAddress(sender)
+        if localPubKey is None:
+            return json.dumps({"message": "Failed to fetch public key from sender."})
     
-    knownSender = True
     if localPubKey is None:
-        knownSender = False
-    
-    if knownSender:
+        # Fetch the public key from the sender and add the tor address to firstContact
+        operator_addFirstContact(sender)
+
+        # Start a new thread to process the first contact
+        thread = threading.Thread(target=processFirstContact, args=(sender,))
+        thread.start()
+        threads.append(thread)
+
+        return json.dumps({"message": "processing"})
+
+    if localPubKey is not None:
         if not verifyMessage(parsedMessageContainer["message"], signature, sender):
             return json.dumps({"message": "Invalid signature."})
-
-    # Store the message in storage.json
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        storage = {"receivedMessages": {}, "sentMessages": {}, "friends": [], "peerList": []}
-
-    if "receivedMessages" not in storage:
-        storage["receivedMessages"] = {}
-
-    if sender not in storage["receivedMessages"]:
-        storage["receivedMessages"][sender] = []
-
-    storage["receivedMessages"][sender].append(parsedMessageContainer)
-
-    with open("storage.json", "w") as f:
-        json.dump(storage, f, indent=4)
-
-    print(f"Message received from {sender}: {content}")
-
-    if knownSender:
-        print(f"Message signature verified.")
     else:
-        print(f"Message signature not verified because the sender is not known.")
+        return json.dumps({"message": "Public key not found."})
+
+    # store the message
+    operator_storeReceivedMessage(json.dumps(parsedMessageContainer))
 
     # Calculate SHA256 of the message content
     sha256_hash = hashlib.sha256(content.encode()).hexdigest()
 
     return json.dumps({"message": "Message received!", "sha256": sha256_hash})
 
+
+def getPublicKeyBase64():
+    return json.dumps({"public_key": getOwnPublicKey()})
 
 def checkFriendRequest():
     request = flask.request.form.get("request")

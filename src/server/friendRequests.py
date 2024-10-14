@@ -1,4 +1,5 @@
 from .serverCrypto import *
+from .jsonOperator import *
 
 def craftCheckFriendRequest(destAddress: str) -> str:
     global address
@@ -64,15 +65,8 @@ def processCheckFriendRequest(request_object_json: str) -> bool:
     if destination != getOwnAddress():
         return {"message": "Destination address does not match."}
     
-    # Check if the origin address is already a friend
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        storage = {"friends": []}
-
-    friends = storage.get("friends", [])
-    if any(f["address"] == origin for f in friends):
+    friends = operator_getFriends()
+    if origin in friends:
         saveFriendPubKey(pubKey)
         return {"message": "Success", "friend": 1}
     

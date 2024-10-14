@@ -9,6 +9,7 @@ global localSocksPort
 global address
 
 from .serverCrypto import *
+from .jsonOperator import *
 
 
 def setupPrivateEndpointVariables(argAddress, argLocalSocksPort):
@@ -51,17 +52,20 @@ def sendMessage():
 
     messageContainer = {
         "message": packagedMessage,
-        "signature": signMessage(packagedMessage),
-        "public_key": getOwnPublicKey()
+        "signature": signMessage(packagedMessage)
     }
 
     packedMessageContainer = json.dumps(messageContainer)
 
     for i in range(3):
         try:
-            response = requests.post(f"http://{destination}/receiveMessage", data={"message": packedMessageContainer}, proxies=proxies)
+            response = requests.post(f"http://{destination}/receiveMessage", data={"message": packedMessageContainer}, proxies=proxies, timeout=15)
             if response.status_code == 200:
                 response_data = response.json()
+
+                if response_data.get("message") == "processing":
+                    return json.dumps({"message": "processing"})
+
                 received_sha256 = response_data.get("sha256")
                 calculated_sha256 = hashlib.sha256(messageContent.encode()).hexdigest()
                 if received_sha256 == calculated_sha256:
@@ -80,25 +84,10 @@ def sendMessage():
     else:
         return json.dumps({"error": "Failed to send message after three tries!"})
 
-    # Store the message in storage.json
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        storage = {"receivedMessages": {}, "sentMessages": {}, "friends": [], "peerList": []}
-
     # Create a copy of the message without the sender field
     message_to_store = {key: value for key, value in message.items() if key != "sender"}
 
-    if destination not in storage["receivedMessages"]:
-        storage["receivedMessages"][destination] = []
-
-    storage["sentMessages"][destination].append(message_to_store)
-
-    with open("storage.json", "w") as f:
-        json.dump(storage, f, indent=4)
-
-    return json.dumps({"message": "Message sent!"})
+    operator_storeSentMessage(message_to_store)
 
 
 def getMessagesFromSender():
@@ -106,92 +95,17 @@ def getMessagesFromSender():
 
     sender = flask.request.data.decode('utf-8')
 
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        return json.dumps({"receivedMessages": [], "sentMessages": []})
-
-    receivedMessages = storage.get("receivedMessages", {}).get(sender, [])
-    sentMessages = storage.get("sentMessages", {}).get(sender, [])
-
-    # Add sender field to each received message
-    parsedReceivedMessages = []
-    for message in receivedMessages:
-        parsedMessage = json.loads(message["message"])
-        parsedMessage["sender"] = sender
-        parsedReceivedMessages.append(parsedMessage)
-
-    # Add sender field to each sent message
-    for message in sentMessages:
-        message["sender"] = address
-
-    # Sort messages by timestamp
-    receivedMessages.sort(key=lambda msg: msg["timestamp"])
-    sentMessages.sort(key=lambda msg: msg["timestamp"])
-
-    response = {
-        "receivedMessages": parsedReceivedMessages,
-        "sentMessages": sentMessages
-    }
-
-    return json.dumps(response)
+    return operator_getMessagesFromSender(sender)
 
 
-def isVerifiedSender():
+def isKnownPeer():
     sender = flask.request.get_json().get("address")
 
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        return json.dumps({"verified": False})
-
-    knownPeers = storage.get("knownPeers", [])
-
-    if any(f["address"] == sender for f in knownPeers):
-        return json.dumps({"verified": True})
-    else:
-        return json.dumps({"verified": False})
+    return operator_isKnownPeer(sender)
 
 
 def getLatestMessages():
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        return json.dumps({"messages": []})
-
-    receivedMessages = storage.get("receivedMessages", {})
-    sentMessages = storage.get("sentMessages", {})
-    latestMessages = {}
-
-    # Get the latest received messages
-    for sender, messages in receivedMessages.items():
-        if messages:
-            latest_message = max(messages, key=lambda msg: json.loads(msg["message"])["timestamp"])
-            latest_message_with_sender = latest_message.copy()
-            latest_message_with_sender["sender"] = sender
-            latestMessages[sender] = latest_message_with_sender
-
-    # Get the latest sent messages
-    for recipient, messages in sentMessages.items():
-        if messages:
-            latest_message = max(messages, key=lambda msg: msg["timestamp"])
-            latest_message_with_sender = latest_message.copy()
-            latest_message_with_sender["sender"] = recipient  # Use the recipient address
-            if recipient not in latestMessages or latest_message_with_sender["timestamp"] > latestMessages[recipient]["timestamp"]:
-                latestMessages[recipient] = latest_message_with_sender
-
-    # Convert the dictionary to a list and sort by timestamp
-    latestMessagesList = list(latestMessages.values())
-    latestMessagesList.sort(key=lambda msg: msg["timestamp"], reverse=True)
-
-    response = {
-        "messages": latestMessagesList
-    }
-
-    return json.dumps(response)
+    return operator_getLatestMessages()
 
 
 def getAddress():
@@ -202,87 +116,72 @@ def getAddress():
 
 
 def getSenders():
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        return json.dumps([])
-
-    receivedMessages = storage.get("receivedMessages", {})
-    senders = list(receivedMessages.keys())
-
-    return json.dumps(senders)
+    return operator_getSenders()
 
 
 def getFriends():
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        return json.dumps([])
+    return operator_getFriends()
 
-    friends = storage.get("friends", [])
 
-    return json.dumps(friends)
+def updatePublicKeyRecords(peerAddress: str) -> bool:
+    global localSocksPort
+    print("Update Public Key Records with peerAddress: ", peerAddress)
+
+    print(localSocksPort)
+
+    proxies = {
+        'http': 'socks5h://localhost:{}'.format(localSocksPort)
+    }
+
+    print(proxies)
+
+    for attempt in range(3):
+        try:
+            response = requests.get(f"http://{peerAddress}/getPublicKeyBase64", proxies=proxies)
+
+            print(response.json())
+
+            public_key_base64 = response.json().get("public_key")
+
+            print(f"Fetched public key from {peerAddress}: {public_key_base64}")
+
+            operator_storePeerPublicKey(peerAddress, public_key_base64)
+
+            return True
+        except requests.RequestException as e:
+            print(f"Error fetching public key: {e}")
+            if attempt < 2:
+                print("Retrying in 5 seconds...")
+                sleep(5)
+            else:
+                print("Failed to fetch public key after three attempts.")
+                return False
 
 
 def startChat():
-    ISAHDHIASODHIOHISODHAIOSHOAHSIDOHIAOSHIDOHAIOSHDOAHSIDOHIASHIDHAISHDIOAHOSIDHIAOSHOIHAIOSDIOAHSIDHOAHSOIDHIAOSHIDOHAOISHDIHAIOSHDAIHOSHIOD
+    friend_address = flask.request.get_json().get("address")
+
+    print(f"Starting chat with {friend_address}...")
+
+    if operator_getPublicKeyFromAddress(friend_address) is None:
+        if not updatePublicKeyRecords(friend_address):
+            return json.dumps({"error": "Failed to fetch public key!"})
+        else:
+            return json.dumps({"message": "Public key fetched!"})
+    else:
+        return json.dumps({"message": "Public key already in storage!"})
 
 
 def addFriend():
     friend = flask.request.get_json()
 
-    # check if the friend is already a friend
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        storage = {"friends": []}
-    
-    friends = storage.get("friends", [])
-
-    if any(f["address"] == friend["address"] for f in friends):
-        return json.dumps({"error": "Friend already added!"})
-    
-    friends.append(friend)
-    storage["friends"] = friends
-
-    with open("storage.json", "w") as f:
-        json.dump(storage, f, indent=4)
-
-    return json.dumps({"message": "Friend added!"})
+    return operator_addFriend(friend)
 
 
 def removeFriend():
-    friend_nickname = flask.request.get_json().get("alias")
+    friend = flask.request.get_json()
 
-    print(friend_nickname)
-
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        return json.dumps({"error": "Friend not found!"})
-
-    friends = storage.get("friends", [])
-
-    print(friends)
-
-    friend_to_remove = next((f for f in friends if f["alias"] == friend_nickname), None)
-
-
-
-    if friend_to_remove:
-        friends.remove(friend_to_remove)
-        storage["friends"] = friends
-
-        with open("storage.json", "w") as f:
-            json.dump(storage, f, indent=4)
-
-        return json.dumps({"message": "Friend removed!"})
-    else:
-        return json.dumps({"error": "Friend not found!"})
+    return operator_removeFriend(friend)
 
 
 def webInterface(filename):

@@ -183,7 +183,15 @@ async function sendMessage() {
     try {
         const result = await requestSendMessage(messageCont, currentChatAddress);
 
+        if (result.message == "processing") {
+            document.querySelector('.sending-message').style.display = 'block';
+            document.querySelector('.sending-message').innerHTML = 'First message! Estabilishing first contact handshake...';
+
+            result = await requestSendMessage(messageCont, currentChatAddress);
+        }
+
         if (!result.error) {
+            document.querySelector('.sending-message').innerHTML = 'Sending message...';
             document.querySelector('.sending-message').style.display = 'none';
             document.querySelector('.message-sent').style.display = 'block';
 

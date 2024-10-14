@@ -5,6 +5,8 @@ from nacl.signing import SigningKey
 from nacl.signing import VerifyKey
 from nacl.encoding import RawEncoder
 from pytor.ed25519 import Ed25519
+from .jsonOperator import *
+import json
 
 TOR_PRIVATE_KEY_FILE = "tor/data/hidden-service/hs_ed25519_secret_key"
 TOR_PUBLIC_KEY_FILE = "tor/data/hidden-service/hs_ed25519_public_key"
@@ -25,76 +27,6 @@ def getOwnPublicKey() -> str:
     return base64.b64encode(public_signing_key.encode(RawEncoder)).decode('utf-8')
 
 
-def getOwnVerificationString() -> str:
-    # verification string is a base64 encoded version of a json containing the public key plus the address
-    verificationInformation = {
-        "k": base64.b64encode(public_signing_key.encode(RawEncoder)).decode('utf-8'),
-        "a": address
-    }
-    encodedVerificationInformation = base64.b64encode(json.dumps(verificationInformation).encode('utf-8')).decode('utf-8')
-
-    sentObj = {
-        "v": encodedVerificationInformation,
-        "h": hashlib.md5(encodedVerificationInformation.encode('utf-8')).hexdigest()
-    }
-
-    return base64.b64encode(json.dumps(sentObj).encode('utf-8')).decode('utf-8')
-
-
-def saveVerificationString(verificationString: str):
-    # Decode the verification string
-    decodedString = base64.b64decode(verificationString).decode('utf-8')
-    verificationObj = json.loads(decodedString)
-
-    # Verify the md5 hash
-    encodedVerificationInformation = verificationObj["v"]
-    expected_hash = verificationObj["h"]
-    actual_hash = hashlib.md5(encodedVerificationInformation.encode('utf-8')).hexdigest()
-
-    if actual_hash != expected_hash:
-        raise ValueError("MD5 hash does not match, verification failed.")
-
-    # Decode the verification information
-    decodedVerificationInformation = base64.b64decode(encodedVerificationInformation).decode('utf-8')
-    verificationInformation = json.loads(decodedVerificationInformation)
-
-    # Read the current storage.json
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        storage = {"peerList": []}
-
-    # Add the new peer information to the peerList
-    peerList = storage.get("peerList", [])
-    peerList.append({
-        "address": verificationInformation["a"],
-        "public_key": verificationInformation["k"]
-    })
-    storage["peerList"] = peerList
-
-    # Write the updated storage back to storage.json
-    with open("storage.json", "w") as f:
-        json.dump(storage, f, indent=4)
-
-
-def getPublicKeyFromAddress(address: str) -> str:
-    # open storage.json and get key peerList
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        storage = {"peerList": []}
-    
-    peerList = storage.get("peerList", [])
-
-    for peer in peerList:
-        if peer["address"] == address:
-            return peer["public_key"]
-    
-    return None
-
-
 def signMessage(message: str) -> str:
     # Sign the message
     signed_message = private_key_signing_key_object.sign(message.encode('utf-8'))
@@ -107,7 +39,7 @@ def signMessage(message: str) -> str:
 
 def verifyMessage(message: str, signature: str, originAddress: str) -> bool:
     # Get the public key from the origin address
-    public_key = base64.b64decode(getPublicKeyFromAddress(originAddress))
+    public_key = base64.b64decode(operator_getPublicKeyFromAddress(originAddress))
 
     # Create a VerifyKey object from the public key
     verify_key = VerifyKey(public_key)
@@ -162,7 +94,7 @@ def initializeTorKeys():
 
         priv_key_array = bytearray(private_key_seed)
         public_tor_key = Ed25519().public_key_from_hash(priv_key_array)
-        address = generateTorAddress(public_key)
+        address = generateTorAddress(public_tor_key)
         private_key_signing_key_object = SigningKey(private_key_seed)
         public_signing_key = private_key_signing_key_object.verify_key
     except Exception as e:

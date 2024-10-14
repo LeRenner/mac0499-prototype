@@ -28,10 +28,12 @@ def initializeFlask():
 
 def setupEndpoints(app, address, localSocksPort):
     setupPrivateEndpointVariables(address, localSocksPort)
+    setupPublicEndpointlVariables(localSocksPort)
     initializeTorKeys()
 
     publicEndpoints = [
-        ["receiveMessage", "POST"]
+        ["receiveMessage", "POST"],
+        ["getPublicKeyBase64", "GET"]
     ]
     
     privateEndpoints = [
@@ -44,7 +46,7 @@ def setupEndpoints(app, address, localSocksPort):
         ["getFriends", "GET"],
         ["addFriend", "POST"],
         ["removeFriend", "POST"],
-        ["isVerifiedSender", "POST"]
+        ["isKnownPeer", "POST"]
     ]
     
     def check_tor_middleware_header():
