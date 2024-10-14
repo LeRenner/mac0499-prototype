@@ -138,14 +138,15 @@ async function generateMessageList() {
             const receivedMessagesDiv = document.getElementById('receivedMessages');
             receivedMessagesDiv.scrollTop = receivedMessagesDiv.scrollHeight;
         }
-        // update sender-address with currentChatAddress
-        let senderAlias = currentChatAddress;
+        // Create a map of addresses to aliases
+        const addressToAlias = new Map();
         const friends = await getFriends();
         friends.forEach(friend => {
-            if (friend.address === currentChatAddress) {
-                senderAlias = friend.alias;
-            }
+            addressToAlias.set(friend.address, friend.alias);
         });
+
+        // update sender-address with currentChatAddress
+        let senderAlias = addressToAlias.get(currentChatAddress) || currentChatAddress;
         console.log(senderAlias);
         document.getElementById('sender-address').innerHTML = senderAlias;
     } catch (error) {

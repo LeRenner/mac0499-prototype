@@ -5,12 +5,12 @@ import requests
 import datetime
 from time import sleep
 
-global localSocksPort
-global address
-
 from .serverCrypto import *
 from .jsonOperator import *
+from .p2p import *
 
+global localSocksPort
+global address
 
 def setupPrivateEndpointVariables(argAddress, argLocalSocksPort):
     global localSocksPort
@@ -52,7 +52,7 @@ def sendMessage():
 
     messageContainer = {
         "message": packagedMessage,
-        "signature": signMessage(packagedMessage)
+        "signature": crypto_signMessage(packagedMessage)
     }
 
     packedMessageContainer = json.dumps(messageContainer)
@@ -77,8 +77,8 @@ def sendMessage():
                 print(f"Erro. Tentando novamente em 5 segundos...")
                 sleep(5)
                 continue
-        except requests.exceptions.ConnectionError:
-            print(f"Erro. Tentando novamente em 5 segundos...")
+        except requests.RequestException as e:
+            print(f"Erro: {e}. Tentando novamente em 5 segundos...")
             sleep(5)
             continue
     else:
@@ -185,3 +185,9 @@ def webInterface(filename):
         filename = "index.html"
 
     return flask.send_from_directory("../web", filename)
+
+
+def changeFocusedFriend():
+    friend = flask.request.get_json().get("address")
+
+    return p2p_changeFocusedFriend(friend)

@@ -13,7 +13,7 @@ from .jsonOperator import *
 ######## INITIALIZE SERVER ##################################
 #############################################################
 
-def initializeFlask():
+def endpoints_initializeFlask():
     app = flask.Flask(__name__)
 
     # Set up logging to a file for Flask
@@ -27,11 +27,11 @@ def initializeFlask():
     return app
 
 
-def setupEndpoints(app, address, localSocksPort):
+def endpoints_setupEndpoints(app, address, localSocksPort):
     setupPrivateEndpointVariables(address, localSocksPort)
     setupPublicEndpointlVariables(localSocksPort)
     operator_setupVariables(address)
-    initializeTorKeys()
+    crypto_initializeTorKeys()
 
     publicEndpoints = [
         ["receiveMessage", "POST"],
@@ -79,7 +79,7 @@ def setupEndpoints(app, address, localSocksPort):
     app.add_url_rule("/web/<path:filename>", "webInterface", webInterface, methods=["GET"])
 
 
-def runServer(argAddress, argHttpPort, argSocksPort):
+def endpoints_runServer(argAddress, argHttpPort, argSocksPort):
     global localHttpPort
     global localSocksPort
     global address
@@ -88,24 +88,6 @@ def runServer(argAddress, argHttpPort, argSocksPort):
     localSocksPort = argSocksPort
     address = argAddress
 
-    app = initializeFlask()
-    setupEndpoints(app, address, localSocksPort)
+    app = endpoints_initializeFlask()
+    endpoints_setupEndpoints(app, address, localSocksPort)
     app.run(host="localhost", port=localHttpPort)
-
-
-#############################################################
-######## AUXILIARY FUNCTIONS ################################
-#############################################################
-
-def getPublicIP():
-    try:
-        response = requests.get("http://httpbin.org/ip")
-        return response.json()["origin"]
-    except requests.exceptions.RequestException:
-        return None
-
-
-def getLocalIP():
-    hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
-    return local_ip

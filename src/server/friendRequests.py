@@ -15,7 +15,7 @@ def craftCheckFriendRequest(destAddress: str) -> str:
     request_json = json.dumps(request)
 
     # Sign the request
-    signature = signMessage(request_json)
+    signature = crypto_signMessage(request_json)
 
     # Create the final request object
     request_object = {
@@ -47,11 +47,11 @@ def processCheckFriendRequest(request_object_json: str) -> bool:
     kind = requestObj["kind"]
 
     # Verify the signature
-    if not verifyMessage(request, signature, base64.b64decode(pubKey)):
+    if not crypto_verifyMessage(request, signature, base64.b64decode(pubKey)):
         return {"message": "Invalid signature."}
     
     # Check if the address and public key match
-    if origin != generateTorAddressFromBase64(pubKey):
+    if origin != crypto_generateTorAddressFromBase64(pubKey):
         return {"message": "Invalid public key."}
     
     if kind != "checkFriend":
@@ -62,7 +62,7 @@ def processCheckFriendRequest(request_object_json: str) -> bool:
         return {"message": "Request is too old."}
     
     # Check if the destination address matches the local address
-    if destination != getOwnAddress():
+    if destination != crypto_getOwnAddress():
         return {"message": "Destination address does not match."}
     
     friends = operator_getFriends()
@@ -93,11 +93,11 @@ def getFriendIPHandler(request_object_json: str) -> str:
     kind = requestObj["kind"]
 
     # Verify the signature
-    if not verifyMessage(request, signature, base64.b64decode(pubKey)):
+    if not crypto_verifyMessage(request, signature, base64.b64decode(pubKey)):
         return json.dumps({"error": "Invalid signature."})
     
     # Check if the address and public key match
-    if origin != generateTorAddressFromBase64(pubKey):
+    if origin != crypto_generateTorAddressFromBase64(pubKey):
         return json.dumps({"error": "Invalid public key."})
     
     # Check if the timestamp is within the last 2 minutes
@@ -105,7 +105,7 @@ def getFriendIPHandler(request_object_json: str) -> str:
         return json.dumps({"error": "Request is too old."})
     
     # Check if the destination address matches the local address
-    if destination != getOwnAddress():
+    if destination != crypto_getOwnAddress():
         return json.dumps({"error": "Destination address does not match."})
     
     # Check request kind

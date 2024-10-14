@@ -1,28 +1,32 @@
-Oct 14 18:39:25.385 [notice] Tor 0.4.8.12 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.3.2, Zlib 1.3.1, Liblzma 5.6.2, Libzstd 1.5.6 and Glibc 2.40 as libc.
-Oct 14 18:39:25.385 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
-Oct 14 18:39:25.385 [notice] Read configuration file "/home/renner/special/mac0499-prototype/src/tor/torrc".
-Oct 14 18:39:25.386 [warn] Path for DataDirectory (tor/data) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data. Is this what you wanted?
-Oct 14 18:39:25.386 [warn] Path for HiddenServiceDir (tor/data/hidden-service) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data/hidden-service. Is this what you wanted?
-Oct 14 18:39:25.386 [notice] Opening Socks listener on 127.0.0.1:5876
-Oct 14 18:39:25.386 [notice] Opened Socks listener connection (ready) on 127.0.0.1:5876
-Oct 14 18:39:25.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
-Oct 14 18:39:25.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
-Oct 14 18:39:25.000 [notice] Bootstrapped 0% (starting): Starting
-Oct 14 18:39:25.000 [notice] Starting with guard context "default"
-Oct 14 18:39:26.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
-Oct 14 18:39:26.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
-Oct 14 18:39:27.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
-Oct 14 18:39:27.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
-Oct 14 18:39:27.000 [notice] Bootstrapped 20% (onehop_create): Establishing an encrypted directory connection
-Oct 14 18:39:27.000 [notice] Bootstrapped 25% (requesting_status): Asking for networkstatus consensus
-Oct 14 18:39:28.000 [notice] Bootstrapped 30% (loading_status): Loading networkstatus consensus
-Oct 14 18:39:29.000 [notice] I learned some more directory information, but not enough to build a circuit: We have no usable consensus.
-Oct 14 18:39:30.000 [notice] Bootstrapped 40% (loading_keys): Loading authority key certs
-Oct 14 18:39:30.000 [notice] The current consensus has no exit nodes. Tor can only build internal paths, such as paths to onion services.
-Oct 14 18:39:30.000 [notice] Bootstrapped 45% (requesting_descriptors): Asking for relay descriptors
-Oct 14 18:39:30.000 [notice] I learned some more directory information, but not enough to build a circuit: We need more microdescriptors: we have 0/8114, and can only build 0% of likely paths. (We have 0% of guards bw, 0% of midpoint bw, and 0% of end bw (no exits in consensus, using mid) = 0% of path bw.)
-Oct 14 18:39:32.000 [notice] Bootstrapped 50% (loading_descriptors): Loading relay descriptors
-Oct 14 18:39:33.000 [notice] The current consensus contains exit nodes. Tor can build exit and internal paths.
-Oct 14 18:39:36.000 [notice] Bootstrapped 55% (loading_descriptors): Loading relay descriptors
-Oct 14 18:39:36.000 [notice] Bootstrapped 60% (loading_descriptors): Loading relay descriptors
-Oct 14 18:39:37.000 [notice] Bootstrapped 67% (loading_descriptors): Loading relay descriptors
+Oct 14 19:02:46.901 [notice] Tor 0.4.8.12 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.3.2, Zlib 1.3.1, Liblzma 5.6.2, Libzstd 1.5.6 and Glibc 2.40 as libc.
+Oct 14 19:02:46.901 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Oct 14 19:02:46.901 [notice] Read configuration file "/home/renner/special/mac0499-prototype/src/tor/torrc".
+Oct 14 19:02:46.902 [warn] Path for DataDirectory (tor/data) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data. Is this what you wanted?
+Oct 14 19:02:46.902 [warn] Path for HiddenServiceDir (tor/data/hidden-service) is relative and will resolve to /home/renner/special/mac0499-prototype/src/tor/data/hidden-service. Is this what you wanted?
+Oct 14 19:02:46.902 [notice] Opening Socks listener on 127.0.0.1:5876
+Oct 14 19:02:46.902 [notice] Opened Socks listener connection (ready) on 127.0.0.1:5876
+Oct 14 19:02:46.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
+Oct 14 19:02:46.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
+Oct 14 19:02:47.000 [notice] Bootstrapped 0% (starting): Starting
+Oct 14 19:02:47.000 [notice] Starting with guard context "default"
+Oct 14 19:02:48.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
+Oct 14 19:02:48.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
+Oct 14 19:02:48.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
+Oct 14 19:02:50.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
+Oct 14 19:02:50.000 [notice] Bootstrapped 20% (onehop_create): Establishing an encrypted directory connection
+Oct 14 19:02:50.000 [notice] Bootstrapped 25% (requesting_status): Asking for networkstatus consensus
+Oct 14 19:02:50.000 [notice] Bootstrapped 30% (loading_status): Loading networkstatus consensus
+Oct 14 19:02:52.000 [notice] I learned some more directory information, but not enough to build a circuit: We have no usable consensus.
+Oct 14 19:02:52.000 [notice] Bootstrapped 40% (loading_keys): Loading authority key certs
+Oct 14 19:02:52.000 [notice] The current consensus has no exit nodes. Tor can only build internal paths, such as paths to onion services.
+Oct 14 19:02:52.000 [notice] Bootstrapped 45% (requesting_descriptors): Asking for relay descriptors
+Oct 14 19:02:52.000 [notice] I learned some more directory information, but not enough to build a circuit: We need more microdescriptors: we have 0/8114, and can only build 0% of likely paths. (We have 0% of guards bw, 0% of midpoint bw, and 0% of end bw (no exits in consensus, using mid) = 0% of path bw.)
+Oct 14 19:02:54.000 [notice] Bootstrapped 50% (loading_descriptors): Loading relay descriptors
+Oct 14 19:02:55.000 [notice] The current consensus contains exit nodes. Tor can build exit and internal paths.
+Oct 14 19:02:57.000 [notice] Bootstrapped 55% (loading_descriptors): Loading relay descriptors
+Oct 14 19:02:57.000 [notice] Bootstrapped 63% (loading_descriptors): Loading relay descriptors
+Oct 14 19:02:57.000 [notice] Bootstrapped 71% (loading_descriptors): Loading relay descriptors
+Oct 14 19:02:57.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough directory info to build circuits
+Oct 14 19:02:58.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
+Oct 14 19:02:58.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
+Oct 14 19:02:59.000 [notice] Bootstrapped 100% (done): Done

@@ -22,7 +22,7 @@ def main():
     server_thread.start()
 
     # run the main server
-    server.endpoints.runServer(localStorage["address"], localStorage["localHttpPort"], localStorage["localSocksPort"])
+    server.endpoints.endpoints_runServer(localStorage["address"], localStorage["localHttpPort"], localStorage["localSocksPort"])
 
 if __name__ == "__main__":
     main()

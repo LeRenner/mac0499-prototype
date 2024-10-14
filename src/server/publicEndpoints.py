@@ -88,7 +88,7 @@ def receiveMessage():
         return json.dumps({"message": "processing"})
 
     if localPubKey is not None:
-        if not verifyMessage(parsedMessageContainer["message"], signature, sender):
+        if not crypto_verifyMessage(parsedMessageContainer["message"], signature, sender):
             return json.dumps({"message": "Invalid signature."})
     else:
         return json.dumps({"message": "Public key not found."})
@@ -103,7 +103,7 @@ def receiveMessage():
 
 
 def getPublicKeyBase64():
-    return json.dumps({"public_key": getOwnPublicKey()})
+    return json.dumps({"public_key": crypto_getOwnPublicKey()})
 
 def checkFriendRequest():
     request = flask.request.form.get("request")

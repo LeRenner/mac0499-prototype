@@ -17,17 +17,17 @@ global public_tor_key
 global public_signing_key
 global address
 
-def getOwnAddress() -> str:
+def crypto_getOwnAddress() -> str:
     global address
     return address
 
 
-def getOwnPublicKey() -> str:
+def crypto_getOwnPublicKey() -> str:
     global public_signing_key
     return base64.b64encode(public_signing_key.encode(RawEncoder)).decode('utf-8')
 
 
-def signMessage(message: str) -> str:
+def crypto_signMessage(message: str) -> str:
     # Sign the message
     signed_message = private_key_signing_key_object.sign(message.encode('utf-8'))
 
@@ -37,7 +37,7 @@ def signMessage(message: str) -> str:
     return signature
 
 
-def verifyMessage(message: str, signature: str, originAddress: str) -> bool:
+def crypto_verifyMessage(message: str, signature: str, originAddress: str) -> bool:
     print("Asked to verify message: ", message)
     print("With signature: ", signature)
     print("From origin: ", originAddress)
@@ -63,7 +63,7 @@ def verifyMessage(message: str, signature: str, originAddress: str) -> bool:
         return False
 
 
-def generateTorAddress(public_key: bytes) -> str:
+def crypto_generateTorAddress(public_key: bytes) -> str:
     if len(public_key) != 32:
         raise ValueError("Public key must be 32 bytes long.")
 
@@ -85,7 +85,7 @@ def generateTorAddress(public_key: bytes) -> str:
 
 
 # Function to read the hs_ed25519_public_key and hs_ed25519_secret_key files and return the onion address
-def initializeTorKeys():
+def crypto_initializeTorKeys():
     global private_key_seed, public_tor_key, public_signing_key, address, private_key_signing_key_object
     try:
         # Read the private key
@@ -101,7 +101,7 @@ def initializeTorKeys():
 
         priv_key_array = bytearray(private_key_seed)
         public_tor_key = Ed25519().public_key_from_hash(priv_key_array)
-        address = generateTorAddress(public_tor_key)
+        address = crypto_generateTorAddress(public_tor_key)
         private_key_signing_key_object = SigningKey(private_key_seed)
         public_signing_key = private_key_signing_key_object.verify_key
     except Exception as e:

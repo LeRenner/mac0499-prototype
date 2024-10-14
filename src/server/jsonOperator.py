@@ -73,7 +73,7 @@ def operator_successFirstContact(address: str):
             contact["success"] = True
 
     with open("storage.json", "w") as f:
-        json.dump(storage, f)
+        json.dump(storage, f, indent=4)
     
     writeLock.release()
     return
@@ -92,7 +92,7 @@ def operator_removeFirstContact(address: str):
             storage["firstContact"].remove(contact)
 
     with open("storage.json", "w") as f:
-        json.dump(storage, f)
+        json.dump(storage, f, indent=4)
     
     writeLock.release()
     return
@@ -113,7 +113,7 @@ def operator_addFirstContact(address: str, success: bool = False):
     storage["firstContact"].append(firstContactObj)
 
     with open("storage.json", "w") as f:
-        json.dump(storage, f)
+        json.dump(storage, f, indent=4)
     
     writeLock.release()
     return
@@ -140,7 +140,7 @@ def operator_storeReceivedMessage(message: str):
     storage["receivedMessages"][sender].append(parsedMessageContainer)
 
     with open("storage.json", "w") as f:
-        json.dump(storage, f)
+        json.dump(storage, f, indent=4)
     
     writeLock.release()
     return
@@ -161,7 +161,7 @@ def operator_storeSentMessage(message: str, destination: str):
     storage["sentMessages"][destination].append(parsedMessage)
 
     with open("storage.json", "w") as f:
-        json.dump(storage, f)
+        json.dump(storage, f, indent=4)
     
     writeLock.release()
     return
@@ -187,7 +187,7 @@ def operator_storePeerPublicKey(address: str, publicKey: str):
     storage["peerList"].append(peerObj)
 
     with open("storage.json", "w") as f:
-        json.dump(storage, f)
+        json.dump(storage, f, indent=4)
     
     writeLock.release()
     return
