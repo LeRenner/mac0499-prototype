@@ -23,13 +23,6 @@ def setupPrivateEndpointVariables(argAddress, argLocalSocksPort):
 ######## PRIVATE ENDPOINTS ##################################
 #############################################################
 
-def root():
-    headers = flask.request.headers
-    for header, value in headers.items():
-        print(f"{header}: {value}")
-    
-    return "Hello, World!"
-
 
 def sendMessage():
     global localSocksPort
@@ -56,9 +49,17 @@ def sendMessage():
         'http': 'socks5h://localhost:{}'.format(localSocksPort)
     }
 
+    messageContainer = {
+        "message": packagedMessage,
+        "signature": signMessage(packagedMessage),
+        "public_key": getOwnPublicKey()
+    }
+
+    packedMessageContainer = json.dumps(messageContainer)
+
     for i in range(3):
         try:
-            response = requests.post(f"http://{destination}/receiveMessage", data={"message": packagedMessage}, proxies=proxies)
+            response = requests.post(f"http://{destination}/receiveMessage", data={"message": packedMessageContainer}, proxies=proxies)
             if response.status_code == 200:
                 response_data = response.json()
                 received_sha256 = response_data.get("sha256")
@@ -84,16 +85,13 @@ def sendMessage():
         with open("storage.json", "r") as f:
             storage = json.load(f)
     except FileNotFoundError:
-        storage = {"receivedMessages": {}, "sentMessages": {}}
-
-    if "sentMessages" not in storage:
-        storage["sentMessages"] = {}
-
-    if destination not in storage["sentMessages"]:
-        storage["sentMessages"][destination] = []
+        storage = {"receivedMessages": {}, "sentMessages": {}, "friends": [], "peerList": []}
 
     # Create a copy of the message without the sender field
     message_to_store = {key: value for key, value in message.items() if key != "sender"}
+
+    if destination not in storage["receivedMessages"]:
+        storage["receivedMessages"][destination] = []
 
     storage["sentMessages"][destination].append(message_to_store)
 
@@ -118,8 +116,11 @@ def getMessagesFromSender():
     sentMessages = storage.get("sentMessages", {}).get(sender, [])
 
     # Add sender field to each received message
+    parsedReceivedMessages = []
     for message in receivedMessages:
-        message["sender"] = sender
+        parsedMessage = json.loads(message["message"])
+        parsedMessage["sender"] = sender
+        parsedReceivedMessages.append(parsedMessage)
 
     # Add sender field to each sent message
     for message in sentMessages:
@@ -130,11 +131,28 @@ def getMessagesFromSender():
     sentMessages.sort(key=lambda msg: msg["timestamp"])
 
     response = {
-        "receivedMessages": receivedMessages,
+        "receivedMessages": parsedReceivedMessages,
         "sentMessages": sentMessages
     }
 
     return json.dumps(response)
+
+
+def isVerifiedSender():
+    sender = flask.request.get_json().get("address")
+
+    try:
+        with open("storage.json", "r") as f:
+            storage = json.load(f)
+    except FileNotFoundError:
+        return json.dumps({"verified": False})
+
+    knownPeers = storage.get("knownPeers", [])
+
+    if any(f["address"] == sender for f in knownPeers):
+        return json.dumps({"verified": True})
+    else:
+        return json.dumps({"verified": False})
 
 
 def getLatestMessages():
@@ -151,7 +169,7 @@ def getLatestMessages():
     # Get the latest received messages
     for sender, messages in receivedMessages.items():
         if messages:
-            latest_message = max(messages, key=lambda msg: msg["timestamp"])
+            latest_message = max(messages, key=lambda msg: json.loads(msg["message"])["timestamp"])
             latest_message_with_sender = latest_message.copy()
             latest_message_with_sender["sender"] = sender
             latestMessages[sender] = latest_message_with_sender
@@ -209,64 +227,7 @@ def getFriends():
 
 
 def startChat():
-    destinationAddress = flask.request.get_json().get("address")
-
-    #check if the user is already in the known keys
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        storage = {"keyList": []}
-
-    keyList = storage.get("keyList", [])
-
-    if len(keyList) > 0 and any(torAddressFromBase64(k["publicKey"]) == destinationAddress for k in keyList):
-        return json.dumps({"message": "User added!"})
-        
-
-    # try to get the user's public key
-    proxies = {
-        'http': 'socks5h://localhost:{}'.format(localSocksPort)
-    }
-
-    publicKey = None
-
-    for i in range(3):
-        try:
-            response = requests.get(f"http://{destinationAddress}/getPublicKey", proxies=proxies)
-            if response.status_code == 200:
-                publicKey = response.json().get("publicKey")
-                break
-            else:
-                print(f"Failed to fetch friend's public key. Retrying in 5 seconds...")
-                sleep(5)
-                continue
-        except requests.exceptions.RequestException as e:
-            print(f"Request exception: {str(e)}. Retrying in 5 seconds...")
-            sleep(5)
-            continue
-    else:
-        return json.dumps({"error": "Failed to fetch friend's public key after three tries!"})
-    
-    # save the user's public key
-    try:
-        with open("storage.json", "r") as f:
-            storage = json.load(f)
-    except FileNotFoundError:
-        storage = {"keyList": []}
-    
-    keyList = storage.get("keyList", [])
-
-    if len(keyList) > 0 and any(torAddressFromBase64(k["publicKey"]) == destinationAddress for k in keyList):
-        return json.dumps({"error": "User already added!"})
-    
-    keyList.append({"publicKey": publicKey})
-    storage["keyList"] = keyList
-
-    with open("storage.json", "w") as f:
-        json.dump(storage, f, indent=4)
-
-    return json.dumps({"message": "User added!"})
+    ISAHDHIASODHIOHISODHAIOSHOAHSIDOHIAOSHIDOHAIOSHDOAHSIDOHIASHIDHAISHDIOAHOSIDHIAOSHOIHAIOSDIOAHSIDHOAHSOIDHIAOSHIDOHAOISHDIHAIOSHDAIHOSHIOD
 
 
 def addFriend():

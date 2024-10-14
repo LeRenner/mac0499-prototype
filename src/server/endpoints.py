@@ -31,12 +31,10 @@ def setupEndpoints(app, address, localSocksPort):
     initializeTorKeys()
 
     publicEndpoints = [
-        ["receiveMessage", "POST"],
-        ["getPublicKey", "GET"]
+        ["receiveMessage", "POST"]
     ]
     
     privateEndpoints = [
-        ["root", "GET"],
         ["getMessagesFromSender", "POST"],
         ["sendMessage", "POST"],
         ["getLatestMessages", "GET"],
@@ -45,7 +43,8 @@ def setupEndpoints(app, address, localSocksPort):
         ["startChat", "POST"],
         ["getFriends", "GET"],
         ["addFriend", "POST"],
-        ["removeFriend", "POST"]
+        ["removeFriend", "POST"],
+        ["isVerifiedSender", "POST"]
     ]
     
     def check_tor_middleware_header():

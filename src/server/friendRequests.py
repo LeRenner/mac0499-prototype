@@ -118,13 +118,6 @@ def getFriendIPHandler(request_object_json: str) -> str:
     if kind != "getFriendIP":
         return json.dumps({"error": "Invalid kind."})
     
-    # Get the friend's public key
-    try:
-        response = requests.post(f"http://localhost:{localHttpPort}/getPublicKey", data={"request": request_object_json})
-        friendPublicKey = response.json()["publicKey"]
-    except requests.exceptions.RequestException:
-        return json.dumps({"error": "Failed to fetch friend's public key."})
-    
     # Calculate the friend's IP address
     friendIP = torAddressFromBase64(friendPublicKey)
 
