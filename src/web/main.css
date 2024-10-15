@@ -109,7 +109,7 @@ pre {
     border-radius: 4px;
 }
 
-.sendMessageButton {
+.request_sendMessageButton {
     flex-shrink: 0;
     padding: 8px 12px;
     border: none;
@@ -120,7 +120,7 @@ pre {
     transition: background-color 0.1s;
 }
 
-.sendMessageButton:hover {
+.request_sendMessageButton:hover {
     background-color: #ddd;
 }
 

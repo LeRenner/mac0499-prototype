@@ -15,44 +15,21 @@ global threads
 global localSocksPort
 threads = []
 
-def setupPublicEndpointlVariables(socksPort):
+def pubEndpoint_setupPublicEndpointlVariables(socksPort):
     global localSocksPort
     localSocksPort = socksPort
-
-def processFirstContact(address):
-    proxies = {
-        'http': 'socks5h://localhost:{}'.format(localSocksPort)
-    }
-
-    for i in range(3):
-        try:
-            response = requests.get(f"http://{address}/getPublicKeyBase64", proxies=proxies, timeout=15)
-            if response.status_code == 200:
-                response_data = response.json()
-                public_key = response_data.get("public_key")
-                if public_key:
-                    operator_storePeerPublicKey(address, public_key)
-                    operator_successFirstContact(address)
-                    return
-        except requests.RequestException as e:
-            print(f"Attempt {i+1} failed: {e}")
-        sleep(1)
-
-    operator_removeFirstContact(address)
-    print("Failed to retrieve public key after 3 attempts.")
 
 
 #############################################################
 ######## PUBLIC ENDPOINTS ###################################
 #############################################################
 
-def receiveMessage():
+
+def pubEndpoint_receiveMessage():
     # get the message from the post request
     message = flask.request.form.get("message")
 
     parsedMessageContainer = json.loads(message)
-
-    print("Parsed message: ", parsedMessageContainer)
 
     decodedMessage = json.loads(parsedMessageContainer["message"])
     sender = decodedMessage["sender"].replace("\n", "")
@@ -81,7 +58,7 @@ def receiveMessage():
         operator_addFirstContact(sender)
 
         # Start a new thread to process the first contact
-        thread = threading.Thread(target=processFirstContact, args=(sender,))
+        thread = threading.Thread(target=p2p_processFirstContact, args=(sender,))
         thread.start()
         threads.append(thread)
 
@@ -102,18 +79,18 @@ def receiveMessage():
     return json.dumps({"message": "Message received!", "sha256": sha256_hash})
 
 
-def getPublicKeyBase64():
+def pubEndpoint_getPublicKeyBase64():
     return json.dumps({"public_key": crypto_getOwnPublicKey()})
 
-def checkFriendRequest():
+def pubEndpoint_checkFriendRequest():
     request = flask.request.form.get("request")
-    return processCheckFriendRequest(request)
+    return processpubEndpoint_checkFriendRequest(request)
 
 
-def getFriendIP():
+def pubEndpoint_getFriendIP():
     request = flask.request.form.get("request")
-    return getFriendIPHandler(request)
+    return pubEndpoint_getFriendIPHandler(request)
 
 
-def p2pRequest():
-    return p2pRequestHandler()
+def pubEndpoint_p2pRequest():
+    return pubEndpoint_p2pRequestHandler()

@@ -4,9 +4,9 @@
 
 
 // returns list of messages from specific sender
-async function getMessagesFromSender(sender) {
+async function request_getMessagesFromSender(sender) {
     try {
-        const response = await fetch('/getMessagesFromSender', {
+        const response = await fetch('/privEndpoint_getMessagesFromSender', {
             method: 'POST',
             body: sender
         });
@@ -21,9 +21,9 @@ async function getMessagesFromSender(sender) {
 
 
 // returns list with the latest message from each sender
-async function getLatestMessages() {
+async function request_getLatestMessages() {
     try {
-        const response = await fetch('/getLatestMessages', {
+        const response = await fetch('/privEndpoint_getLatestMessages', {
             method: 'GET'
         });
 
@@ -37,9 +37,9 @@ async function getLatestMessages() {
 
 
 // returns list of messages from specific sender
-async function requestSendMessage(messageContent, address) {
+async function request_sendMessage(messageContent, address) {
     try {
-        const response = await fetch('/sendMessage', {
+        const response = await fetch('/privEndpoint_sendMessage', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -62,9 +62,9 @@ async function requestSendMessage(messageContent, address) {
 
 
 // returns list with the latest message from each sender
-async function getLatestMessages() {
+async function request_getLatestMessages() {
     try {
-        const response = await fetch('/getLatestMessages', {
+        const response = await fetch('/privEndpoint_getLatestMessages', {
             method: 'GET'
         });
 
@@ -77,9 +77,9 @@ async function getLatestMessages() {
 }
 
 // returns list of friends
-async function getFriends() {
+async function request_getFriends() {
     try {
-        const response = await fetch('/getFriends', {
+        const response = await fetch('/privEndpoint_getFriends', {
             method: 'GET'
         });
 
@@ -92,12 +92,12 @@ async function getFriends() {
 }
 
 // adds request for new friend
-async function addFriend() {
+async function request_addFriend() {
     const address = document.getElementById('new-friend-address').value;
     const alias = document.getElementById('new-friend').value;
 
     try {
-        const response = await fetch('/addFriend', {
+        const response = await fetch('/privEndpoint_addFriend', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -119,11 +119,11 @@ async function addFriend() {
 }
 
 // removes friend
-async function removeFriend() {
+async function request_removeFriend() {
     const alias = document.getElementById('remove-friend').value;
 
     try {
-        const response = await fetch('/removeFriend', {
+        const response = await fetch('/privEndpoint_removeFriend', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -144,9 +144,9 @@ async function removeFriend() {
 }
 
 // starts new chat with friend
-async function startChat(address) {
+async function request_startChat(address) {
     try {
-        const response = await fetch('/startChat', {
+        const response = await fetch('/privEndpoint_startChat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -173,7 +173,7 @@ async function startChat(address) {
 //////// Buttons //////////////////////////////
 ///////////////////////////////////////////////
 
-async function sendMessage() {
+async function request_callSendMessage() {
     document.querySelector('.sending-message').style.display = 'block';
     document.querySelector('.message-sent').style.display = 'none';
     document.querySelector('.message-error').style.display = 'none';
@@ -181,13 +181,13 @@ async function sendMessage() {
     const messageCont = document.getElementById('message').value;
 
     try {
-        let result = await requestSendMessage(messageCont, currentChatAddress);
+        let result = await request_sendMessage(messageCont, currentChatAddress);
 
         if (result.message == "processing") {
             document.querySelector('.sending-message').style.display = 'block';
             document.querySelector('.sending-message').innerHTML = 'First message! Estabilishing first contact handshake...';
 
-            result = await requestSendMessage(messageCont, currentChatAddress);
+            result = await request_sendMessage(messageCont, currentChatAddress);
         }
 
         document.querySelector('.sending-message').innerHTML = 'Sending message...';

@@ -38,10 +38,6 @@ def crypto_signMessage(message: str) -> str:
 
 
 def crypto_verifyMessage(message: str, signature: str, originAddress: str) -> bool:
-    print("Asked to verify message: ", message)
-    print("With signature: ", signature)
-    print("From origin: ", originAddress)
-
 
     # Get the public key from the origin address
     public_key = base64.b64decode(operator_getPublicKeyFromAddress(originAddress))
@@ -55,7 +51,7 @@ def crypto_verifyMessage(message: str, signature: str, originAddress: str) -> bo
     # Verify the message
     try:
         verify_key.verify(message.encode('utf-8'), signature_bytes)
-        print("Message verified.")
+        print("Message signature verified.")
         return True
     except Exception as e:
         print("Message verification failed.")

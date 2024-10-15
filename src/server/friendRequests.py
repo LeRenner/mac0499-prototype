@@ -1,7 +1,7 @@
 from .serverCrypto import *
 from .jsonOperator import *
 
-def craftCheckFriendRequest(destAddress: str) -> str:
+def craftpubEndpoint_checkFriendRequest(destAddress: str) -> str:
     global address
 
     request = {
@@ -30,7 +30,7 @@ def craftCheckFriendRequest(destAddress: str) -> str:
     return request_object_json
 
 
-def processCheckFriendRequest(request_object_json: str) -> bool:
+def processpubEndpoint_checkFriendRequest(request_object_json: str) -> bool:
     # Deserialize the request object
     request_object = json.loads(request_object_json)
 
@@ -73,10 +73,10 @@ def processCheckFriendRequest(request_object_json: str) -> bool:
     return {"message": "Success", "friend": 0}
 
 
-# def craftGetFriendIPRequest(destAddress: str) -> str:
+# def craftpubEndpoint_getFriendIPRequest(destAddress: str) -> str:
 
 
-def getFriendIPHandler(request_object_json: str) -> str:
+def pubEndpoint_getFriendIPHandler(request_object_json: str) -> str:
     # Deserialize the request object
     request_object = json.loads(request_object_json)
 
@@ -109,7 +109,7 @@ def getFriendIPHandler(request_object_json: str) -> str:
         return json.dumps({"error": "Destination address does not match."})
     
     # Check request kind
-    if kind != "getFriendIP":
+    if kind != "pubEndpoint_getFriendIP":
         return json.dumps({"error": "Invalid kind."})
     
     # Calculate the friend's IP address

@@ -323,14 +323,14 @@ def operator_addFriend(friend: dict):
     return json.dumps({"message": "Friend added!"})
 
 
-def operator_removeFriend(address: str):
+def operator_removeFriend(alias: str):
     global writeLock
     storage = operator_getCurrentStorage()
     
     friends = storage.get("friends", [])
 
     for friend in friends:
-        if friend["address"] == address:
+        if friend["alias"] == alias:
             friends.remove(friend)
             storage["friends"] = friends
 

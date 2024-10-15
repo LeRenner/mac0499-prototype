@@ -1,0 +1,24 @@
+{
+    "receivedMessages": {
+        "ydv7xoxqie65sdxauteoraonqtj6atnsvvxduy74qs7vztgvrpr7dryd.onion": [
+            {
+                "message": "{\"sender\": \"ydv7xoxqie65sdxauteoraonqtj6atnsvvxduy74qs7vztgvrpr7dryd.onion\", \"content\": \"omg omg omg hiiiiiii\", \"timestamp\": 1728960556}",
+                "signature": "a1NCwsDrBNVYYxvvUQCnskRo/TAkEC+asM2Zx8vvfMtdXEs0C1jU5bwCbcmS1WmkJJ8dtSQNOIrFUllfOUXIBw=="
+            }
+        ]
+    },
+    "sentMessages": {},
+    "friends": [],
+    "peerList": [
+        {
+            "address": "ydv7xoxqie65sdxauteoraonqtj6atnsvvxduy74qs7vztgvrpr7dryd.onion",
+            "public_key": "3lVYWRMAZONFWz2SYXLFfS0aPcT+H+tfXoFPBz5UAaI="
+        }
+    ],
+    "firstContact": [
+        {
+            "address": "ydv7xoxqie65sdxauteoraonqtj6atnsvvxduy74qs7vztgvrpr7dryd.onion",
+            "success": true
+        }
+    ]
+}

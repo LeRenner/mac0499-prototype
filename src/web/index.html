@@ -31,7 +31,7 @@
             <div id="receivedMessages">No message received yet.</div>
             <div id="message-sender-container"></div>
                 <input type="text" id="message" placeholder="Enter Message">
-                <button class="sendMessageButton" onclick="sendMessage()">
+                <button class="request_sendMessageButton" onclick="request_callSendMessage()">
                     Ʌ
                 </button>
                 <p class="sending-message" style="display: none;">Sending message... (will try for 20s)</p>
@@ -48,13 +48,13 @@
                 <h3>Friends Options</h3>
                 <hr/>
                 <h4>Add Friend</h4>
-                <input type="text" id="new-friend" placeholder="Enter friend nickname">
                 <input type="text" id="new-friend-address" placeholder="Enter friend address">
-                <button onclick="addFriend()">Add Friend</button>
+                <input type="text" id="new-friend" placeholder="Enter friend nickname">
+                <button onclick="request_addFriend()">Add Friend</button>
                 <hr/>
                 <h4>Remove Friend</h4>
                 <input type="text" id="remove-friend" placeholder="Enter friend nickname">
-                <button onclick="removeFriend()">Remove Friend</button>
+                <button onclick="request_removeFriend()">Remove Friend</button>
                 <hr/>
                 <h3>Friends list</h3>
             </div>

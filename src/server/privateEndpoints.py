@@ -12,7 +12,7 @@ from .p2p import *
 global localSocksPort
 global address
 
-def setupPrivateEndpointVariables(argAddress, argLocalSocksPort):
+def privEndpoint_setupPrivateEndpointVariables(argAddress, argLocalSocksPort):
     global localSocksPort
     global address
 
@@ -25,7 +25,7 @@ def setupPrivateEndpointVariables(argAddress, argLocalSocksPort):
 #############################################################
 
 
-def sendMessage():
+def privEndpoint_sendMessage():
     global localSocksPort
     global address
 
@@ -59,7 +59,7 @@ def sendMessage():
 
     for i in range(3):
         try:
-            response = requests.post(f"http://{destination}/receiveMessage", data={"message": packedMessageContainer}, proxies=proxies, timeout=15)
+            response = requests.post(f"http://{destination}/pubEndpoint_receiveMessage", data={"message": packedMessageContainer}, proxies=proxies, timeout=15)
             if response.status_code == 200:
                 response_data = response.json()
 
@@ -92,7 +92,7 @@ def sendMessage():
     return json.dumps({"message": "Message sent!"})
 
 
-def getMessagesFromSender():
+def privEndpoint_getMessagesFromSender():
     global address
 
     sender = flask.request.data.decode('utf-8')
@@ -100,32 +100,32 @@ def getMessagesFromSender():
     return operator_getMessagesFromSender(sender)
 
 
-def isKnownPeer():
+def privEndpoint_isKnownPeer():
     sender = flask.request.get_json().get("address")
 
     return operator_isKnownPeer(sender)
 
 
-def getLatestMessages():
+def privEndpoint_getLatestMessages():
     return operator_getLatestMessages()
 
 
-def getAddress():
+def privEndpoint_getAddress():
     result = {
         "address": address
     }
     return json.dumps(result)
 
 
-def getSenders():
+def privEndpoint_getSenders():
     return operator_getSenders()
 
 
-def getFriends():
+def privEndpoint_getFriends():
     return operator_getFriends()
 
 
-def updatePublicKeyRecords(peerAddress: str) -> bool:
+def privEndpoint_updatePublicKeyRecords(peerAddress: str) -> bool:
     global localSocksPort
 
     proxies = {
@@ -134,20 +134,18 @@ def updatePublicKeyRecords(peerAddress: str) -> bool:
 
     for attempt in range(3):
         try:
-            print("Starting request...")
-            response = requests.get(f"http://{peerAddress}/getPublicKeyBase64", proxies=proxies, timeout=15)
-
-            print(response.json())
+            print("[updatePublicKeyRecords] Starting request...")
+            response = requests.get(f"http://{peerAddress}/pubEndpoint_getPublicKeyBase64", proxies=proxies, timeout=15)
 
             public_key_base64 = response.json().get("public_key")
 
-            print(f"Fetched public key from {peerAddress}: {public_key_base64}")
+            print(f"[updatePublicKeyRecords] Fetched pubkey: {public_key_base64}")
 
             operator_storePeerPublicKey(peerAddress, public_key_base64)
 
             return True
         except requests.RequestException as e:
-            print(f"Error fetching public key: {e}")
+            print(f"Error fetching public key")
             if attempt < 2:
                 print("Retrying in 5 seconds...")
                 sleep(5)
@@ -156,11 +154,11 @@ def updatePublicKeyRecords(peerAddress: str) -> bool:
                 return False
 
 
-def startChat():
+def privEndpoint_startChat():
     friend_address = flask.request.get_json().get("address")
 
     if operator_getPublicKeyFromAddress(friend_address) is None:
-        if not updatePublicKeyRecords(friend_address):
+        if not privEndpoint_updatePublicKeyRecords(friend_address):
             return json.dumps({"error": "Failed to fetch public key!"})
         else:
             return json.dumps({"message": "Public key fetched!"})
@@ -168,26 +166,30 @@ def startChat():
         return json.dumps({"message": "Public key already in storage!"})
 
 
-def addFriend():
+def privEndpoint_addFriend():
     friend = flask.request.get_json()
 
     return operator_addFriend(friend)
 
 
-def removeFriend():
+def privEndpoint_removeFriend():
     friend = flask.request.get_json()
 
-    return operator_removeFriend(friend)
+    return operator_removeFriend(friend["alias"])
 
 
-def webInterface(filename):
+def privEndpoint_webInterface(filename):
     if filename == "":
         filename = "index.html"
 
     return flask.send_from_directory("../web", filename)
 
 
-def changeFocusedFriend():
+def privEndpoint_changeFocusedFriend():
     friend = flask.request.get_json().get("address")
 
     return p2p_changeFocusedFriend(friend)
+
+
+def privEndpoint_getFriendConectionStatus():
+    return p2p_getFriendConnectionStatus()

@@ -5,8 +5,9 @@ import logging
 
 from .privateEndpoints import *
 from .publicEndpoints import *
-from .serverCrypto import *
-from .jsonOperator import *
+from .serverCrypto import crypto_initializeTorKeys
+from .jsonOperator import operator_setupVariables
+from .p2p import p2p_initializeVariables
 
 
 #############################################################
@@ -28,27 +29,29 @@ def endpoints_initializeFlask():
 
 
 def endpoints_setupEndpoints(app, address, localSocksPort):
-    setupPrivateEndpointVariables(address, localSocksPort)
-    setupPublicEndpointlVariables(localSocksPort)
+    privEndpoint_setupPrivateEndpointVariables(address, localSocksPort)
+    pubEndpoint_setupPublicEndpointlVariables(localSocksPort)
+    p2p_initializeVariables(localSocksPort)
     operator_setupVariables(address)
     crypto_initializeTorKeys()
 
     publicEndpoints = [
-        ["receiveMessage", "POST"],
-        ["getPublicKeyBase64", "GET"]
+        ["pubEndpoint_receiveMessage", "POST"],
+        ["pubEndpoint_getPublicKeyBase64", "GET"]
     ]
     
     privateEndpoints = [
-        ["getMessagesFromSender", "POST"],
-        ["sendMessage", "POST"],
-        ["getLatestMessages", "GET"],
-        ["getSenders", "GET"],
-        ["getAddress", "GET"],
-        ["startChat", "POST"],
-        ["getFriends", "GET"],
-        ["addFriend", "POST"],
-        ["removeFriend", "POST"],
-        ["isKnownPeer", "POST"]
+        ["privEndpoint_getMessagesFromSender", "POST"],
+        ["privEndpoint_sendMessage", "POST"],
+        ["privEndpoint_getLatestMessages", "GET"],
+        ["privEndpoint_getSenders", "GET"],
+        ["privEndpoint_getAddress", "GET"],
+        ["privEndpoint_startChat", "POST"],
+        ["privEndpoint_getFriends", "GET"],
+        ["privEndpoint_addFriend", "POST"],
+        ["privEndpoint_removeFriend", "POST"],
+        ["privEndpoint_isKnownPeer", "POST"],
+        ["privEndpoint_changeFocusedFriend", "POST"]
     ]
     
     def check_tor_middleware_header():
@@ -67,16 +70,16 @@ def endpoints_setupEndpoints(app, address, localSocksPort):
 
     # Public endpoints
     for endpoint, method in publicEndpoints:
-        app.add_url_rule(f"/{endpoint}", endpoint, globals()[endpoint], methods=[method])
+        app.add_url_rule(f"/{endpoint}", endpoint, globals().get(endpoint), methods=[method])
 
     # Private endpoints with middleware check
     app.before_request(check_tor_middleware_header)
     for endpoint, method in privateEndpoints:
-        app.add_url_rule(f"/{endpoint}", endpoint, globals()[endpoint], methods=[method])
+        app.add_url_rule(f"/{endpoint}", endpoint, globals().get(endpoint), methods=[method])
 
-    app.add_url_rule("/web", "webInterface", webInterface, defaults={'filename': ''}, methods=["GET"])
-    app.add_url_rule("/web/", "webInterface", webInterface, defaults={'filename': ''}, methods=["GET"])
-    app.add_url_rule("/web/<path:filename>", "webInterface", webInterface, methods=["GET"])
+    app.add_url_rule("/web", "privEndpoint_webInterface", privEndpoint_webInterface, defaults={'filename': ''}, methods=["GET"])
+    app.add_url_rule("/web/", "privEndpoint_webInterface", privEndpoint_webInterface, defaults={'filename': ''}, methods=["GET"])
+    app.add_url_rule("/web/<path:filename>", "privEndpoint_webInterface", privEndpoint_webInterface, methods=["GET"])
 
 
 def endpoints_runServer(argAddress, argHttpPort, argSocksPort):

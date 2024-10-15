@@ -62,7 +62,7 @@ document.getElementById('senders').addEventListener('click', async function(even
 
         // if current chat address starts and ends with []
         if (currentChatAddress.startsWith('[') && currentChatAddress.endsWith(']')) {
-            let friends = await getFriends();
+            let friends = await request_getFriends();
             // find friend with this alias
             friends.forEach(friend => {
                 if (friend.alias === currentChatAddress.slice(1, -1)) {
@@ -85,6 +85,7 @@ document.getElementById('friends-tab').addEventListener('click', function() {
 
 // when clicking on item with ID senders-tab, show senders
 document.getElementById('chats-tab').addEventListener('click', function() {
+    previousChatListHash = '';
     changeInterfaceState(0);
 });
 
