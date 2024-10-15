@@ -24,7 +24,6 @@ def pubEndpoint_setupPublicEndpointlVariables(socksPort):
 ######## PUBLIC ENDPOINTS ###################################
 #############################################################
 
-
 def pubEndpoint_receiveMessage():
     # get the message from the post request
     message = flask.request.form.get("message")
@@ -86,6 +85,11 @@ def pubEndpoint_getPublicKeyBase64():
 def pubEndpoint_checkFriendRequest():
     request = flask.request.form.get("request")
     return friends_receiveCheckFriendRequest(request)
+
+
+def pubEndpoint_getIpRequest():
+    request = flask.request.form.get("request")
+    return friends_receiveGetIpRequest(request)
 
 
 def pubEndpoint_getFriendIP():

@@ -1,15 +1,13 @@
 import hashlib
 import base64
+import json
 
 from nacl.signing import SigningKey
 from nacl.signing import VerifyKey
 from nacl.encoding import RawEncoder
 from pytor.ed25519 import Ed25519
+from time import sleep
 from .jsonOperator import *
-import json
-
-TOR_PRIVATE_KEY_FILE = "tor/data/hidden-service/hs_ed25519_secret_key"
-TOR_PUBLIC_KEY_FILE = "tor/data/hidden-service/hs_ed25519_public_key"
 
 global private_key_seed
 global private_key_signing_key_object
@@ -17,8 +15,17 @@ global public_tor_key
 global public_signing_key
 global address
 
+TOR_PRIVATE_KEY_FILE = "tor/data/hidden-service/hs_ed25519_secret_key"
+TOR_PUBLIC_KEY_FILE = "tor/data/hidden-service/hs_ed25519_public_key"
+address = None
+
+
 def crypto_getOwnAddress() -> str:
     global address
+
+    while address is None:
+        sleep(1)
+
     return address
 
 

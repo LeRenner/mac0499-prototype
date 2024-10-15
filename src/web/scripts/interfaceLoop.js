@@ -4,11 +4,12 @@ let currentChatAddress = '';
 
 
 // every second get messages and update the UI
-function updateUI() {
+async function updateUI() {
     if (interfaceState === 0) {
         generateChatList();
     } else if (interfaceState === 1) {
         generateMessageList();
+        await updateFriendConnectionStatus();
     } else if (interfaceState === 2) {
         updateFriends();
     }
@@ -62,6 +63,10 @@ document.getElementById('senders').addEventListener('click', async function(even
 
         // if current chat address starts and ends with []
         if (currentChatAddress.startsWith('[') && currentChatAddress.endsWith(']')) {
+            // start running the update friend connection status loop
+            await changeFocusedFriend(currentChatAddress.slice(1, -1));
+            shouldRunUpdateFriendConnectionStatus = true;
+
             let friends = await request_getFriends();
             // find friend with this alias
             friends.forEach(friend => {

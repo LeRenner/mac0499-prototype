@@ -1,24 +1,41 @@
 {
     "receivedMessages": {
-        "ydv7xoxqie65sdxauteoraonqtj6atnsvvxduy74qs7vztgvrpr7dryd.onion": [
+        "r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion": [
             {
-                "message": "{\"sender\": \"ydv7xoxqie65sdxauteoraonqtj6atnsvvxduy74qs7vztgvrpr7dryd.onion\", \"content\": \"omg omg omg hiiiiiii\", \"timestamp\": 1728960556}",
-                "signature": "a1NCwsDrBNVYYxvvUQCnskRo/TAkEC+asM2Zx8vvfMtdXEs0C1jU5bwCbcmS1WmkJJ8dtSQNOIrFUllfOUXIBw=="
+                "message": "{\"sender\": \"r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion\", \"content\": \"heyyyy\", \"timestamp\": 1729035035}",
+                "signature": "+GAmdVOX1nIDfg9pApenK35iQCluNrYeRw7gzaMfyMAYphfyLud8VArAObfh1Ez7AzrJiSknXUQfep5d5mohBg=="
             }
         ]
     },
-    "sentMessages": {},
-    "friends": [],
-    "peerList": [
+    "sentMessages": {
+        "r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion": [
+            {
+                "content": "omg omg omg hiii",
+                "timestamp": 1729035021
+            }
+        ],
+        "ekqc3b4xoxv7rsohcxqsx24mykrhy6uqb5yx2stv7sxw2l7o2m3psmid.onion": [
+            {
+                "content": "omg omg hiii",
+                "timestamp": 1729035553
+            }
+        ]
+    },
+    "friends": [
         {
-            "address": "ydv7xoxqie65sdxauteoraonqtj6atnsvvxduy74qs7vztgvrpr7dryd.onion",
-            "public_key": "3lVYWRMAZONFWz2SYXLFfS0aPcT+H+tfXoFPBz5UAaI="
+            "address": "r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion",
+            "alias": "asduahsidohioas"
         }
     ],
-    "firstContact": [
+    "peerList": [
         {
-            "address": "ydv7xoxqie65sdxauteoraonqtj6atnsvvxduy74qs7vztgvrpr7dryd.onion",
-            "success": true
+            "address": "r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion",
+            "public_key": "o+trjeMpwGa/7YFNOAnmTb9Lp3IDMWG9NJiq3iNTqss="
+        },
+        {
+            "address": "ekqc3b4xoxv7rsohcxqsx24mykrhy6uqb5yx2stv7sxw2l7o2m3psmid.onion",
+            "public_key": "jzugS81uEnLKkoYZWlt2O99GeuqMgnNl+QT/iF74twI="
         }
-    ]
+    ],
+    "firstContact": []
 }

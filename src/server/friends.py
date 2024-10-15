@@ -20,11 +20,13 @@ def friends_initializeVariables(rcvSocksPort):
 
 def friends_craftFriendCheckRequest(destAddress: str) -> str:
     request = {
-        "origin": crypto_getOwnAddress,
+        "origin": crypto_getOwnAddress(),
         "destination": destAddress,
         "timestamp": int(datetime.datetime.now().timestamp()),
         "kind": "checkFriend"
     }
+
+    print(f"Crafted checkFriend request: {request}")
 
     # Serialize the request as JSON
     request_json = json.dumps(request)
@@ -45,6 +47,8 @@ def friends_craftFriendCheckRequest(destAddress: str) -> str:
 
 
 def friends_receiveCheckFriendRequest(request_object_json: str) -> bool:
+    print(f"Received checkFriend request: {request_object_json}")
+
     # Deserialize the request object
     deserialized_request_object = json.loads(request_object_json)
 
@@ -85,7 +89,8 @@ def friends_checkIsMutualFriend(friendAddress: str) -> bool:
     iAmTheirFriend = None
     theyAreMyFriend = None
 
-    myFriends = operator_getFriends()
+    myFriends = json.loads(operator_getFriends())
+
     for friend in myFriends:
         if friend["address"] == friendAddress:
             theyAreMyFriend = True
@@ -120,6 +125,36 @@ def friends_checkIsMutualFriend(friendAddress: str) -> bool:
 
     return theyAreMyFriend and iAmTheirFriend
 
+
+def friends_getFriendIpAddress(friendAddress: str) -> str:
+    global localSocksPort
+
+    request = friends_craftGetIpRequest(friendAddress)
+
+    proxies = {
+        'http': 'socks5h://localhost:{}'.format(localSocksPort)
+    }
+
+    for attempt in range(3):
+        try:
+            print("[friends_getFriendIpAddress] Starting request...")
+            response = requests.post(f"http://{friendAddress}/pubEndpoint_getIpRequest", data=request, proxies=proxies, timeout=15)
+
+            response_json = response.json()
+            friend = response_json.get("friend")
+
+            if friend is not None:
+                return friend
+        except requests.RequestException as e:
+            print(f"Error fetching friend IP: {e}")
+            if attempt < 2:
+                print("Retrying in 5 seconds...")
+                sleep(5)
+            else:
+                print("Failed to fetch friend IP after three attempts.")
+                return None
+
+    return None
 
 
 def friends_craftGetIpRequest(destAddress: str) -> str:
@@ -175,12 +210,22 @@ def friends_receiveGetIpRequest(request_object_json: str) -> bool:
     if int(datetime.datetime.now().timestamp()) - timestamp > 120:
         return {"error": "Request is too old."}
 
+    ownLocalIP = friends_getLocalIP()
+    ownPublicIP = friends_getPublicIP()
+
+    originIsFriend = None
     friends = operator_getFriends()
     for friend in friends:
         if friend["address"] == origin:
-            return {"friend": True}
+            originIsFriend = True
+            break
+    if originIsFriend is None:
+        originIsFriend = False
     
-    return {"friend": False}
+    if originIsFriend:
+        return {"message": "Success", "localIp": ownLocalIP, "publicIp": ownPublicIP}
+    else:
+        return {"error": "Origin is not a friend."}
 
 
 #####################################################

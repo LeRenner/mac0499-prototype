@@ -22,12 +22,12 @@ def p2p_initializeVariables(rcvSocksPort):
     global friendConnectionThread
     global friendUpdateThread
     global localSocksPort
+    global currentFocusedFriend
+    global friendConnectionStatus
 
     localSocksPort = rcvSocksPort
     currentFocusedFriend = None
     friendConnectionStatus = None
-    friendConnectionThread = threading.Thread(target=p2p_friendConnectionThread)
-    friendConnectionThread.start()
     friendUpdateThread = threading.Thread(target=p2p_friendUpdateThread)
     friendUpdateThread.start()
 
@@ -40,12 +40,20 @@ def p2p_friendConnectionThread():
     global currentFocusedFriend
     global friendConnectionStatus
 
+    print("Current focused friend: " + str(currentFocusedFriend))
+
     friendConnectionStatus = "Checking if friend is mutual..."
 
     focusedFriendIsMutual = friends_checkIsMutualFriend(currentFocusedFriend)
 
     friendConnectionStatus = "Getting friend's IP addresses..."
-    
+
+    friendIPs = friends_getFriendIpAddress(currentFocusedFriend)
+
+    friendConnectionStatus = "Friend IP addresses are: " + str(friendIPs)
+
+    while True:
+        sleep(1)
 
 
 def p2p_friendUpdateThread():
@@ -122,7 +130,13 @@ def p2p_changeFocusedFriend(address):
     else:
         currentFocusedFriend = address
 
+    return {"status": "Success"}
+
 
 def p2p_getFriendConnectionStatus():
     global friendConnectionStatus
-    return friendConnectionStatus
+
+    if friendConnectionStatus is None:
+        return {"status": "No friend connection status available."}
+
+    return {"status": friendConnectionStatus}

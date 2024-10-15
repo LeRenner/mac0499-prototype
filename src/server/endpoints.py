@@ -39,7 +39,11 @@ def endpoints_setupEndpoints(app, address, localSocksPort):
 
     publicEndpoints = [
         ["pubEndpoint_receiveMessage", "POST"],
-        ["pubEndpoint_getPublicKeyBase64", "GET"]
+        ["pubEndpoint_getPublicKeyBase64", "GET"],
+        ["pubEndpoint_checkFriendRequest", "POST"],
+        ["pubEndpoint_getIpRequest", "POST"],
+        ["pubEndpoint_getFriendIP", "POST"],
+        ["pubEndpoint_p2pRequest", "GET"],
     ]
     
     privateEndpoints = [
@@ -52,8 +56,8 @@ def endpoints_setupEndpoints(app, address, localSocksPort):
         ["privEndpoint_getFriends", "GET"],
         ["privEndpoint_addFriend", "POST"],
         ["privEndpoint_removeFriend", "POST"],
-        ["privEndpoint_isKnownPeer", "POST"],
-        ["privEndpoint_changeFocusedFriend", "POST"]
+        ["privEndpoint_changeFocusedFriend", "POST"],
+        ["privEndpoint_getFriendConectionStatus", "GET"]
     ]
     
     def check_tor_middleware_header():
