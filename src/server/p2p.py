@@ -8,24 +8,72 @@ from time import sleep
 import threading
 
 from .serverCrypto import *
+from .jsonOperator import *
+from .friends import *
 
 global currentFocusedFriend
 global friendConnectionThread
+global friendUpdateThread
 global localSocksPort
-friendConnectionThread = None
-currentFocusedFriend = None
+global friendConnectionStatus
 
-def p2p_friendConnectionThread():
-    print("Friend connection thread started.")
 
 def p2p_initializeVariables(rcvSocksPort):
     global friendConnectionThread
+    global friendUpdateThread
     global localSocksPort
 
     localSocksPort = rcvSocksPort
+    currentFocusedFriend = None
+    friendConnectionStatus = None
     friendConnectionThread = threading.Thread(target=p2p_friendConnectionThread)
     friendConnectionThread.start()
+    friendUpdateThread = threading.Thread(target=p2p_friendUpdateThread)
+    friendUpdateThread.start()
 
+
+#####################################################
+######## P2P THREADS ################################
+#####################################################
+
+def p2p_friendConnectionThread():
+    global currentFocusedFriend
+    global friendConnectionStatus
+
+    friendConnectionStatus = "Checking if friend is mutual..."
+
+    focusedFriendIsMutual = friends_checkIsMutualFriend(currentFocusedFriend)
+
+    friendConnectionStatus = "Getting friend's IP addresses..."
+    
+
+
+def p2p_friendUpdateThread():
+    global currentFocusedFriend
+    global friendConnectionThread
+
+    pastFocusedFriend = None
+
+    while True:
+        while currentFocusedFriend == pastFocusedFriend:
+            sleep(1)
+        
+        pastFocusedFriend = currentFocusedFriend
+
+        if currentFocusedFriend is None:
+            # kill friend connection thread
+            friendConnectionThread.join()
+            break
+        else:
+            # start friend connection thread
+            friendConnectionThread = threading.Thread(target=p2p_friendConnectionThread)
+            friendConnectionThread.start()
+        
+        sleep(1)
+
+#####################################################
+######## P2P FUNCTIONS ##############################
+#####################################################
 
 def p2p_processFirstContact(address):
     global localSocksPort
@@ -66,6 +114,15 @@ def p2p_getLocalIP():
     return local_ip
 
 
-def p2p_privEndpoint_changeFocusedFriend(address):
+def p2p_changeFocusedFriend(address):
     global currentFocusedFriend
-    currentFocusedFriend = address
+
+    if address == "null":
+        currentFocusedFriend = None
+    else:
+        currentFocusedFriend = address
+
+
+def p2p_getFriendConnectionStatus():
+    global friendConnectionStatus
+    return friendConnectionStatus

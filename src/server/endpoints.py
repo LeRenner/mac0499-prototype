@@ -8,6 +8,7 @@ from .publicEndpoints import *
 from .serverCrypto import crypto_initializeTorKeys
 from .jsonOperator import operator_setupVariables
 from .p2p import p2p_initializeVariables
+from .friends import friends_initializeVariables
 
 
 #############################################################
@@ -32,6 +33,7 @@ def endpoints_setupEndpoints(app, address, localSocksPort):
     privEndpoint_setupPrivateEndpointVariables(address, localSocksPort)
     pubEndpoint_setupPublicEndpointlVariables(localSocksPort)
     p2p_initializeVariables(localSocksPort)
+    friends_initializeVariables(localSocksPort)
     operator_setupVariables(address)
     crypto_initializeTorKeys()
 

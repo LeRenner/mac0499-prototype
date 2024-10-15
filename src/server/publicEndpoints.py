@@ -4,8 +4,8 @@ import datetime
 import hashlib
 
 from .serverCrypto import *
-from .friendRequests import *
 from .jsonOperator import *
+from .friends import *
 from .p2p import *
 import threading
 import requests
@@ -82,9 +82,10 @@ def pubEndpoint_receiveMessage():
 def pubEndpoint_getPublicKeyBase64():
     return json.dumps({"public_key": crypto_getOwnPublicKey()})
 
+
 def pubEndpoint_checkFriendRequest():
     request = flask.request.form.get("request")
-    return processpubEndpoint_checkFriendRequest(request)
+    return friends_receiveCheckFriendRequest(request)
 
 
 def pubEndpoint_getFriendIP():
