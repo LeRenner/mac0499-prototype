@@ -8,7 +8,6 @@ let previousChatListHash = '';
 async function generateChatList() {
     try {
         const messages = await request_getLatestMessages();
-        const friends = await request_getFriends();
 
         // Hash the messages content
         const messagesString = JSON.stringify(messages);
@@ -29,29 +28,10 @@ async function generateChatList() {
         } else {
             let chatList = '';
 
-            messages.forEach(message => {
+            for (const message of messages) {
                 const formattedTimestamp = convertTimestamp(message.timestamp);
                 const userAddress = message.sender;
-                let messageTitle = "";
-
-                if (friends.length != 0) {        
-                    for (let i = 0; i < friends.length; i++) {
-                        if (friends[i].address === userAddress) {
-                            messageTitle = friends[i].alias;
-                            break;
-                        }
-                    }
-                
-                    if (messageTitle === "") {
-                        messageTitle = userAddress;
-                    }
-                    else {
-                        messageTitle = "[" + messageTitle + "]";
-                    }
-                }
-                else {
-                    messageTitle = userAddress;
-                }
+                let messageTitle = await substituteAlias(userAddress);
 
                 console.log("Concluded that the message title is: " + messageTitle);
         
@@ -66,7 +46,7 @@ async function generateChatList() {
                         </p>
                     </div><br/>
                 `;
-            });
+            }
 
             document.getElementById('senders').innerHTML = chatList;
         }
@@ -151,18 +131,7 @@ async function generateMessageList() {
             receivedMessagesDiv.scrollTop = receivedMessagesDiv.scrollHeight;
         }
 
-        // try to get the alias of the currentChatAddress
-        const friends = await request_getFriends();
-        let friendAlias = "";
-
-        for (let i = 0; i < friends.length; i++) {
-            if (friends[i].address === currentChatAddress) {
-                friendAlias = friends[i].alias;
-                break;
-            }
-        }
-
-        document.getElementById('sender-address').innerHTML = friendAlias || currentChatAddress;
+        document.getElementById('sender-address').innerHTML = await substituteAlias(currentChatAddress);
     } catch (error) {
         console.log('Error receiving messages: ' + error.message);
     }
@@ -173,14 +142,10 @@ let previousFriendsHash = '';
 
 async function updateFriends() {
     try {
-        const response = await fetch('/privEndpoint_getFriends', {
-            method: 'GET'
-        });
-
-        const data = await response.json();
+        const friends = await request_getFriends();
 
         // Hash the friends content
-        const friendsString = JSON.stringify(data);
+        const friendsString = JSON.stringify(friends);
         const currentFriendsHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(friendsString));
         const currentFriendsHashHex = Array.from(new Uint8Array(currentFriendsHash)).map(b => b.toString(16).padStart(2, '0')).join('');
 
@@ -192,12 +157,12 @@ async function updateFriends() {
         // Update the previous hash
         previousFriendsHash = currentFriendsHashHex;
 
-        // check data.friends length
-        if (data.length === 0) {
+        // check friends.friends length
+        if (friends.length === 0) {
             document.getElementById('friendsList').innerHTML = 'No friends yet...';
         } else {
             let friendsList = '<hr/>';
-            data.forEach(friend => {
+            friends.forEach(friend => {
                 friendsList += `
                     <div class="friend">
                         <p class="friend-name">

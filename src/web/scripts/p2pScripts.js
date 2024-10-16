@@ -10,17 +10,7 @@ async function updateFriendConnectionStatus() {
 }
 
 async function changeFocusedFriend (friendAlias) {
-    // address is the alias of the friend. Need to get the address from the alias
-    const friends = await request_getFriends();
-    let friendAddress = "";
-
-    for (let i = 0; i < friends.length; i++) {
-        if (friends[i].alias === friendAlias) {
-            friendAddress = friends[i].address;
-            break;
-        }
-    }
-
+    const friendAddress = await addressFromAlias(friendAlias);
     await request_changeFocusedFriend(friendAddress);
 }
 

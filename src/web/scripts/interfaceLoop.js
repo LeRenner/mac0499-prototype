@@ -20,6 +20,8 @@ function changeInterfaceState(newState) {
     interfaceState = newState;
     
     if (newState === 0) {
+        request_changeFocusedFriend('00000000000000000000000000000000000000000000000000000000.onion');
+        shouldRunUpdateFriendConnectionStatus = false;
         document.getElementById('senderList').style.display = 'block';
         document.getElementById('chat').style.display = 'none';
         document.getElementById('friends').style.display = 'none';
@@ -28,6 +30,8 @@ function changeInterfaceState(newState) {
         document.getElementById('chat').style.display = 'block';
         document.getElementById('friends').style.display = 'none';
     } else if (newState === 2) {
+        request_changeFocusedFriend('00000000000000000000000000000000000000000000000000000000.onion');
+        shouldRunUpdateFriendConnectionStatus = false;
         document.getElementById('senderList').style.display = 'none';
         document.getElementById('chat').style.display = 'none';
         document.getElementById('friends').style.display = 'block';
@@ -67,13 +71,8 @@ document.getElementById('senders').addEventListener('click', async function(even
             await changeFocusedFriend(currentChatAddress.slice(1, -1));
             shouldRunUpdateFriendConnectionStatus = true;
 
-            let friends = await request_getFriends();
-            // find friend with this alias
-            friends.forEach(friend => {
-                if (friend.alias === currentChatAddress.slice(1, -1)) {
-                    currentChatAddress = friend.address;
-                }
-            });
+            currentChatAddress = await addressFromAlias(currentChatAddress);
+            console.log('Clicked on alias: ' + currentChatAddress);
         }
 
         console.log('Clicked on address: ' + currentChatAddress);

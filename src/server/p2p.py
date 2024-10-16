@@ -42,9 +42,22 @@ def p2p_friendConnectionThread():
 
     print("Current focused friend: " + str(currentFocusedFriend))
 
+    if currentFocusedFriend == "00000000000000000000000000000000000000000000000000000000.onion":
+        friendConnectionStatus = "None."
+        return
+
     friendConnectionStatus = "Checking if friend is mutual..."
 
     focusedFriendIsMutual = friends_checkIsMutualFriend(currentFocusedFriend)
+
+    if focusedFriendIsMutual == False:
+        friendConnectionStatus = "Friend is not mutual."
+        return
+
+    friendConnectionStatus = "Waiting for friend to focus on you..."
+
+    while friends_checkIsFocusedFriend(currentFocusedFriend) == False:
+        sleep(5)
 
     friendConnectionStatus = "Getting friend's IP addresses..."
 
@@ -120,6 +133,15 @@ def p2p_getLocalIP():
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)
     return local_ip
+
+
+def p2p_checkIfIsFocusedFriend(address):
+    global currentFocusedFriend
+
+    if currentFocusedFriend == address:
+        return {"status": "Focused"}
+    else:
+        return {"status": "Not focused"}
 
 
 def p2p_changeFocusedFriend(address):

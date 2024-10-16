@@ -82,20 +82,16 @@ def pubEndpoint_getPublicKeyBase64():
     return json.dumps({"public_key": crypto_getOwnPublicKey()})
 
 
-def pubEndpoint_checkFriendRequest():
-    request = flask.request.form.get("request")
-    return friends_receiveCheckFriendRequest(request)
+def pubEndpoint_receiveGenericFriendRequest():
+    request_object_json = flask.request.form.get("request")
 
+    request_type = json.loads(json.loads(request_object_json).get("request")).get("kind")
 
-def pubEndpoint_getIpRequest():
-    request = flask.request.form.get("request")
-    return friends_receiveGetIpRequest(request)
-
-
-def pubEndpoint_getFriendIP():
-    request = flask.request.form.get("request")
-    return pubEndpoint_getFriendIPHandler(request)
-
-
-def pubEndpoint_p2pRequest():
-    return pubEndpoint_p2pRequestHandler()
+    if request_type == "getIp":
+        return json.dumps(friends_receiveGetIpRequest(request_object_json))
+    elif request_type == "isFocused":
+        return json.dumps(friends_receiveFriendIsFocusedRequest(request_object_json))
+    elif request_type == "checkFriend":
+        return json.dumps(friends_receiveCheckFriendRequest(request_object_json))
+    else:
+        return json.dumps({"message": "Invalid request type."})

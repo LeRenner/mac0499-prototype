@@ -44,6 +44,7 @@ def endpoints_setupEndpoints(app, address, localSocksPort):
         ["pubEndpoint_getIpRequest", "POST"],
         ["pubEndpoint_getFriendIP", "POST"],
         ["pubEndpoint_p2pRequest", "GET"],
+        ["pubEndpoint_receiveGenericFriendRequest", "POST"]
     ]
     
     privateEndpoints = [

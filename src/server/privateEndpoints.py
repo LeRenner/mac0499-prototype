@@ -122,7 +122,13 @@ def privEndpoint_getSenders():
 
 
 def privEndpoint_getFriends():
-    return operator_getFriends()
+    friends = operator_getFriends()
+
+    response = {
+        "friends": friends
+    }
+    
+    return json.dumps(response)
 
 
 def privEndpoint_updatePublicKeyRecords(peerAddress: str) -> bool:

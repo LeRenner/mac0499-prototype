@@ -300,7 +300,7 @@ def operator_getFriends():
 
     friends = storage.get("friends", [])
 
-    return json.dumps(friends)
+    return friends
 
 
 def operator_addFriend(friend: dict):

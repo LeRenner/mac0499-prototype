@@ -1,40 +1,23 @@
 {
-    "receivedMessages": {
-        "r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion": [
-            {
-                "message": "{\"sender\": \"r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion\", \"content\": \"heyyyy\", \"timestamp\": 1729035035}",
-                "signature": "+GAmdVOX1nIDfg9pApenK35iQCluNrYeRw7gzaMfyMAYphfyLud8VArAObfh1Ez7AzrJiSknXUQfep5d5mohBg=="
-            }
-        ]
-    },
+    "receivedMessages": {},
     "sentMessages": {
-        "r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion": [
+        "433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion": [
             {
-                "content": "omg omg omg hiii",
-                "timestamp": 1729035021
-            }
-        ],
-        "ekqc3b4xoxv7rsohcxqsx24mykrhy6uqb5yx2stv7sxw2l7o2m3psmid.onion": [
-            {
-                "content": "omg omg hiii",
-                "timestamp": 1729035553
+                "content": "ajsdopjaposd",
+                "timestamp": 1729065496
             }
         ]
     },
     "friends": [
         {
-            "address": "r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion",
-            "alias": "asduahsidohioas"
+            "address": "433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion",
+            "alias": "433Nicky"
         }
     ],
     "peerList": [
         {
-            "address": "r2znx7xx22gb54nxjvcwmzfm5rt72dugrshfe4fv6um4sok75ulyxeid.onion",
-            "public_key": "o+trjeMpwGa/7YFNOAnmTb9Lp3IDMWG9NJiq3iNTqss="
-        },
-        {
-            "address": "ekqc3b4xoxv7rsohcxqsx24mykrhy6uqb5yx2stv7sxw2l7o2m3psmid.onion",
-            "public_key": "jzugS81uEnLKkoYZWlt2O99GeuqMgnNl+QT/iF74twI="
+            "address": "433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion",
+            "public_key": "2ShatbNaa39Hzf8hHaiyl3hGzUCk3nCzSF8mBvSuJSw="
         }
     ],
     "firstContact": []

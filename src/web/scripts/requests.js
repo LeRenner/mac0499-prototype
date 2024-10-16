@@ -83,10 +83,12 @@ async function request_getFriends() {
             method: 'GET'
         });
 
-        const data = await response.json();
+        let data = await response.json();
+        data = data.friends;
 
         return data;
     } catch (error) {
+        console.log('Error getting friends: ' + error.message);
         return {};
     }
 }
