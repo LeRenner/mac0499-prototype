@@ -129,6 +129,21 @@ def p2p_getPublicIP():
         return None
 
 
+def p2p_receiveFriendIsFocusedRequest(request_object_json: str) -> bool:
+    global currentFocusedFriend
+    result = friends_receiveGenericFriendRequest(request_object_json, "isFocused")
+
+    if result is not True:
+        return result
+
+    origin = json.loads(json.loads(request_object_json)["request"])["origin"]
+
+    if currentFocusedFriend == origin:
+        return {"message": "Success", "isFocused": True}
+    else:
+        return {"message": "Success", "isFocused": False}
+
+
 def p2p_getLocalIP():
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)

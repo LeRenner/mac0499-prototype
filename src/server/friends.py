@@ -2,6 +2,8 @@ import json
 import datetime
 import base64
 import requests
+import socket
+from time import sleep
 
 from .serverCrypto import *
 from .jsonOperator import *
@@ -97,20 +99,6 @@ def friends_receiveGetIpRequest(request_object_json: str) -> bool:
     return {"message": "Success", "localIp": ownLocalIP, "publicIp": ownPublicIP}
 
 
-def friends_receiveFriendIsFocusedRequest(request_object_json: str) -> bool:
-    result = friends_receiveGenericFriendRequest(request_object_json, "isFocused")
-
-    if result is not True:
-        return result
-
-    origin = json.loads(json.loads(request_object_json)["request"])["origin"]
-
-    if currentFocusedFriend == origin:
-        return {"message": "Success", "isFocused": True}
-    else:
-        return {"message": "Success", "isFocused": False}
-
-
 def friends_receiveCheckFriendRequest(request_object_json: str) -> bool:
     result = friends_receiveGenericFriendRequest(request_object_json, "checkFriend")
 
@@ -188,8 +176,10 @@ def friends_checkIsMutualFriend(friendAddress: str) -> bool:
 def friends_getFriendIpAddress(friendAddress: str) -> str:
     request_response = friends_sendGenericRequest("getIp", friendAddress)
 
-    localIp = request_response.get("localIp")
-    publicIp = request_response.get("publicIp")
+    parsed_response = json.loads(request_response)
+
+    localIp = parsed_response.get("localIp")
+    publicIp = parsed_response.get("publicIp")
 
     return {"local": localIp, "public": publicIp}   
 
@@ -200,12 +190,12 @@ def friends_checkIsFocusedFriend(friendAddress: str) -> bool:
     if request_response is False:
         return False
 
-    print(f"[friends_checkIsFocusedFriend] Response: {request_response}")
+    parsed_response = json.loads(request_response)
 
-    if request_response.get("error") == "Origin is not a friend.":
+    if "error" in parsed_response and parsed_response.get("error") == "Origin is not a friend.":
         return False
 
-    return request_response.get("isFocused")
+    return parsed_response.get("isFocused")
 
 
 #####################################################

@@ -90,7 +90,7 @@ def pubEndpoint_receiveGenericFriendRequest():
     if request_type == "getIp":
         return json.dumps(friends_receiveGetIpRequest(request_object_json))
     elif request_type == "isFocused":
-        return json.dumps(friends_receiveFriendIsFocusedRequest(request_object_json))
+        return json.dumps(p2p_receiveFriendIsFocusedRequest(request_object_json))
     elif request_type == "checkFriend":
         return json.dumps(friends_receiveCheckFriendRequest(request_object_json))
     else:
