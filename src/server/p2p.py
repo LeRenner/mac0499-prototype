@@ -4,13 +4,13 @@ import json
 import base64
 import datetime
 import socket
-import upnpy
 from time import sleep
 import threading
 
 from .serverCrypto import *
 from .jsonOperator import *
 from .friends import *
+from .upnp import *
 
 global currentFocusedFriend
 global friendConnectionThread
@@ -88,52 +88,24 @@ def p2p_tryConnecting():
     friendConnectionDetails["friendPublicAddress"] = friendIPs["public"]
     friendConnectionDetails["friendLocalAddress"] = friendIPs["local"]
 
+
+
     # if users are on the same machine, friendConnectionStatus = 1
     if friendIPs["public"] == p2p_getPublicIP() and friendIPs["local"] == p2p_getLocalIP():
-        friendConnectionStatus = 1
-        statusIndicatorBadge = "Connected on localhost!"
+        return p2p_localhostConnection()
 
-        while True:
-            try:
-                requestMethod = {
-                    "hostname": f"http://localhost:{friendConnectionDetails['middlewarePort']}/pubEndpoint_receiveGenericFriendRequest",
-                    "proxy": None
-                }
-                isFocused = friends_checkIsFocusedFriend(currentFocusedFriend, requestMethod)
 
-                if isFocused == False:
-                    statusIndicatorBadge = "Friend closed chat with you. Defaulting to tor."
-                    return 1
-            except requests.RequestException:
-                statusIndicatorBadge = "Friend connection lost."
-                return 1
-                    
-            sleep(1)
-    
-
+    # if users are on the same local network, friendConnectionStatus = 2
     if friendIPs["public"] == p2p_getPublicIP():
-        friendConnectionStatus = 2
-        statusIndicatorBadge = "Connected on local network!"
-        return 1
+        return p2p_localNetworkConnection()
     
 
+    # if users are on different networks, friendConnectionStatus = 3
     if friendIPs["public"] != p2p_getPublicIP():
-        friendConnectionStatus = 3
-        statusIndicatorBadge = "On different networks! Will try to UPNP port forward."
+        return p2p_UPnPConnection()
 
-        # try to UPNP port forward
-        try:
-            upnp = upnpy.UPnP()
-            upnp.discover()
-            upnp.select_igd()
-            upnp.get_status_info()
-            upnp.get_port_mappings()
-            upnp.add_port_mapping(friendConnectionDetails["middlewarePort"], "TCP", "P2P Middleware Port", "
-        
-
-    while True:
-        print("DIED DIED DIED")
-        sleep(1)
+    print("REACHED END OF TRYCONNECTING. EXITING.")
+    return -1
 
 
 def p2p_friendUpdateThread():
@@ -159,6 +131,74 @@ def p2p_friendUpdateThread():
             friendConnectionThread.start()
         
         sleep(1)
+
+
+#####################################################
+######## P2P CONNECTIONS ############################
+#####################################################
+
+def p2p_localhostConnection():
+    global friendConnectionStatus
+    global statusIndicatorBadge
+    global currentFocusedFriend
+
+    friendConnectionStatus = 1
+    statusIndicatorBadge = "Connected on localhost!"
+
+    while True:
+        try:
+            requestMethod = {
+                "hostname": f"http://localhost:{friendConnectionDetails['middlewarePort']}/pubEndpoint_receiveGenericFriendRequest",
+                "proxy": None
+            }
+            isFocused = friends_checkIsFocusedFriend(currentFocusedFriend, requestMethod)
+
+            if isFocused == False:
+                statusIndicatorBadge = "Friend closed chat with you. Defaulting to tor."
+                return 1
+        except requests.RequestException:
+            statusIndicatorBadge = "Friend connection lost."
+            return 1
+                
+        sleep(1)
+
+
+def localNetworkConnection():
+    friendConnectionStatus = 2
+    statusIndicatorBadge = "OMG local network but it still doesnt work!"
+    return -1
+
+
+def p2p_UPnPConnection():
+    global friendConnectionStatus
+    global statusIndicatorBadge
+    global friendConnectionDetails
+
+    friendConnectionStatus = 3
+    statusIndicatorBadge = "On different networks! Will try to UPNP port forward."
+
+    # try to UPNP port forward
+    hasUPnP = upnp_discoverUPnPDevices()
+
+    if hasUPnP == False:
+        statusIndicatorBadge = "No UPnP devices found."
+        friends_updateUPnPStatus(False, 0)
+        return 10
+    
+    success, externalport = upnp_newPortForwardingRule(p2p_getPublicIP(), friendConnectionDetails["middlewarePort"])
+
+    if not success:
+        statusIndicatorBadge = "Failed to UPnP port forward."
+        friends_updateUPnPStatus(False, 0)
+        return 10
+
+    friends_updateUPnPStatus(True, externalport)
+
+    statusIndicatorBadge = "UPnP port forwarding successful! Checking in with friend..."
+
+    while True:
+        result = friends_getUPnPStatus(currentFocusedFriend)
+        console.log(result)
 
 
 #####################################################

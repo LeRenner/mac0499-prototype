@@ -1,3 +1,4 @@
 src/tor*
 venv*
 src/log.txt*
+src/server/__pycache__*

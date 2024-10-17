@@ -10,12 +10,24 @@ from .jsonOperator import *
 
 global localSocksPort
 global localMiddlewarePort
+global upnpStatus
 
 def friends_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
     global localSocksPort
     global localMiddlewarePort
     localSocksPort = rcvSocksPort
     localMiddlewarePort = rcvLocalMiddlewarePort
+
+    upnpStatus = {
+        "enabled": None,
+        "upnpPort": 0
+    }
+
+
+def friends_updateUPnPStatus(upnpEnabled: bool, upnpPort: int = 0):
+    global upnpStatus
+    upnpStatus["enabled"] = upnpEnabled
+    upnpStatus["upnpPort"] = upnpPort
 
 
 ##########################################################################################################
@@ -117,6 +129,16 @@ def friends_receiveCheckFriendRequest(request_object_json: str) -> bool:
         return {"message": "Success", "friend": False}
 
 
+def friends_receiveUPnPStatusRequest(request_object_json: str) -> bool:
+    global upnpStatus
+    result = friends_receiveGenericFriendRequest(request_object_json, "getUPnPStatus")
+
+    if result is not True:
+        return result
+
+    return {"message": "Success", "upnpStatus": upnpStatus}
+
+
 #####################################################
 ######## SEND REQUESTS ##############################
 #####################################################
@@ -204,6 +226,17 @@ def friends_checkIsFocusedFriend(friendAddress: str, connectionMethod: dict = No
         return False
 
     return parsed_response.get("isFocused")
+
+
+def friends_getUPnPStatus(friendAddress: str) -> dict:
+    request_response = friends_sendGenericRequest("getUPnPStatus", friendAddress)
+
+    if request_response is False:
+        return False
+
+    parsed_response = json.loads(request_response)
+
+    return parsed_response.get("upnpStatus")
 
 
 #####################################################
