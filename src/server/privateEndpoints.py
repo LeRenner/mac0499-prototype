@@ -43,12 +43,11 @@ def privEndpoint_sendMessage():
 
     packagedMessage = json.dumps(message)
 
-    print(f"Enviando mensagem para {destination}...")
-    # send the message to the server
-
     proxies = {
         'http': 'socks5h://localhost:{}'.format(localSocksPort)
     }
+
+    hostname = f"http://{destination}/pubEndpoint_receiveMessage"
 
     messageContainer = {
         "message": packagedMessage,
@@ -57,9 +56,22 @@ def privEndpoint_sendMessage():
 
     packedMessageContainer = json.dumps(messageContainer)
 
+
+    print("p2p_getFriendConnectionStatus() = ", p2p_getFriendConnectionStatus())
+
+
+    # check is message can be sent locally
+    if p2p_getFriendConnectionStatus()["status"] == "1":
+        middlewarePort = p2p_getFriendConnectionStatus()["middlewarePort"]
+        hostname = f"http://localhost:{middlewarePort}/pubEndpoint_receiveMessage"
+        proxies = None
+    
+
+    print("Sending message to", hostname, "with content", messageContent, "and proxies", proxies)
+
     for i in range(3):
         try:
-            response = requests.post(f"http://{destination}/pubEndpoint_receiveMessage", data={"message": packedMessageContainer}, proxies=proxies, timeout=15)
+            response = requests.post(hostname, data={"message": packedMessageContainer}, proxies=proxies, timeout=15)
             if response.status_code == 200:
                 response_data = response.json()
 
@@ -198,4 +210,4 @@ def privEndpoint_changeFocusedFriend():
 
 
 def privEndpoint_getFriendConectionStatus():
-    return p2p_getFriendConnectionStatus()
+    return p2p_getstatusIndicatorBadge()

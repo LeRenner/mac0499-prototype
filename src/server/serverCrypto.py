@@ -58,7 +58,6 @@ def crypto_verifyMessage(message: str, signature: str, originAddress: str) -> bo
     # Verify the message
     try:
         verify_key.verify(message.encode('utf-8'), signature_bytes)
-        print("Message signature verified.")
         return True
     except Exception as e:
         print("Message verification failed.")

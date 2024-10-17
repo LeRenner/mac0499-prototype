@@ -56,6 +56,15 @@ document.getElementById('address').addEventListener('click', function() {
 });
 
 
+var sendMessage = document.getElementById("message");
+sendMessage.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        document.getElementById("botaodeenviaramensagemporqueodanielmandou").click();
+    }
+})
+
+
 // when clicking on anything with the class contact, set address and show chat
 document.getElementById('senders').addEventListener('click', async function(event) {
     if (event.target.classList.contains('contact') || 

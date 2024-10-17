@@ -29,11 +29,11 @@ def endpoints_initializeFlask():
     return app
 
 
-def endpoints_setupEndpoints(app, address, localSocksPort):
+def endpoints_setupEndpoints(app, address, localSocksPort, localMiddlewarePort):
     privEndpoint_setupPrivateEndpointVariables(address, localSocksPort)
     pubEndpoint_setupPublicEndpointlVariables(localSocksPort)
     p2p_initializeVariables(localSocksPort)
-    friends_initializeVariables(localSocksPort)
+    friends_initializeVariables(localSocksPort, localMiddlewarePort)
     operator_setupVariables(address)
     crypto_initializeTorKeys()
 
@@ -44,7 +44,8 @@ def endpoints_setupEndpoints(app, address, localSocksPort):
         ["pubEndpoint_getIpRequest", "POST"],
         ["pubEndpoint_getFriendIP", "POST"],
         ["pubEndpoint_p2pRequest", "GET"],
-        ["pubEndpoint_receiveGenericFriendRequest", "POST"]
+        ["pubEndpoint_receiveGenericFriendRequest", "POST"],
+        ["pubEndpoint_ping", "GET"],
     ]
     
     privateEndpoints = [
@@ -89,7 +90,7 @@ def endpoints_setupEndpoints(app, address, localSocksPort):
     app.add_url_rule("/web/<path:filename>", "privEndpoint_webInterface", privEndpoint_webInterface, methods=["GET"])
 
 
-def endpoints_runServer(argAddress, argHttpPort, argSocksPort):
+def endpoints_runServer(argAddress, argHttpPort, argSocksPort, argMiddlewarePort):
     global localHttpPort
     global localSocksPort
     global address
@@ -99,5 +100,5 @@ def endpoints_runServer(argAddress, argHttpPort, argSocksPort):
     address = argAddress
 
     app = endpoints_initializeFlask()
-    endpoints_setupEndpoints(app, address, localSocksPort)
+    endpoints_setupEndpoints(app, address, localSocksPort, argMiddlewarePort)
     app.run(host="localhost", port=localHttpPort)

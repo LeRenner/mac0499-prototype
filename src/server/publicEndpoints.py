@@ -95,3 +95,7 @@ def pubEndpoint_receiveGenericFriendRequest():
         return json.dumps(friends_receiveCheckFriendRequest(request_object_json))
     else:
         return json.dumps({"message": "Invalid request type."})
+
+
+def pubEndpoint_ping():
+    return json.dumps({"message": "Success"})

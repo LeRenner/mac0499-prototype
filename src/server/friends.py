@@ -9,10 +9,13 @@ from .serverCrypto import *
 from .jsonOperator import *
 
 global localSocksPort
+global localMiddlewarePort
 
-def friends_initializeVariables(rcvSocksPort):
+def friends_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
     global localSocksPort
+    global localMiddlewarePort
     localSocksPort = rcvSocksPort
+    localMiddlewarePort = rcvLocalMiddlewarePort
 
 
 ##########################################################################################################
@@ -88,6 +91,7 @@ def friends_receiveGenericFriendRequest(request_object_json: str, request_kind) 
 
 
 def friends_receiveGetIpRequest(request_object_json: str) -> bool:
+    global localMiddlewarePort
     result = friends_receiveGenericFriendRequest(request_object_json, "getIp")
 
     if result is not True:
@@ -96,7 +100,7 @@ def friends_receiveGetIpRequest(request_object_json: str) -> bool:
     ownLocalIP = friends_getLocalIP()
     ownPublicIP = friends_getPublicIP()
 
-    return {"message": "Success", "localIp": ownLocalIP, "publicIp": ownPublicIP}
+    return {"message": "Success", "localIp": ownLocalIP, "publicIp": ownPublicIP, "middlewarePort": localMiddlewarePort}
 
 
 def friends_receiveCheckFriendRequest(request_object_json: str) -> bool:
@@ -117,22 +121,25 @@ def friends_receiveCheckFriendRequest(request_object_json: str) -> bool:
 ######## SEND REQUESTS ##############################
 #####################################################
 
-def friends_sendGenericRequest(requestKind: str, destAddress: str) -> bool:
+def friends_sendGenericRequest(requestKind: str, destAddress: str, connectionMethod: dict = None) -> bool:
     global localSocksPort
 
     request = friends_craftGenericFriendRequest(destAddress, requestKind)
-
-    print("[friends_sendGenericRequest] Request: " + request)
 
     proxies = {
         'http': 'socks5h://localhost:{}'.format(localSocksPort)
     }
 
+    hostname = f"http://{destAddress}/pubEndpoint_receiveGenericFriendRequest"
+
+    if connectionMethod is not None:
+        hostname = connectionMethod["hostname"]
+        proxies = connectionMethod["proxy"]
+
     for attempt in range(4):
         try:
-            print("[friends_sendGenericRequest] Starting request...")
             response = requests.post(
-                f"http://{destAddress}/pubEndpoint_receiveGenericFriendRequest",
+                hostname,
                 data={'request': request},
                 proxies=proxies,
                 timeout=15
@@ -180,12 +187,13 @@ def friends_getFriendIpAddress(friendAddress: str) -> str:
 
     localIp = parsed_response.get("localIp")
     publicIp = parsed_response.get("publicIp")
+    localMiddlewarePort = parsed_response.get("middlewarePort")
 
-    return {"local": localIp, "public": publicIp}   
+    return {"local": localIp, "public": publicIp, "middlewarePort": localMiddlewarePort}   
 
 
-def friends_checkIsFocusedFriend(friendAddress: str) -> bool:
-    request_response = friends_sendGenericRequest("isFocused", friendAddress)
+def friends_checkIsFocusedFriend(friendAddress: str, connectionMethod: dict = None) -> bool:
+    request_response = friends_sendGenericRequest("isFocused", friendAddress, connectionMethod)
 
     if request_response is False:
         return False

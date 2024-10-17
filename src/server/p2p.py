@@ -4,6 +4,7 @@ import json
 import base64
 import datetime
 import socket
+# import upnpy
 from time import sleep
 import threading
 
@@ -15,7 +16,9 @@ global currentFocusedFriend
 global friendConnectionThread
 global friendUpdateThread
 global localSocksPort
+global statusIndicatorBadge
 global friendConnectionStatus
+global friendConnectionDetails
 
 
 def p2p_initializeVariables(rcvSocksPort):
@@ -23,11 +26,20 @@ def p2p_initializeVariables(rcvSocksPort):
     global friendUpdateThread
     global localSocksPort
     global currentFocusedFriend
+    global statusIndicatorBadge
     global friendConnectionStatus
+    global friendConnectionDetails
 
     localSocksPort = rcvSocksPort
     currentFocusedFriend = None
-    friendConnectionStatus = None
+    statusIndicatorBadge = None
+    friendConnectionThread = None
+    friendConnectionStatus = 0
+    friendConnectionDetails = {
+        "middlewarePort": None,
+        "friendPublicAddress": None,
+        "friendLocalAddress": None
+    }
     friendUpdateThread = threading.Thread(target=p2p_friendUpdateThread)
     friendUpdateThread.start()
 
@@ -37,36 +49,97 @@ def p2p_initializeVariables(rcvSocksPort):
 #####################################################
 
 def p2p_friendConnectionThread():
+    while True:
+        waitTime = p2p_tryConnecting()
+        if waitTime == -1:
+            break
+        sleep(waitTime)
+
+
+def p2p_tryConnecting():
     global currentFocusedFriend
+    global statusIndicatorBadge
     global friendConnectionStatus
 
     print("Current focused friend: " + str(currentFocusedFriend))
 
     if currentFocusedFriend == "00000000000000000000000000000000000000000000000000000000.onion":
-        friendConnectionStatus = "None."
-        return
+        statusIndicatorBadge = "None."
+        return -1
 
-    friendConnectionStatus = "Checking if friend is mutual..."
+    statusIndicatorBadge = "Checking if friend is mutual..."
 
     focusedFriendIsMutual = friends_checkIsMutualFriend(currentFocusedFriend)
 
     if focusedFriendIsMutual == False:
-        friendConnectionStatus = "Friend is not mutual."
-        return
+        statusIndicatorBadge = "Friend is not mutual."
+        return 20
 
-    friendConnectionStatus = "Waiting for friend to focus on you..."
+    statusIndicatorBadge = "Waiting for friend to focus on you..."
 
     while friends_checkIsFocusedFriend(currentFocusedFriend) == False:
         sleep(5)
 
-    friendConnectionStatus = "Getting friend's IP addresses..."
+    statusIndicatorBadge = "Getting friend's IP addresses..."
 
     friendIPs = friends_getFriendIpAddress(currentFocusedFriend)
 
-    friendConnectionStatus = "Friend IP addresses are: " + str(friendIPs)
+    # {"local": localIp, "public": publicIp, "middlewarePort": localMiddlewarePort}   
+    # friendConnectionDetails = {
+    #     "middlewarePort": None,
+    #     "friendPublicAddress": None,
+    #     "friendLocalAddress": None
+    # }
+    friendConnectionDetails["middlewarePort"] = friendIPs["middlewarePort"]
+    friendConnectionDetails["friendPublicAddress"] = friendIPs["public"]
+    friendConnectionDetails["friendLocalAddress"] = friendIPs["local"]
 
-    while True:
-        sleep(1)
+    # if users are on the same machine, friendConnectionStatus = 1
+    if friendIPs["public"] == p2p_getPublicIP() and friendIPs["local"] == p2p_getLocalIP():
+        friendConnectionStatus = 1
+        statusIndicatorBadge = "Connected on localhost!"
+
+        while True:
+            try:
+                requestMethod = {
+                    "hostname": f"http://localhost:{friendConnectionDetails['middlewarePort']}/pubEndpoint_receiveGenericFriendRequest",
+                    "proxy": None
+                }
+                isFocused = friends_checkIsFocusedFriend(currentFocusedFriend, requestMethod)
+
+                if isFocused == False:
+                    statusIndicatorBadge = "Friend closed chat with you. Defaulting to tor."
+                    return 1
+            except requests.RequestException:
+                statusIndicatorBadge = "Friend connection lost."
+                return 1
+                    
+            sleep(1)
+    
+
+    if friendIPs["public"] == p2p_getPublicIP():
+        friendConnectionStatus = 2
+        statusIndicatorBadge = "Connected on local network!"
+        return 1
+    
+
+    # if friendIPs["public"] != p2p_getPublicIP():
+    #     friendConnectionStatus = 3
+    #     statusIndicatorBadge = "On different networks! Will try to UPNP port forward."
+
+    #     # try to UPNP port forward
+    #     try:
+    #         upnp = upnpy.UPnP()
+    #         upnp.discover()
+    #         upnp.select_igd()
+    #         upnp.get_status_info()
+    #         upnp.get_port_mappings()
+    #         upnp.add_port_mapping(friendConnectionDetails["middlewarePort"], "TCP", "P2P Middleware Port", "
+        
+
+    # while True:
+    #     print("DIED DIED DIED")
+    #     sleep(1)
 
 
 def p2p_friendUpdateThread():
@@ -81,16 +154,18 @@ def p2p_friendUpdateThread():
         
         pastFocusedFriend = currentFocusedFriend
 
-        if currentFocusedFriend is None:
-            # kill friend connection thread
-            friendConnectionThread.join()
-            break
+        if currentFocusedFriend is None or currentFocusedFriend == "00000000000000000000000000000000000000000000000000000000.onion":
+            if friendConnectionThread is not None:
+                # kill friend connection thread
+                friendConnectionThread.join()
+                break
         else:
             # start friend connection thread
             friendConnectionThread = threading.Thread(target=p2p_friendConnectionThread)
             friendConnectionThread.start()
         
         sleep(1)
+
 
 #####################################################
 ######## P2P FUNCTIONS ##############################
@@ -170,10 +245,27 @@ def p2p_changeFocusedFriend(address):
     return {"status": "Success"}
 
 
-def p2p_getFriendConnectionStatus():
-    global friendConnectionStatus
+def p2p_getstatusIndicatorBadge():
+    global statusIndicatorBadge
 
-    if friendConnectionStatus is None:
+    if statusIndicatorBadge is None:
         return {"status": "No friend connection status available."}
 
-    return {"status": friendConnectionStatus}
+    return {"status": statusIndicatorBadge}
+
+
+# 0 = not connected
+# 1 = connected on localhost
+# 2 = connected on local network
+# 3 = connected on p2p
+def p2p_getFriendConnectionStatus():
+    global friendConnectionStatus
+    global friendConnectionDetails
+
+    if friendConnectionStatus == 0:
+        return {"status": "0"}
+    
+    if friendConnectionStatus == 1:
+        return {"status": "1", "middlewarePort": friendConnectionDetails["middlewarePort"]}
+
+    return friendConnectionStatus

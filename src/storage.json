@@ -1,10 +1,105 @@
 {
-    "receivedMessages": {},
+    "receivedMessages": {
+        "433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion": [
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"heyyy omg omg omg\", \"timestamp\": 1729127208}",
+                "signature": "KWrYfSRi8Ld0YRx/qf3gJgXjRxbgspzGpw0YrmSWljqy5L4r6wiIKwYN8SvcISeLG2iGoMditFSRdPwg/z73Bg=="
+            },
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"omg omg omg\", \"timestamp\": 1729127844}",
+                "signature": "NbZX48QZclKlQBAiBLO4FxuuZhsN6SNn1alI4BmlT9hHxUfy0NMSWE25pv6+/ldey8hz/J/8R28x8TDv79mqAA=="
+            },
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"plzzzzzz\", \"timestamp\": 1729128051}",
+                "signature": "/rZxK9DP2WAZgCnXf2K6OKzvk8S8a8+tDOJY2ljzx72m2GlDibq7+U8UW2ZXn7BpstUhtiJZt2+PYaEjflMRBg=="
+            },
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"omg omg omg\", \"timestamp\": 1729134996}",
+                "signature": "l1+8MYNHBBUi4d3WqYzywVMUG7U2kHuSrnLVFqP1EjYffUu8KxSPX0Bghelo1d6VQ2+v2eRIA1ykSP1TCad9Cg=="
+            },
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"Yes!\", \"timestamp\": 1729135720}",
+                "signature": "gexdHa4rn8HJNeIgNhKpRX237wyPT5wyuvF+emWg1dS7/HoAYo+1Tq2XJe4qLeJ77pU6lF1kON1lO+3r7DibCQ=="
+            },
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"litedralmente tapidodasdasasddas\", \"timestamp\": 1729137113}",
+                "signature": "9ly/WqMZdABDWPX+mgifu19blm69k6kUYePsT7pIFPJ7qouDJ20XYDk6BlrJIkSxM+skdAJkBZiZXbFqhrYSCQ=="
+            },
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"esse dois menor que tr\\u00eas\", \"timestamp\": 1729138200}",
+                "signature": "KSFZANXMU6gY9SUlnWezLxzOuZLc7B0k0cYoaXh+oHEUGFHMW+ro8RTQGdW5myLh6D3HXs1pULS05JQBhV87Bg=="
+            },
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"\", \"timestamp\": 1729138200}",
+                "signature": "+CAC/t7NyykK8KC2UiwK5BAozCrjflqQTbx1/Vj37VLwsxO3JB8jL8tUv/zPcjxv73/W8eKcrD/Z/cqcX+3zAA=="
+            },
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"\", \"timestamp\": 1729138200}",
+                "signature": "+CAC/t7NyykK8KC2UiwK5BAozCrjflqQTbx1/Vj37VLwsxO3JB8jL8tUv/zPcjxv73/W8eKcrD/Z/cqcX+3zAA=="
+            },
+            {
+                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"\", \"timestamp\": 1729138200}",
+                "signature": "+CAC/t7NyykK8KC2UiwK5BAozCrjflqQTbx1/Vj37VLwsxO3JB8jL8tUv/zPcjxv73/W8eKcrD/Z/cqcX+3zAA=="
+            }
+        ]
+    },
     "sentMessages": {
         "433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion": [
             {
                 "content": "omg 433Nicky hiiiii",
                 "timestamp": 1729065909
+            },
+            {
+                "content": "heyyyyy omg omg",
+                "timestamp": 1729127112
+            },
+            {
+                "content": "heheheheheh, hi from localhost!",
+                "timestamp": 1729127722
+            },
+            {
+                "content": "heheheheheh",
+                "timestamp": 1729127943
+            },
+            {
+                "content": "now it should work omg",
+                "timestamp": 1729127992
+            },
+            {
+                "content": "yes!",
+                "timestamp": 1729134990
+            },
+            {
+                "content": "aaaaaaaaa omg omg",
+                "timestamp": 1729135681
+            },
+            {
+                "content": "velocidade da luz",
+                "timestamp": 1729136882
+            },
+            {
+                "content": "vsf daniel lmao lol",
+                "timestamp": 1729138152
+            },
+            {
+                "content": "vsf daniel lmao lol",
+                "timestamp": 1729138160
+            },
+            {
+                "content": "vsf daniel lmao lol",
+                "timestamp": 1729138161
+            },
+            {
+                "content": "ahsdioahsdioahsid",
+                "timestamp": 1729138421
+            },
+            {
+                "content": "obrigadu ",
+                "timestamp": 1729138439
+            },
+            {
+                "content": "hehehe",
+                "timestamp": 1729138441
             }
         ]
     },

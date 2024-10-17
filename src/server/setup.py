@@ -25,6 +25,11 @@ def setupTor():
         if portIsOpen(i):
             localSocksPort = i
             break
+    
+    if localSocksPort == 5877:
+        localSocksPort = 5876
+    if localSocksPort == 5880:
+        localSocksPort = 5879
 
     for i in range(localSocksPort + 1, 35000):
         if portIsOpen(i):
@@ -62,7 +67,7 @@ def setupTor():
     log = open("logs/tor.log", "w")
     
     # start tor
-    process = subprocess.Popen(["tor", "-f", "tor/torrc"], stdout=log, stderr=log)
+    process = "lalala"#subprocess.Popen(["tor", "-f", "tor/torrc"], stdout=log, stderr=log)
 
     # wait for the creation of tor/data/hidden-service/hostname
     print("Esperando o tor iniciar.", end="")

@@ -217,11 +217,15 @@ async function request_getFriendConnectionStatus() {
 ///////////////////////////////////////////////
 
 async function request_callSendMessage() {
+    const messageCont = document.getElementById('message').value;
+
+    if (messageCont.length < 1) {
+        return;
+    }
+
     document.querySelector('.sending-message').style.display = 'block';
     document.querySelector('.message-sent').style.display = 'none';
     document.querySelector('.message-error').style.display = 'none';
-
-    const messageCont = document.getElementById('message').value;
 
     try {
         let result = await request_sendMessage(messageCont, currentChatAddress);
