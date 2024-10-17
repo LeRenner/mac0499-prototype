@@ -4,7 +4,7 @@ import json
 import base64
 import datetime
 import socket
-# import upnpy
+import upnpy
 from time import sleep
 import threading
 
@@ -84,12 +84,6 @@ def p2p_tryConnecting():
 
     friendIPs = friends_getFriendIpAddress(currentFocusedFriend)
 
-    # {"local": localIp, "public": publicIp, "middlewarePort": localMiddlewarePort}   
-    # friendConnectionDetails = {
-    #     "middlewarePort": None,
-    #     "friendPublicAddress": None,
-    #     "friendLocalAddress": None
-    # }
     friendConnectionDetails["middlewarePort"] = friendIPs["middlewarePort"]
     friendConnectionDetails["friendPublicAddress"] = friendIPs["public"]
     friendConnectionDetails["friendLocalAddress"] = friendIPs["local"]
@@ -123,23 +117,23 @@ def p2p_tryConnecting():
         return 1
     
 
-    # if friendIPs["public"] != p2p_getPublicIP():
-    #     friendConnectionStatus = 3
-    #     statusIndicatorBadge = "On different networks! Will try to UPNP port forward."
+    if friendIPs["public"] != p2p_getPublicIP():
+        friendConnectionStatus = 3
+        statusIndicatorBadge = "On different networks! Will try to UPNP port forward."
 
-    #     # try to UPNP port forward
-    #     try:
-    #         upnp = upnpy.UPnP()
-    #         upnp.discover()
-    #         upnp.select_igd()
-    #         upnp.get_status_info()
-    #         upnp.get_port_mappings()
-    #         upnp.add_port_mapping(friendConnectionDetails["middlewarePort"], "TCP", "P2P Middleware Port", "
+        # try to UPNP port forward
+        try:
+            upnp = upnpy.UPnP()
+            upnp.discover()
+            upnp.select_igd()
+            upnp.get_status_info()
+            upnp.get_port_mappings()
+            upnp.add_port_mapping(friendConnectionDetails["middlewarePort"], "TCP", "P2P Middleware Port", "
         
 
-    # while True:
-    #     print("DIED DIED DIED")
-    #     sleep(1)
+    while True:
+        print("DIED DIED DIED")
+        sleep(1)
 
 
 def p2p_friendUpdateThread():
