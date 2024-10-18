@@ -1,4 +1,5 @@
 import subprocess
+import random
 
 '''
 I was having issues with the upnpy module regarding timeout of new connections. 
@@ -12,10 +13,12 @@ def upnp_discoverUPnPDevices():
     output = result.stdout
 
     if result.returncode != 0:
+        print("Result of command: ", result)
         if "command not found" in result.stderr:
             raise RuntimeError("upnpc command not found")
         else:
-            raise RuntimeError(f"Command failed with error: {result.stderr}")
+            print(f"Command failed with error: {result.stderr}")
+            return False
 
     if "Found valid IGD" in output:
         return True
@@ -29,10 +32,13 @@ def upnp_newPortForwardingRule(ownIpAddress, middlewarePort):
     output = result.stdout
 
     if result.returncode != 0:
+        print("Result of command: ", result)
         if "command not found" in result.stderr:
             raise RuntimeError("upnpc command not found")
         else:
-            raise RuntimeError(f"Command failed with error: {result.stderr}")
+            print(f"Command failed with error: {result.stderr}")
+            return False, 0
+
 
     # Parse the output to find currently used ports
     used_ports = set()
@@ -52,14 +58,17 @@ def upnp_newPortForwardingRule(ownIpAddress, middlewarePort):
             break
 
     # upnpc -e "MyApp" -a 192.168.1.160 34567 34567 TCP
-    result = subprocess.run(['upnpc', '-e', 'MyApp', '-a', ownIpAddress, externalPort, middlewarePort, 'TCP'], capture_output=True, text=True)
+    result = subprocess.run(['upnpc', '-e', 'MyApp', '-a', str(ownIpAddress), str(externalPort), str(middlewarePort), 'TCP'], capture_output=True, text=True)
 
     if result.returncode != 0:
+        print("Result of command: ", result)
         if "command not found" in result.stderr:
             raise RuntimeError("upnpc command not found")
         else:
-            raise RuntimeError(f"Command failed with error: {result.stderr}")
-    
+            print(f"Command failed with error: {result.stderr}")
+            return False, 0
+
+
     if "is redirected to internal" in result.stdout:
         return True, externalPort
     else:

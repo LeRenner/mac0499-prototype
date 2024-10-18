@@ -183,22 +183,27 @@ def p2p_UPnPConnection():
     if hasUPnP == False:
         statusIndicatorBadge = "No UPnP devices found."
         friends_updateUPnPStatus(False, 0)
-        return 10
-    
-    success, externalport = upnp_newPortForwardingRule(p2p_getPublicIP(), friendConnectionDetails["middlewarePort"])
 
-    if not success:
-        statusIndicatorBadge = "Failed to UPnP port forward."
-        friends_updateUPnPStatus(False, 0)
-        return 10
+        # check if friend has UPnP
+        while friends_getUPnPStatus(currentFocusedFriend) == None:
+            print("Waiting for friend to check UPnP status.")
+            sleep(5)
+    else:
+        success, externalport = upnp_newPortForwardingRule(p2p_getPublicIP(), friendConnectionDetails["middlewarePort"])
 
-    friends_updateUPnPStatus(True, externalport)
+        if not success:
+            statusIndicatorBadge = "Failed to UPnP port forward."
+            friends_updateUPnPStatus(False, 0)
+            return 10
 
-    statusIndicatorBadge = "UPnP port forwarding successful! Checking in with friend..."
+        friends_updateUPnPStatus(True, externalport)
 
-    while True:
-        result = friends_getUPnPStatus(currentFocusedFriend)
-        console.log(result)
+        statusIndicatorBadge = "UPnP port forwarding successful! Checking in with friend..."
+
+        while True:
+            result = friends_getUPnPStatus(currentFocusedFriend)
+            print("On UPnP connection, result is: ", result)
+            console.log(result)
 
 
 #####################################################

@@ -15,6 +15,8 @@ global upnpStatus
 def friends_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
     global localSocksPort
     global localMiddlewarePort
+    global upnpStatus
+
     localSocksPort = rcvSocksPort
     localMiddlewarePort = rcvLocalMiddlewarePort
 

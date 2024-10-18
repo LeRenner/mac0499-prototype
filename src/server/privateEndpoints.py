@@ -69,6 +69,7 @@ def privEndpoint_sendMessage():
 
     print("Sending message to", hostname, "with content", messageContent, "and proxies", proxies)
 
+    success = False
     for i in range(3):
         try:
             response = requests.post(hostname, data={"message": packedMessageContainer}, proxies=proxies, timeout=15)
@@ -81,6 +82,8 @@ def privEndpoint_sendMessage():
                 received_sha256 = response_data.get("sha256")
                 calculated_sha256 = hashlib.sha256(messageContent.encode()).hexdigest()
                 if received_sha256 == calculated_sha256:
+                    print("Message sent successfully!")
+                    success = True
                     break
                 else:
                     print("SHA256 mismatch! Message verification failed.")
@@ -94,6 +97,9 @@ def privEndpoint_sendMessage():
             sleep(5)
             continue
     else:
+        return json.dumps({"error": "Failed to send message after three tries!"})
+
+    if not success:
         return json.dumps({"error": "Failed to send message after three tries!"})
 
     # Create a copy of the message without the sender field
@@ -152,7 +158,7 @@ def privEndpoint_updatePublicKeyRecords(peerAddress: str) -> bool:
 
     for attempt in range(3):
         try:
-            print("[updatePublicKeyRecords] Starting request...")
+            print("[updatePublicKeyRecords] Starting request to:", f"http://{peerAddress}/pubEndpoint_getPublicKeyBase64", "with proxies", proxies)
             response = requests.get(f"http://{peerAddress}/pubEndpoint_getPublicKeyBase64", proxies=proxies, timeout=15)
 
             public_key_base64 = response.json().get("public_key")
