@@ -212,6 +212,8 @@ def privEndpoint_webInterface(filename):
 def privEndpoint_changeFocusedFriend():
     friend = flask.request.get_json().get("address")
 
+    print("Changing focused friend to", friend)
+
     return p2p_changeFocusedFriend(friend)
 
 

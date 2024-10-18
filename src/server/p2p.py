@@ -6,6 +6,7 @@ import datetime
 import socket
 from time import sleep
 import threading
+import multiprocessing
 
 from .serverCrypto import *
 from .jsonOperator import *
@@ -62,27 +63,49 @@ def p2p_tryConnecting():
     global friendConnectionStatus
 
     print("Current focused friend: " + str(currentFocusedFriend))
+    print("Status indicator badge: " + str(statusIndicatorBadge))
 
     if currentFocusedFriend == "00000000000000000000000000000000000000000000000000000000.onion":
         statusIndicatorBadge = "None."
         return -1
 
+    print("Trying to connect to friend.")
+    print("statusIndicatorBadge: ", statusIndicatorBadge)
+
     statusIndicatorBadge = "Checking if friend is mutual..."
 
     focusedFriendIsMutual = friends_checkIsMutualFriend(currentFocusedFriend)
 
+    print("Focused friend is mutual: ", focusedFriendIsMutual)
+    print("Current focused friend: ", currentFocusedFriend)
+
     if focusedFriendIsMutual == False:
+        print("Friend is not mutual.")
         statusIndicatorBadge = "Friend is not mutual."
         return 20
 
     statusIndicatorBadge = "Waiting for friend to focus on you..."
 
+    while True:
+        print("Status indicator badge: ", statusIndicatorBadge)
+        sleep(1)
+
+    print("Waiting for friend to focus on you...", end="")
+    print("Current focused friend: ", currentFocusedFriend)
+
     while friends_checkIsFocusedFriend(currentFocusedFriend) == False:
+        print(".", end="")
         sleep(5)
 
     statusIndicatorBadge = "Getting friend's IP addresses..."
 
+    print("Getting friend's IP addresses...")
+    print("Current focused friend: ", currentFocusedFriend)
+
     friendIPs = friends_getFriendIpAddress(currentFocusedFriend)
+
+    print("Friend IPs: ", friendIPs)
+    print("Current focused friend: ", currentFocusedFriend)
 
     friendConnectionDetails["middlewarePort"] = friendIPs["middlewarePort"]
     friendConnectionDetails["friendPublicAddress"] = friendIPs["public"]
@@ -115,21 +138,34 @@ def p2p_friendUpdateThread():
     pastFocusedFriend = None
 
     while True:
+        print("=============================================")
+        print("Started! currentFocusedFriend: ", currentFocusedFriend)
+        print("pastFocusedFriend: ", pastFocusedFriend)
+
         while currentFocusedFriend == pastFocusedFriend:
             sleep(1)
+
+        print("Focused friend changed. Updating connection thread.")
         
         pastFocusedFriend = currentFocusedFriend
 
-        if currentFocusedFriend is None or currentFocusedFriend == "00000000000000000000000000000000000000000000000000000000.onion":
-            if friendConnectionThread is not None:
-                # kill friend connection thread
-                friendConnectionThread.join()
-                break
+        if currentFocusedFriend is None or "00000000000000000000000000000000000000000" in currentFocusedFriend:
+            try:
+                print("Killing thread.")
+                friendConnectionThread.terminate()
+            except AttributeError:
+                print("No thread to terminate.")
+
+            except AttributeError:
+                print("No thread to join.")
         else:
+            print("Starting new thread.")
             # start friend connection thread
-            friendConnectionThread = threading.Thread(target=p2p_friendConnectionThread)
+            friendConnectionThread = multiprocessing.Process(target=p2p_friendConnectionThread)
             friendConnectionThread.start()
         
+        print("Reached the end???????????")
+
         sleep(1)
 
 
@@ -163,7 +199,7 @@ def p2p_localhostConnection():
         sleep(1)
 
 
-def localNetworkConnection():
+def p2p_localNetworkConnection():
     friendConnectionStatus = 2
     statusIndicatorBadge = "OMG local network but it still doesnt work!"
     return -1
@@ -286,6 +322,8 @@ def p2p_changeFocusedFriend(address):
 
 def p2p_getstatusIndicatorBadge():
     global statusIndicatorBadge
+
+    print("Status indicator badge: ", statusIndicatorBadge)
 
     if statusIndicatorBadge is None:
         return {"status": "No friend connection status available."}
