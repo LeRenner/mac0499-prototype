@@ -67,6 +67,11 @@ def privEndpoint_sendMessage():
         proxies = None
     
 
+    if p2p_getFriendConnectionStatus()["status"] == "2":
+        p2p_sendMessageToFriend(packagedMessage)
+        return json.dumps({"message": "Message sent!"})
+    
+
     print("Sending message to", hostname, "with content", messageContent, "and proxies", proxies)
 
     success = False
@@ -218,4 +223,4 @@ def privEndpoint_changeFocusedFriend():
 
 
 def privEndpoint_getFriendConectionStatus():
-    return p2p_getstatusIndicatorBadge()
+    return p2p_getStatusIndicatorBadge()

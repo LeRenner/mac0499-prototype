@@ -11,11 +11,13 @@ from .jsonOperator import *
 global localSocksPort
 global localMiddlewarePort
 global upnpStatus
+global localConnectionPort
 
 def friends_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
     global localSocksPort
     global localMiddlewarePort
     global upnpStatus
+    global localConnectionPort
 
     localSocksPort = rcvSocksPort
     localMiddlewarePort = rcvLocalMiddlewarePort
@@ -24,12 +26,18 @@ def friends_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
         "enabled": None,
         "upnpPort": 0
     }
+    localConnectionPort = None
 
 
 def friends_updateUPnPStatus(upnpEnabled: bool, upnpPort: int = 0):
     global upnpStatus
     upnpStatus["enabled"] = upnpEnabled
     upnpStatus["upnpPort"] = upnpPort
+
+
+def friends_setLocalNetworkPort(port: int):
+    global localConnectionPort
+    localConnectionPort = port
 
 
 ##########################################################################################################
@@ -141,6 +149,17 @@ def friends_receiveUPnPStatusRequest(request_object_json: str) -> bool:
     return {"message": "Success", "upnpStatus": upnpStatus}
 
 
+def friends_receiveGetLocalConnectionPort(request_object_json: str) -> bool:
+    global localConnectionPort
+
+    result = friends_receiveGenericFriendRequest(request_object_json, "getLocalPort")
+
+    if result is not True:
+        return result
+    
+    return {"message": "Success", "localConnectionPort": localConnectionPort}
+
+
 #####################################################
 ######## SEND REQUESTS ##############################
 #####################################################
@@ -241,6 +260,17 @@ def friends_getUPnPStatus(friendAddress: str) -> dict:
     return parsed_response.get("upnpStatus")
 
 
+def friends_getLocalConnectionPort(friendAddress: str) -> int:
+    request_response = friends_sendGenericRequest("getLocalPort", friendAddress)
+
+    if request_response is False:
+        return False
+
+    parsed_response = json.loads(request_response)
+
+    return parsed_response.get("localConnectionPort")
+
+
 #####################################################
 ######## AUXILIARY FUNCTIONS ########################
 #####################################################
@@ -262,6 +292,20 @@ def friends_getPublicIP():
 
 
 def friends_getLocalIP():
-    hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
-    return local_ip
+    local_ip = None
+    try:
+        # Create a socket and connect to an external server to determine the local IP address
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0)
+        s.connect(('10.254.254.254', 1))
+        local_ip = s.getsockname()[0]
+    except Exception:
+        local_ip = '127.0.0.1'
+    finally:
+        s.close()
+    
+    # Filter out public IPs, localhosts, and other not relevant IPs
+    if local_ip.startswith("127.") or local_ip.startswith("169.254.") or local_ip.startswith("172.16.") or local_ip.startswith("192.168.") or local_ip.startswith("10."):
+        return local_ip
+    else:
+        return None

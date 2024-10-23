@@ -32,7 +32,7 @@ def endpoints_initializeFlask():
 def endpoints_setupEndpoints(app, address, localSocksPort, localMiddlewarePort):
     privEndpoint_setupPrivateEndpointVariables(address, localSocksPort)
     pubEndpoint_setupPublicEndpointlVariables(localSocksPort)
-    p2p_initializeVariables(localSocksPort)
+    p2p_initializeVariables(localSocksPort, localMiddlewarePort)
     friends_initializeVariables(localSocksPort, localMiddlewarePort)
     operator_setupVariables(address)
     crypto_initializeTorKeys()

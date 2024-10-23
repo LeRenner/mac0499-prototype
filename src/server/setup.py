@@ -3,13 +3,7 @@ import os
 import subprocess
 import time
 
-def portIsOpen(port):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    result = sock.connect_ex(('127.0.0.1', port))
-    if result == 0:
-        return False
-    else:
-        return True
+from .p2p import p2p_portIsOpen
 
 
 def setupTor():
@@ -22,7 +16,7 @@ def setupTor():
 
     # find 3 free ports between 5000 and 35000
     for i in range(5876, 35000):
-        if portIsOpen(i):
+        if p2p_portIsOpen(i):
             localSocksPort = i
             break
     
@@ -32,12 +26,12 @@ def setupTor():
         localSocksPort = 5879
 
     for i in range(localSocksPort + 1, 35000):
-        if portIsOpen(i):
+        if p2p_portIsOpen(i):
             localHttpPort = i
             break
     
     for i in range(localHttpPort + 1, 35000):
-        if portIsOpen(i):
+        if p2p_portIsOpen(i):
             torMiddlewarePort = i
             break
     
@@ -67,7 +61,7 @@ def setupTor():
     log = open("logs/tor.log", "w")
     
     # start tor
-    process = "lalala"#subprocess.Popen(["tor", "-f", "tor/torrc"], stdout=log, stderr=log)
+    process = subprocess.Popen(["tor", "-f", "tor/torrc"], stdout=log, stderr=log)
 
     # wait for the creation of tor/data/hidden-service/hostname
     print("Esperando o tor iniciar.", end="")

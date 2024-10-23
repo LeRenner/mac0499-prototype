@@ -29,12 +29,22 @@
                 "content": "isadiosdhfs",
                 "timestamp": 1729230992
             }
+        ],
+        "oqkigk6sd3jscd7524w37dol33mrmq6blyncnvrdnwppjpn6jtylysqd.onion": [
+            {
+                "content": "ola!",
+                "timestamp": 1729281287
+            }
         ]
     },
     "friends": [
         {
             "address": "jd252eixmvp4xxtqw6amub4n6xun4lhryihgzyxi6m7cbbdh35dpfwqd.onion",
             "alias": "omg omg jd252"
+        },
+        {
+            "address": "oqkigk6sd3jscd7524w37dol33mrmq6blyncnvrdnwppjpn6jtylysqd.onion",
+            "alias": "pessoa 2"
         }
     ],
     "peerList": [
@@ -45,6 +55,10 @@
         {
             "address": "jd252eixmvp4xxtqw6amub4n6xun4lhryihgzyxi6m7cbbdh35dpfwqd.onion",
             "public_key": "KsDhToEpiMcLsdvaQxMUy5ro/3FCeFp+zg4aUNJNsuA="
+        },
+        {
+            "address": "oqkigk6sd3jscd7524w37dol33mrmq6blyncnvrdnwppjpn6jtylysqd.onion",
+            "public_key": "iX226RrFUyUdlUdjwnEPCwb6S6B0a4TF3nZ+05f4s2c="
         }
     ],
     "firstContact": []
