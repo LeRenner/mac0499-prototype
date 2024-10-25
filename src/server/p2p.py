@@ -1,9 +1,10 @@
-localMiddlewarePortimport flask
+import flask
 import requests
 import json
 import base64
 import datetime
 import socket
+import random
 from time import sleep
 import threading
 
@@ -44,6 +45,7 @@ def p2p_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
 
         # for local network connections
         "localConnectionPort": None,
+        "externalConnectionPort": None,
 
         # socket direct network connections
         "directConnectionSocket": None,
@@ -135,7 +137,7 @@ def p2p_tryConnecting():
     # check if connection thread should die
     if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
-    p2p_status["localhost_friendMiddlewarePort"] = friendIPs["localhost_friendMiddlewarePort"]
+    p2p_status["localhost_friendMiddlewarePort"] = friendIPs["middlewarePort"]
     p2p_status["friendPublicAddress"] = friendIPs["public"]
     p2p_status["friendLocalAddress"] = friendIPs["local"]
 
@@ -163,12 +165,9 @@ def p2p_friendUpdateThread():
     while True:
         print("=============================================")
         print("Started! p2p_status[focusedFriend]: ", p2p_status["general_currentFocusedFriend"])
-        print("pastFocusedFriend: ", pastFocusedFriend)
 
         while p2p_status["general_currentFocusedFriend"] == pastFocusedFriend:
             sleep(1)
-
-        print("Focused friend changed. Updating connection thread.")
         
         pastFocusedFriend = p2p_status["general_currentFocusedFriend"]
 
@@ -208,7 +207,7 @@ def p2p_localhostConnection():
 
         try:
             requestMethod = {
-                "hostname": f"http://localhost:{friendConnectionDetails["general_localMiddlewarePort"]}/pubEndpoint_receiveGenericFriendRequest",
+                "hostname": f"http://localhost:{friendConnectionDetails['general_localMiddlewarePort']}/pubEndpoint_receiveGenericFriendRequest",
                 "proxy": None
             }
             isFocused = friends_checkIsFocusedFriend(p2p_status["general_currentFocusedFriend"], requestMethod)
@@ -231,7 +230,7 @@ def p2p_localNetworkConnection():
 
     # Determine which peer will host the connection
     if crypto_getOwnAddress() > p2p_status["general_currentFocusedFriend"]:
-        return p2p_hostServer()
+        return p2p_localNetworkHostServer()
     else:
         return p2p_localNetworkConnectToServer()
 
@@ -263,27 +262,33 @@ def p2p_UPnPConnection():
                 p2p_status["general_clientConnectionMessage"] = "Friend does not have UPnP support. Defaulting to tor."
                 return -1
             
-            if friendUpnpStatus["enabled"] == False:
+            if friendUpnpStatus["readyForConnection"] == False:
+                p2p_status["general_clientConnectionMessage"] = "Friend is not ready for connection. Waiting..."
                 sleep(3)
                 continue
             
-            if friendUpnpStatus["enabled"] == True and friendUpnpStatus["upnpPort"] != 0:
+            if friendUpnpStatus["readyForConnection"] == True and friendUpnpStatus["upnpPort"] != 0:
                 p2p_status["friendUpnpInformation"] = friendUpnpStatus
+
+                p2p_status["general_clientConnectionMessage"] = "Friend has UPnP support! Estabilishing connection..."
                 p2p_upnpConnectToServer()
 
     else:
         friends_updateUPnPStatus(True, False, 0)
 
         internalConnectionPort = p2p_findLocallyAvailablePort()
+        p2p_status["localConnectionPort"] = internalConnectionPort
 
         success, externalport = upnp_newPortForwardingRule(friends_getLocalIP(), internalConnectionPort)
+        p2p_status["externalConnectionPort"] = externalport
 
         if not success:
             p2p_status["general_clientConnectionMessage"] = "Failed to UPnP port forward."
             friends_updateUPnPStatus(False, False, 0)
             return 10
 
-        friends_updateUPnPStatus(True, True, externalport)
+        print("SETTING STATUS TO", externalport, "AND")
+        friends_updateUPnPStatus(True, False, externalport)
 
         p2p_status["general_clientConnectionMessage"] = "UPnP port forwarding successful! Checking in with friend..."
 
@@ -293,7 +298,7 @@ def p2p_UPnPConnection():
 
             if result["hasSupport"] == False:
                 p2p_status["general_clientConnectionMessage"] = "Friend does not have UPnP support, but we do! Estabilishing connection!"
-                p2p_upnpConnectToServer()
+                p2p_upnpHostServer()
 
 
 #####################################################
@@ -305,7 +310,7 @@ def p2p_forwardToMiddleware(message):
 
     try:
         response = requests.post(
-            f"http://localhost:{p2p_status["general_localMiddlewarePort"]}/pubEndpoint_receiveMessage",
+            f"http://localhost:{p2p_status['general_localMiddlewarePort']}/pubEndpoint_receiveMessage",
             data={"message": message}
         )
 
@@ -337,7 +342,7 @@ def p2p_sendMessageToFriend(message):
     friendSocket.sendall(message.encode('utf-8'))
 
 
-def p2p_hostServer():
+def p2p_localNetworkHostServer():
     global p2p_status
 
     localSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -368,13 +373,27 @@ def p2p_upnpHostServer():
 
     localSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    localConnectionPort = p2p_findLocallyAvailablePort()
+    localConnectionPort = p2p_status["localConnectionPort"]
     friends_setLocalNetworkPort(localConnectionPort)
-    p2p_status["localConnectionPort"] = localConnectionPort
 
     print(f"Hosting server on port {localConnectionPort}")
 
-    localSocket.bind(('
+    localSocket.bind(('0.0.0.0', localConnectionPort))
+    localSocket.listen(1)
+
+    friends_updateUPnPStatus(True, True, p2p_status["externalConnectionPort"])
+
+    conn, addr = localSocket.accept()
+    print(f"Connection from {addr}")
+
+    p2p_status["directConnectionSocket"] = conn
+
+    p2p_status["friendConnectionStatus"] = 3
+
+    p2p_handleReceivedMessage(conn)
+
+    return 0
+
 
 
 def p2p_localNetworkConnectToServer():
@@ -404,13 +423,18 @@ def p2p_upnpConnectToServer():
     friendPublicAddress = p2p_status["friendPublicAddress"]
     friendPort = p2p_status["friendUpnpInformation"]["upnpPort"]
 
+    print("Connecting to friend on UPnP port ", friendPort)
+    print("Connecting to friend on UPnP address ", friendPublicAddress)
+
     friendSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    friendSocket.connect((friendPublicAddress, friendPort))
+    friendSocket.connect((friendPublicAddress, int(friendPort)))
 
     if friendSocket is None:
+        p2p_status["general_clientConnectionMessage"] = "Failed to connect to friend :("
         return 1
 
     p2p_status["directConnectionSocket"] = friendSocket
+    p2p_status["general_clientConnectionMessage"] = "P2P connected to friend with UPnP!"
 
     p2p_status["friendConnectionStatus"] = 3
 
@@ -513,6 +537,8 @@ def p2p_getStatusIndicatorBadge():
 def p2p_getFriendConnectionStatus():
     global p2p_status
 
+    friendConnectionStatus = p2p_status["friendConnectionStatus"]
+
     if friendConnectionStatus == 0:
         return {"status": "0"}
     
@@ -524,11 +550,10 @@ def p2p_getFriendConnectionStatus():
 
 # finds port between 40000 and 60000 that is not in use
 def p2p_findLocallyAvailablePort():
-    for i in range(40000, 60000):
-        if p2p_portIsOpen(i):
-            return i
-
-    return -1
+    while True:
+        port = random.randint(50001, 60000)
+        if p2p_portIsOpen(port):
+            return port
 
 
 def p2p_portIsOpen(port: int) -> bool:

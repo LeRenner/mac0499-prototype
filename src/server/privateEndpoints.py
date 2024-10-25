@@ -56,10 +56,6 @@ def privEndpoint_sendMessage():
 
     packedMessageContainer = json.dumps(messageContainer)
 
-
-    print("p2p_getFriendConnectionStatus() = ", p2p_getFriendConnectionStatus())
-
-
     # check is message can be sent locally
     if p2p_getFriendConnectionStatus()["status"] == "1":
         middlewarePort = p2p_getFriendConnectionStatus()["middlewarePort"]

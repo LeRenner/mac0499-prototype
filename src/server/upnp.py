@@ -69,8 +69,6 @@ def upnp_cleanupPortForwardingRules():
 
     currentRules = upnp_getAllPortForwardingRules()
 
-    print(currentRules)
-
     if currentRules is False:
         return False
     

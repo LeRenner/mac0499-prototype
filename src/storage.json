@@ -1,64 +1,34 @@
 {
     "receivedMessages": {
-        "433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion": [
-            {
-                "message": "{\"sender\": \"433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion\", \"content\": \"heheheheheheheh hiiiii\", \"timestamp\": 1729209011}",
-                "signature": "WYSX03z+Be9TqjJTlFp5WCuc7InarSSIhmFxY9lRZC9naN5PzY5L34FRgpFzzDBH3ZKE1c9G/1IpXTC/mfebAw=="
-            }
-        ],
         "jd252eixmvp4xxtqw6amub4n6xun4lhryihgzyxi6m7cbbdh35dpfwqd.onion": [
             {
-                "message": "{\"sender\": \"jd252eixmvp4xxtqw6amub4n6xun4lhryihgzyxi6m7cbbdh35dpfwqd.onion\", \"content\": \"omg omg omg omg\", \"timestamp\": 1729209191}",
-                "signature": "U9KfLLh+6xgvk50GJ78SfZmnUp8K0xlauh52S3AjnoJFNVWfVWTo+HVB+w1glU+LkGj0BXpZJr7d872YbAvoCg=="
+                "message": "{\"sender\": \"jd252eixmvp4xxtqw6amub4n6xun4lhryihgzyxi6m7cbbdh35dpfwqd.onion\", \"content\": \"heyyyyyyyyyyy omg omg\", \"timestamp\": 1729817457}",
+                "signature": "4y79rAk7de7Fp/P5yWQfa4MR3Eao8EGfra9WAr5nCCTK3UjhuFos/ME1C+gEZkZUHBAMEOmzYUD4cDl1quaJCQ=="
             }
         ]
     },
     "sentMessages": {
-        "433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion": [
-            {
-                "content": "heheheheheheheh hiiiii",
-                "timestamp": 1729209011
-            }
-        ],
         "jd252eixmvp4xxtqw6amub4n6xun4lhryihgzyxi6m7cbbdh35dpfwqd.onion": [
             {
-                "content": "heheheheheh hiiii",
-                "timestamp": 1729209178
+                "content": "omg omg omg hiiii",
+                "timestamp": 1729817438
             },
             {
-                "content": "isadiosdhfs",
-                "timestamp": 1729230992
-            }
-        ],
-        "oqkigk6sd3jscd7524w37dol33mrmq6blyncnvrdnwppjpn6jtylysqd.onion": [
-            {
-                "content": "ola!",
-                "timestamp": 1729281287
+                "content": "hey!",
+                "timestamp": 1729818410
             }
         ]
     },
     "friends": [
         {
             "address": "jd252eixmvp4xxtqw6amub4n6xun4lhryihgzyxi6m7cbbdh35dpfwqd.onion",
-            "alias": "omg omg jd252"
-        },
-        {
-            "address": "oqkigk6sd3jscd7524w37dol33mrmq6blyncnvrdnwppjpn6jtylysqd.onion",
-            "alias": "pessoa 2"
+            "alias": "JD252"
         }
     ],
     "peerList": [
         {
-            "address": "433wh3i32gjug77njyzju5zgrakib4z5seh3m5dgt5i4k5rbb2f53zyd.onion",
-            "public_key": "2ShatbNaa39Hzf8hHaiyl3hGzUCk3nCzSF8mBvSuJSw="
-        },
-        {
             "address": "jd252eixmvp4xxtqw6amub4n6xun4lhryihgzyxi6m7cbbdh35dpfwqd.onion",
             "public_key": "KsDhToEpiMcLsdvaQxMUy5ro/3FCeFp+zg4aUNJNsuA="
-        },
-        {
-            "address": "oqkigk6sd3jscd7524w37dol33mrmq6blyncnvrdnwppjpn6jtylysqd.onion",
-            "public_key": "iX226RrFUyUdlUdjwnEPCwb6S6B0a4TF3nZ+05f4s2c="
         }
     ],
     "firstContact": []
