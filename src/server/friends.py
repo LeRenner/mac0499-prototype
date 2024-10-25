@@ -13,6 +13,7 @@ global localMiddlewarePort
 global upnpStatus
 global localConnectionPort
 
+
 def friends_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
     global localSocksPort
     global localMiddlewarePort
@@ -23,14 +24,16 @@ def friends_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
     localMiddlewarePort = rcvLocalMiddlewarePort
 
     upnpStatus = {
-        "enabled": None,
+        "hasSupport": None,
+        "readyToReceiveConnection": None,
         "upnpPort": 0
     }
     localConnectionPort = None
 
 
-def friends_updateUPnPStatus(upnpEnabled: bool, upnpPort: int = 0):
+def friends_updateUPnPStatus(hasSupport: bool, upnpEnabled: bool, upnpPort: int):
     global upnpStatus
+    upnpStatus["hasSupport"] = hasSupport
     upnpStatus["enabled"] = upnpEnabled
     upnpStatus["upnpPort"] = upnpPort
 
@@ -38,6 +41,18 @@ def friends_updateUPnPStatus(upnpEnabled: bool, upnpPort: int = 0):
 def friends_setLocalNetworkPort(port: int):
     global localConnectionPort
     localConnectionPort = port
+
+
+def friends_resetConnectionVariables():
+    global upnpStatus
+    global localConnectionPort
+
+    upnpStatus = {
+        "enabled": None,
+        "hasSupport": None,
+        "upnpPort": 0
+    }
+    localConnectionPort = None
 
 
 ##########################################################################################################

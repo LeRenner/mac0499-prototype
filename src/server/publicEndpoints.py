@@ -93,6 +93,10 @@ def pubEndpoint_receiveGenericFriendRequest():
         return json.dumps(p2p_receiveFriendIsFocusedRequest(request_object_json))
     elif request_type == "checkFriend":
         return json.dumps(friends_receiveCheckFriendRequest(request_object_json))
+    elif request_type == "getUPnPStatus":
+        return json.dumps(friends_receiveUPnPStatusRequest(request_object_json))
+    elif request_type == "getLocalPort":
+        return json.dumps(friends_receiveGetLocalConnectionPort(request_object_json))
     else:
         return json.dumps({"message": "Invalid request type."})
 

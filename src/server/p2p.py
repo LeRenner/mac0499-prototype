@@ -1,4 +1,4 @@
-import flask
+localMiddlewarePortimport flask
 import requests
 import json
 import base64
@@ -19,13 +19,14 @@ def p2p_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
     global p2p_status
 
     p2p_status = {
-        "shouldKillConnectionThread": False,
-        "socksPort": rcvSocksPort,
-        "localMiddlewarePort": rcvLocalMiddlewarePort,
-        "focusedFriend": None,
-
-        # status message that is shown in the client
-        "connectionStatus": None,
+        #############################################################
+        ######## GENERAL VARIABLES ##################################
+        #############################################################
+        "general_shouldKillConnectionThread": False,
+        "general_socksPort": rcvSocksPort,
+        "general_localMiddlewarePort": rcvLocalMiddlewarePort,
+        "general_currentFocusedFriend": None,
+        "general_clientConnectionMessage": None,
 
         # 0 = not connected
         # 1 = connected on localhost
@@ -34,22 +35,38 @@ def p2p_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
         "friendConnectionStatus": 0,
 
         # for connections on localhost; friend's middleware port        
-        "middlewarePort": None,
+        "localhost_friendMiddlewarePort": None,
 
         # friend's addresses
         "friendPublicAddress": None,
         "friendLocalAddress": None,
+        "friendUpnpInformation": None,
 
         # for local network connections
         "localConnectionPort": None,
 
-        "localNetworkSocket": None,
+        # socket direct network connections
+        "directConnectionSocket": None,
 
+        # threads that manage peer-to-peer connections
         "friendUpdateThread": threading.Thread(target=p2p_friendUpdateThread),
-
         "friendConnectionThread": None
     }
     p2p_status["friendUpdateThread"].start()
+
+
+def p2p_resetConnectionVariables():
+    global p2p_status
+
+    p2p_status["general_shouldKillConnectionThread"] = False
+    p2p_status["general_clientConnectionMessage"] = None
+    p2p_status["friendConnectionStatus"] = 0
+    p2p_status["localhost_friendMiddlewarePort"] = None
+    p2p_status["friendPublicAddress"] = None
+    p2p_status["friendLocalAddress"] = None
+    p2p_status["localConnectionPort"] = None
+    p2p_status["directConnectionSocket"] = None
+    p2p_status["friendConnectionThread"] = None
 
 
 #####################################################
@@ -67,54 +84,58 @@ def p2p_friendConnectionThread():
 def p2p_connectionThreadDying():
     global p2p_status
 
-    p2p_status["shouldKillConnectionThread"] = False
+    p2p_status["general_shouldKillConnectionThread"] = False
     return -1
 
 
 def p2p_tryConnecting():
     global p2p_status
 
-    if p2p_status["focusedFriend"] == "00000000000000000000000000000000000000000000000000000000.onion":
-        p2p_status["connectionStatus"] = "None."
+    friends_resetConnectionVariables()
+    p2p_resetConnectionVariables()
+
+
+    if p2p_status["general_currentFocusedFriend"] == "00000000000000000000000000000000000000000000000000000000.onion":
+        p2p_status["general_clientConnectionMessage"] = "None."
         return -1
 
     # check if connection thread should die
-    if p2p_status["shouldKillConnectionThread"]: return p2p_connectionThreadDying()
+    if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
-    p2p_status["connectionStatus"] = "Checking if friend is mutual..."
+    p2p_status["general_clientConnectionMessage"] = "Checking if friend is mutual..."
 
-    focusedFriendIsMutual = friends_checkIsMutualFriend(p2p_status["focusedFriend"])
+    focusedFriendIsMutual = friends_checkIsMutualFriend(p2p_status["general_currentFocusedFriend"])
 
     # check if connection thread should die
-    if p2p_status["shouldKillConnectionThread"]: return p2p_connectionThreadDying()
+    if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
     if focusedFriendIsMutual == False:
         print("Friend is not mutual.")
-        p2p_status["connectionStatus"] = "Friend is not mutual."
+        p2p_status["general_clientConnectionMessage"] = "Friend is not mutual."
         return 20
 
-    p2p_status["connectionStatus"] = "Waiting for friend to focus on you..."
+    p2p_status["general_clientConnectionMessage"] = "Waiting for friend to focus on you..."
 
-    while friends_checkIsFocusedFriend(p2p_status["focusedFriend"]) == False:
+    while friends_checkIsFocusedFriend(p2p_status["general_currentFocusedFriend"]) == False:
         # check if connection thread should die
-        if p2p_status["shouldKillConnectionThread"]: return p2p_connectionThreadDying()
+        if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
         print(".", end="")
         sleep(5)
     
 
     # check if connection thread should die
-    if p2p_status["shouldKillConnectionThread"]: return p2p_connectionThreadDying()
+    if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
 
-    p2p_status["connectionStatus"] = "Getting friend's IP addresses..."
+    p2p_status["general_clientConnectionMessage"] = "Getting friend's IP addresses..."
 
-    friendIPs = friends_getFriendIpAddress(p2p_status["focusedFriend"])
+    friendIPs = friends_getFriendIpAddress(p2p_status["general_currentFocusedFriend"])
 
     # check if connection thread should die
-    if p2p_status["shouldKillConnectionThread"]: return p2p_connectionThreadDying()
+    if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
-    p2p_status["middlewarePort"] = friendIPs["middlewarePort"]
+    p2p_status["localhost_friendMiddlewarePort"] = friendIPs["localhost_friendMiddlewarePort"]
     p2p_status["friendPublicAddress"] = friendIPs["public"]
     p2p_status["friendLocalAddress"] = friendIPs["local"]
 
@@ -141,17 +162,17 @@ def p2p_friendUpdateThread():
 
     while True:
         print("=============================================")
-        print("Started! p2p_status[focusedFriend]: ", p2p_status["focusedFriend"])
+        print("Started! p2p_status[focusedFriend]: ", p2p_status["general_currentFocusedFriend"])
         print("pastFocusedFriend: ", pastFocusedFriend)
 
-        while p2p_status["focusedFriend"] == pastFocusedFriend:
+        while p2p_status["general_currentFocusedFriend"] == pastFocusedFriend:
             sleep(1)
 
         print("Focused friend changed. Updating connection thread.")
         
-        pastFocusedFriend = p2p_status["focusedFriend"]
+        pastFocusedFriend = p2p_status["general_currentFocusedFriend"]
 
-        if p2p_status["focusedFriend"] is None or "00000000000000000000000000000000000000000" in p2p_status["focusedFriend"]:
+        if p2p_status["general_currentFocusedFriend"] is None or "00000000000000000000000000000000000000000" in p2p_status["general_currentFocusedFriend"]:
             try:
                 print("Killing thread.")
                 p2p_status["friendConnectionThread"].terminate()
@@ -179,24 +200,24 @@ def p2p_localhostConnection():
     global p2p_status
 
     friendConnectionStatus = 1
-    p2p_status["connectionStatus"] = "Connected on localhost!"
+    p2p_status["general_clientConnectionMessage"] = "Connected on localhost!"
 
     while True:
         # check if connection thread should die
-        if p2p_status["shouldKillConnectionThread"]: return p2p_connectionThreadDying()
+        if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
         try:
             requestMethod = {
-                "hostname": f"http://localhost:{friendConnectionDetails['middlewarePort']}/pubEndpoint_receiveGenericFriendRequest",
+                "hostname": f"http://localhost:{friendConnectionDetails["general_localMiddlewarePort"]}/pubEndpoint_receiveGenericFriendRequest",
                 "proxy": None
             }
-            isFocused = friends_checkIsFocusedFriend(p2p_status["focusedFriend"], requestMethod)
+            isFocused = friends_checkIsFocusedFriend(p2p_status["general_currentFocusedFriend"], requestMethod)
 
             if isFocused == False:
-                p2p_status["connectionStatus"] = "Friend closed chat with you. Defaulting to tor."
+                p2p_status["general_clientConnectionMessage"] = "Friend closed chat with you. Defaulting to tor."
                 return 1
         except requests.RequestException:
-            p2p_status["connectionStatus"] = "Friend connection lost."
+            p2p_status["general_clientConnectionMessage"] = "Friend connection lost."
             return 1
                 
         sleep(1)
@@ -206,13 +227,13 @@ def p2p_localNetworkConnection():
     global p2p_status
 
     friendConnectionStatus = 2
-    p2p_status["connectionStatus"] = "Connecting on local network..."
+    p2p_status["general_clientConnectionMessage"] = "Connecting on local network..."
 
     # Determine which peer will host the connection
-    if crypto_getOwnAddress() > p2p_status["focusedFriend"]:
+    if crypto_getOwnAddress() > p2p_status["general_currentFocusedFriend"]:
         return p2p_hostServer()
     else:
-        return p2p_connectToServer()
+        return p2p_localNetworkConnectToServer()
 
     return
 
@@ -221,35 +242,58 @@ def p2p_UPnPConnection():
     global p2p_status
 
     friendConnectionStatus = 3
-    p2p_status["connectionStatus"] = "On different networks! Will try to UPNP port forward."
+    p2p_status["general_clientConnectionMessage"] = "On different networks! Will try to UPNP port forward."
+
+    upnp_cleanupPortForwardingRules()
 
     # try to UPNP port forward
     hasUPnP = upnp_discoverUPnPDevices()
 
     if hasUPnP == False:
-        p2p_status["connectionStatus"] = "No UPnP devices found."
-        friends_updateUPnPStatus(False, 0)
+        p2p_status["general_clientConnectionMessage"] = "No UPnP devices found."
+        friends_updateUPnPStatus(False, False, 0)
 
         # check if friend has UPnP
-        while friends_getUPnPStatus(p2p_status["focusedFriend"]) == None:
-            print("Waiting for friend to check UPnP status.")
-            sleep(5)
+        while True:
+            friendUpnpStatus = friends_getUPnPStatus(p2p_status["general_currentFocusedFriend"])
+
+            print("I dont have UPNP. Friend's UPNP status is: ", friendUpnpStatus)
+
+            if friendUpnpStatus["hasSupport"] == False:
+                p2p_status["general_clientConnectionMessage"] = "Friend does not have UPnP support. Defaulting to tor."
+                return -1
+            
+            if friendUpnpStatus["enabled"] == False:
+                sleep(3)
+                continue
+            
+            if friendUpnpStatus["enabled"] == True and friendUpnpStatus["upnpPort"] != 0:
+                p2p_status["friendUpnpInformation"] = friendUpnpStatus
+                p2p_upnpConnectToServer()
+
     else:
-        success, externalport = upnp_newPortForwardingRule(p2p_getPublicIP(), p2p_status["middlewarePort"])
+        friends_updateUPnPStatus(True, False, 0)
+
+        internalConnectionPort = p2p_findLocallyAvailablePort()
+
+        success, externalport = upnp_newPortForwardingRule(friends_getLocalIP(), internalConnectionPort)
 
         if not success:
-            p2p_status["connectionStatus"] = "Failed to UPnP port forward."
-            friends_updateUPnPStatus(False, 0)
+            p2p_status["general_clientConnectionMessage"] = "Failed to UPnP port forward."
+            friends_updateUPnPStatus(False, False, 0)
             return 10
 
-        friends_updateUPnPStatus(True, externalport)
+        friends_updateUPnPStatus(True, True, externalport)
 
-        p2p_status["connectionStatus"] = "UPnP port forwarding successful! Checking in with friend..."
+        p2p_status["general_clientConnectionMessage"] = "UPnP port forwarding successful! Checking in with friend..."
 
         while True:
-            result = friends_getUPnPStatus(p2p_status["focusedFriend"])
+            result = friends_getUPnPStatus(p2p_status["general_currentFocusedFriend"])
             print("On UPnP connection, result is: ", result)
-            console.log(result)
+
+            if result["hasSupport"] == False:
+                p2p_status["general_clientConnectionMessage"] = "Friend does not have UPnP support, but we do! Estabilishing connection!"
+                p2p_upnpConnectToServer()
 
 
 #####################################################
@@ -261,7 +305,7 @@ def p2p_forwardToMiddleware(message):
 
     try:
         response = requests.post(
-            f"http://localhost:{p2p_status['localMiddlewarePort']}/pubEndpoint_receiveMessage",
+            f"http://localhost:{p2p_status["general_localMiddlewarePort"]}/pubEndpoint_receiveMessage",
             data={"message": message}
         )
 
@@ -278,13 +322,18 @@ def p2p_handleReceivedMessage(conn):
         data = conn.recv(1024)
         if not data:
             break
+
+        if data.decode('utf-8') == "checkFocus":
+            conn.sendall(p2p_status["general_currentFocusedFriend"].encode('utf-8'))
+            continue
+        
         p2p_forwardToMiddleware(data.decode('utf-8'))
 
 
 def p2p_sendMessageToFriend(message):
     global p2p_status
 
-    friendSocket = p2p_status["localNetworkSocket"]
+    friendSocket = p2p_status["directConnectionSocket"]
     friendSocket.sendall(message.encode('utf-8'))
 
 
@@ -292,8 +341,6 @@ def p2p_hostServer():
     global p2p_status
 
     localSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    sleep(1)
 
     localConnectionPort = p2p_findLocallyAvailablePort()
     friends_setLocalNetworkPort(localConnectionPort)
@@ -307,7 +354,7 @@ def p2p_hostServer():
     conn, addr = localSocket.accept()
     print(f"Connection from {addr}")
 
-    p2p_status["localNetworkSocket"] = conn
+    p2p_status["directConnectionSocket"] = conn
 
     p2p_status["friendConnectionStatus"] = 2
 
@@ -316,16 +363,33 @@ def p2p_hostServer():
     return 0
 
 
-def p2p_connectToServer():
+def p2p_upnpHostServer():
     global p2p_status
 
-    friendLocalConnectionPort = friends_setLocalNetworkPort(p2p_status["focusedFriend"])
+    localSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    localConnectionPort = p2p_findLocallyAvailablePort()
+    friends_setLocalNetworkPort(localConnectionPort)
+    p2p_status["localConnectionPort"] = localConnectionPort
+
+    print(f"Hosting server on port {localConnectionPort}")
+
+    localSocket.bind(('
+
+
+def p2p_localNetworkConnectToServer():
+    global p2p_status
+
+    friendLocalConnectionPort = friends_setLocalNetworkPort(p2p_status["general_currentFocusedFriend"])
     p2p_status["localConnectionPort"] = friendLocalConnectionPort
 
     friendSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     friendSocket.connect((p2p_status["friendLocalAddress"], friendLocalConnectionPort))
 
-    p2p_status["localNetworkSocket"] = friendSocket
+    if friendSocket is None:
+        return 1
+
+    p2p_status["directConnectionSocket"] = friendSocket
 
     p2p_status["friendConnectionStatus"] = 2
 
@@ -334,8 +398,30 @@ def p2p_connectToServer():
     return 0
 
 
+def p2p_upnpConnectToServer():
+    global p2p_status
+
+    friendPublicAddress = p2p_status["friendPublicAddress"]
+    friendPort = p2p_status["friendUpnpInformation"]["upnpPort"]
+
+    friendSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    friendSocket.connect((friendPublicAddress, friendPort))
+
+    if friendSocket is None:
+        return 1
+
+    p2p_status["directConnectionSocket"] = friendSocket
+
+    p2p_status["friendConnectionStatus"] = 3
+
+    p2p_handleReceivedMessage(friendSocket)
+
+    return 0
+    
+
+
 def p2p_processFirstContact(address):
-    localSocksPort = p2p_status["socksPort"]
+    localSocksPort = p2p_status["general_socksPort"]
 
     proxies = {
         'http': 'socks5h://localhost:{}'.format(localSocksPort)
@@ -377,7 +463,7 @@ def p2p_receiveFriendIsFocusedRequest(request_object_json: str) -> bool:
 
     origin = json.loads(json.loads(request_object_json)["request"])["origin"]
 
-    if p2p_status["focusedFriend"] == origin:
+    if p2p_status["general_currentFocusedFriend"] == origin:
         return {"message": "Success", "isFocused": True}
     else:
         return {"message": "Success", "isFocused": False}
@@ -386,7 +472,7 @@ def p2p_receiveFriendIsFocusedRequest(request_object_json: str) -> bool:
 def p2p_checkIfIsFocusedFriend(address):
     global p2p_status
 
-    if p2p_status["focusedFriend"] == address:
+    if p2p_status["general_currentFocusedFriend"] == address:
         return {"status": "Focused"}
     else:
         return {"status": "Not focused"}
@@ -396,9 +482,9 @@ def p2p_changeFocusedFriend(address):
     global p2p_status
 
     if address == "null":
-        p2p_status["focusedFriend"] = None
+        p2p_status["general_currentFocusedFriend"] = None
     else:
-        p2p_status["focusedFriend"] = address
+        p2p_status["general_currentFocusedFriend"] = address
 
     return {"status": "Success"}
 
@@ -414,12 +500,10 @@ def p2p_getLocalConnectionPort():
 def p2p_getStatusIndicatorBadge():
     global p2p_status
 
-    print("Status indicator badge: ", p2p_status["connectionStatus"])
-
-    if p2p_status["connectionStatus"] is None:
+    if p2p_status["general_clientConnectionMessage"] is None:
         return {"status": "No friend connection status available."}
 
-    return {"status": p2p_status["connectionStatus"]}
+    return {"status": p2p_status["general_clientConnectionMessage"]}
 
 
 # 0 = not connected
@@ -433,7 +517,7 @@ def p2p_getFriendConnectionStatus():
         return {"status": "0"}
     
     if friendConnectionStatus == 1:
-        return {"status": "1", "middlewarePort": p2p_status["middlewarePort"]}
+        return {"status": "1", "localhost_friendMiddlewarePort": p2p_status["localhost_friendMiddlewarePort"]}
 
     return friendConnectionStatus
 
