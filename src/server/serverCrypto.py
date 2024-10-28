@@ -5,7 +5,6 @@ import json
 from nacl.signing import SigningKey
 from nacl.signing import VerifyKey
 from nacl.encoding import RawEncoder
-from pytor.ed25519 import Ed25519
 from time import sleep
 from .jsonOperator import *
 
@@ -100,9 +99,19 @@ def crypto_initializeTorKeys():
             if len(privkey_seed) != 32:
                 raise ValueError("Invalid private key length in the file.")
             private_key_seed = privkey_seed
+        
+        # Read the public key
+        with open(TOR_PUBLIC_KEY_FILE, 'rb') as f:
+            # skip the first 32 bytes
+            f.seek(32)
+
+            # Read the public key from the file (should be 32 bytes)
+            public_key = f.read(32)
+            if len(public_key) != 32:
+                raise ValueError("Invalid public key length in the file.")
+            public_tor_key = public_key
 
         priv_key_array = bytearray(private_key_seed)
-        public_tor_key = Ed25519().public_key_from_hash(priv_key_array)
         address = crypto_generateTorAddress(public_tor_key)
         private_key_signing_key_object = SigningKey(private_key_seed)
         public_signing_key = private_key_signing_key_object.verify_key

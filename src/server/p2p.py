@@ -254,6 +254,8 @@ def p2p_UPnPConnection():
 
         # check if friend has UPnP
         while True:
+            if "0000000000000000000000000000000000" in p2p_status["general_currentFocusedFriend"]: return 0
+
             friendUpnpStatus = friends_getUPnPStatus(p2p_status["general_currentFocusedFriend"])
 
             print("I dont have UPNP. Friend's UPNP status is: ", friendUpnpStatus)
@@ -328,9 +330,8 @@ def p2p_handleReceivedMessage(conn):
 
         print("RECEIVED LOCAL NETWORK MESSAGE: ", data.decode('utf-8'))
 
-        if data.decode('utf-8') == "checkFocus":
-            conn.sendall(p2p_status["general_currentFocusedFriend"].encode('utf-8'))
-            continue
+        if data.decode('utf-8') == "exit":
+            return 0
         
         p2p_forwardToMiddleware(data.decode('utf-8'))
 
