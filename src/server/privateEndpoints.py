@@ -64,7 +64,9 @@ def privEndpoint_sendMessage():
     
 
     if p2p_getFriendConnectionStatus()["status"] == "2" or p2p_getFriendConnectionStatus()["status"] == "3":
-        p2p_sendMessageToFriend(packagedMessage)
+        p2p_sendMessageToFriend(packedMessageContainer)
+        message_to_store = {key: value for key, value in message.items() if key != "sender"}
+        operator_storeSentMessage(json.dumps(message_to_store), destination)
         return json.dumps({"message": "Message sent!"})
     
 

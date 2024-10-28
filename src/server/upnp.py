@@ -1,5 +1,6 @@
 import subprocess
 import random
+import socket
 
 '''
 I was having issues with the upnpy module regarding timeout of new connections. 
@@ -80,23 +81,20 @@ def upnp_cleanupPortForwardingRules():
     return True
     
 
-def upnp_newPortForwardingRule(ownIpAddress, internalPort):
+def upnp_newPortForwardingRule(ownIpAddress):
     # get current port redirections
     if upnp_discoverUPnPDevices() is False:
         return False, 0
 
-    currentRules = upnp_getAllPortForwardingRules()
-    used_ports = set()
-    for rule in currentRules:
-        used_ports.add(rule[1])
+    connectionPort = upnp_findLocallyAvailablePort()
 
-    # Find random port between 60001 and 60000 that is not already used
-    while True:
-        externalPort = str(random.randint(60001, 63000))
-        if ('TCP', externalPort) not in used_ports:
-            break
+    result = subprocess.run(['upnpc', '-e', 'p2p-messenger', '-a', str(ownIpAddress), str(connectionPort), str(connectionPort), 'TCP'], capture_output=True, text=True)
 
-    result = subprocess.run(['upnpc', '-e', 'p2p-messenger', '-a', str(ownIpAddress), str(internalPort), str(externalPort), 'TCP'], capture_output=True, text=True)
+    if "failed with code" in result.stdout or "failed with code" in result.stderr:
+        print("ShIt, LeTs trY aGaiN")
+
+        upnp_cleanupPortForwardingRules()
+        return upnp_newPortForwardingRule(ownIpAddress)
 
     currentRules = upnp_getAllPortForwardingRules()
     ruleAdded = False
@@ -109,6 +107,33 @@ def upnp_newPortForwardingRule(ownIpAddress, internalPort):
         print("Failed to add UPnP port forwarding rule")
         return False, 0
     
-    print("DONE adding UPnP port forwarding rule on port", externalPort)
+    print("DONE adding UPnP port forwarding rule on port", connectionPort)
     
-    return True, externalPort
+    return True, connectionPort
+
+
+##############################################################
+###### EXTRA FUNCTIONS #######################################
+##############################################################
+
+def upnp_findLocallyAvailablePort():
+    while True:
+        port = random.randint(50001, 60000)
+        if upnp_portIsOpen(port) and upnp_portIsNotUpnpForwarded(port):
+            return port
+
+
+def upnp_portIsNotUpnpForwarded(port: int) -> bool:
+    currentRules = upnp_getAllPortForwardingRules()
+    for rule in currentRules:
+        if rule[1] == str(port):
+            return False
+
+    return True
+
+
+def upnp_portIsOpen(port: int) -> bool:
+    print(f"Checking if port {port} is open.")
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('localhost', port)) != 0

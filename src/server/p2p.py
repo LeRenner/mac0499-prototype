@@ -276,19 +276,17 @@ def p2p_UPnPConnection():
     else:
         friends_updateUPnPStatus(True, False, 0)
 
-        internalConnectionPort = p2p_findLocallyAvailablePort()
-        p2p_status["localConnectionPort"] = internalConnectionPort
-
-        success, externalport = upnp_newPortForwardingRule(friends_getLocalIP(), internalConnectionPort)
-        p2p_status["externalConnectionPort"] = externalport
+        success, connectionPort = upnp_newPortForwardingRule(friends_getLocalIP())
+        p2p_status["externalConnectionPort"] = connectionPort
+        p2p_status["localConnectionPort"] = connectionPort
 
         if not success:
             p2p_status["general_clientConnectionMessage"] = "Failed to UPnP port forward."
             friends_updateUPnPStatus(False, False, 0)
             return 10
 
-        print("SETTING STATUS TO", externalport, "AND")
-        friends_updateUPnPStatus(True, False, externalport)
+        print("SETTING STATUS TO", connectionPort, "AND")
+        friends_updateUPnPStatus(True, False, connectionPort)
 
         p2p_status["general_clientConnectionMessage"] = "UPnP port forwarding successful! Checking in with friend..."
 
@@ -328,6 +326,8 @@ def p2p_handleReceivedMessage(conn):
         if not data:
             break
 
+        print("RECEIVED LOCAL NETWORK MESSAGE: ", data.decode('utf-8'))
+
         if data.decode('utf-8') == "checkFocus":
             conn.sendall(p2p_status["general_currentFocusedFriend"].encode('utf-8'))
             continue
@@ -360,10 +360,12 @@ def p2p_localNetworkHostServer():
     print(f"Connection from {addr}")
 
     p2p_status["directConnectionSocket"] = conn
-
+    p2p_status["general_clientConnectionMessage"] = "P2P connected to friend on local network!"
     p2p_status["friendConnectionStatus"] = 2
 
     p2p_handleReceivedMessage(conn)
+
+    p2p_status["general_clientConnectionMessage"] = "Friend exited the chat. Returning to tor..."
 
     return 0
 
@@ -387,10 +389,12 @@ def p2p_upnpHostServer():
     print(f"Connection from {addr}")
 
     p2p_status["directConnectionSocket"] = conn
-
+    p2p_status["general_clientConnectionMessage"] = "P2P connected to friend with UPnP!"
     p2p_status["friendConnectionStatus"] = 3
 
     p2p_handleReceivedMessage(conn)
+
+    p2p_status["general_clientConnectionMessage"] = "Friend exited the chat. Returning to tor..."
 
     return 0
 
@@ -399,20 +403,26 @@ def p2p_upnpHostServer():
 def p2p_localNetworkConnectToServer():
     global p2p_status
 
-    friendLocalConnectionPort = friends_setLocalNetworkPort(p2p_status["general_currentFocusedFriend"])
-    p2p_status["localConnectionPort"] = friendLocalConnectionPort
+    while True:
+        localPort = friends_getLocalConnectionPort(p2p_status["general_currentFocusedFriend"])
+        if localPort is not None:
+            break
+
+    p2p_status["localConnectionPort"] = localPort
 
     friendSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    friendSocket.connect((p2p_status["friendLocalAddress"], friendLocalConnectionPort))
+    friendSocket.connect((p2p_status["friendLocalAddress"], int(localPort)))
 
     if friendSocket is None:
         return 1
 
     p2p_status["directConnectionSocket"] = friendSocket
-
+    p2p_status["general_clientConnectionMessage"] = "P2P connected to friend on local network!"
     p2p_status["friendConnectionStatus"] = 2
 
     p2p_handleReceivedMessage(friendSocket)
+
+    p2p_status["general_clientConnectionMessage"] = "Friend exited the chat. Returning to tor..."
 
     return 0
 
@@ -439,6 +449,8 @@ def p2p_upnpConnectToServer():
     p2p_status["friendConnectionStatus"] = 3
 
     p2p_handleReceivedMessage(friendSocket)
+
+    p2p_status["general_clientConnectionMessage"] = "Friend exited the chat. Returning to tor..."
 
     return 0
     
@@ -545,7 +557,10 @@ def p2p_getFriendConnectionStatus():
     if friendConnectionStatus == 1:
         return {"status": "1", "localhost_friendMiddlewarePort": p2p_status["localhost_friendMiddlewarePort"]}
 
-    return friendConnectionStatus
+    elif friendConnectionStatus == 2 or friendConnectionStatus == 3:
+        return {"status": str(friendConnectionStatus)}
+
+    raise RuntimeError("Invalid friend connection status.")
 
 
 # finds port between 40000 and 60000 that is not in use
