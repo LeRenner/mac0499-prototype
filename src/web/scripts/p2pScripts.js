@@ -14,7 +14,3 @@ async function changeFocusedFriend (friendAlias) {
     await request_changeFocusedFriend(friendAddress);
 }
 
-
-
-// request_changeFocusedFriend
-// request_getFriendConnectionStatus
