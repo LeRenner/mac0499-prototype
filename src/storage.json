@@ -1,30 +1,39 @@
 {
     "receivedMessages": {
-        "poytpb22ybj2sparpwdktje6w3zttvhtfg7ls7kgt5gxkrz67sloflid.onion": [
+        "vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion": [
             {
-                "message": "{\"sender\": \"poytpb22ybj2sparpwdktje6w3zttvhtfg7ls7kgt5gxkrz67sloflid.onion\", \"content\": \"hi\", \"timestamp\": 1730139466}",
-                "signature": "tPhSI3xgnoPEnYPC0cVi+Ekkd8wECx47frFU32+pXySYgJCTlL56uamA6b8f4pjciW61q+Dgl1owiUxw/8trBw=="
+                "message": "{\"sender\": \"vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion\", \"content\": \"haha\", \"timestamp\": 1730437817}",
+                "signature": "XXGtGmAD82SFr18CD8hUaNrvMfzBeY/DRgN4NO1ZLWB2UaEy5un0pbwI0Q77Tw4j/8A2u/nZldU4x24OmrtCCg=="
+            },
+            {
+                "message": "{\"sender\": \"vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion\", \"content\": \"haha\", \"timestamp\": 1730437866}",
+                "signature": "voj2VqEt9EG5k+Kgur9iuRCJDcTN3u9p4EIJcqR9TxcN6WyRl2vcR6RC4ncLsK18VoD9cLFkQZsifu0gxTmuDw=="
             }
         ]
     },
     "sentMessages": {
-        "poytpb22ybj2sparpwdktje6w3zttvhtfg7ls7kgt5gxkrz67sloflid.onion": [
+        "vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion": [
             {
-                "content": "hello",
-                "timestamp": 1730139450
+                "content": "hehe",
+                "timestamp": 1730437805
+            },
+            {
+                "content": "hehe",
+                "timestamp": 1730437863
             }
         ]
     },
     "friends": [
         {
-            "address": "poytpb22ybj2sparpwdktje6w3zttvhtfg7ls7kgt5gxkrz67sloflid.onion",
-            "alias": "poypoy"
+            "address": "vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion",
+            "alias": "haha"
         }
     ],
     "peerList": [
         {
-            "address": "poytpb22ybj2sparpwdktje6w3zttvhtfg7ls7kgt5gxkrz67sloflid.onion",
-            "public_key": "kcpfwO0wCTNyuBcylIYekyJaWCycymM7Y37DWbgFgbA="
+            "address": "vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion",
+            "publicSigningKey": "dacefda365535684c7f17bda64c336478c9461aa6c8d0f11960796bc9e662c5e",
+            "publicEncryptionKey": "5eb2d5448854051c834a38de0a2012290ccff4be47f8471d3dc0da3ea81d8d7f"
         }
     ],
     "firstContact": []

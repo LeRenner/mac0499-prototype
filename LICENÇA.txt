@@ -1,0 +1,3 @@
+O conteúdo deste programa esta licenciado por meio da GNU General Public License v3 (arquivo license/gpl-3.0.txt). Este programa utiliza o tor, licenciado por meio da "3-clause BSD", com considerações adicionais sobre componentes utilizados (arquivo license/tor-license.txt). Este programa também utiliza o miniupnpc, licenciado pela "3-clause BSD" (arquivo license/miniupnpc-license.txt). 
+
+Ao utilizar, reproduzir, ou modificar este programa você concorda com as três licenças. 

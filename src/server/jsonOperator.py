@@ -174,9 +174,14 @@ def operator_storePeerPublicKey(address: str, publicKey: str):
     if "peerList" not in storage:
         storage["peerList"] = []
 
+    decodedPublicKeys = json.loads(publicKey)
+    publicSigningKey = decodedPublicKeys["publicSigningKey"]
+    publicEncryptionKey = decodedPublicKeys["publicEncryptionKey"]
+
     peerObj = {
         "address": address,
-        "public_key": publicKey
+        "publicSigningKey": publicSigningKey,
+        "publicEncryptionKey": publicEncryptionKey
     }
 
     for peer in storage["peerList"]:
@@ -356,6 +361,6 @@ def operator_getPublicKeyFromAddress(address: str) -> str:
 
     for peer in peerList:
         if peer["address"] == address:
-            return peer["public_key"]
+            return peer
     
     return None

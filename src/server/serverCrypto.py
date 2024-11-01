@@ -5,14 +5,13 @@ import json
 from nacl.signing import SigningKey
 from nacl.signing import VerifyKey
 from nacl.encoding import RawEncoder
+from nacl.encoding import HexEncoder
+from nacl.public import PrivateKey, Box
 from time import sleep
 from .jsonOperator import *
+from nacl.public import PublicKey, SealedBox
 
-global private_key_seed
-global private_key_signing_key_object
-global public_tor_key
-global public_signing_key
-global address
+global privateSigningKey, privateEncryptionKey, publicSigningKey, publicEncryptionKey, address
 
 TOR_PRIVATE_KEY_FILE = "tor/data/hidden-service/hs_ed25519_secret_key"
 TOR_PUBLIC_KEY_FILE = "tor/data/hidden-service/hs_ed25519_public_key"
@@ -29,27 +28,63 @@ def crypto_getOwnAddress() -> str:
 
 
 def crypto_getOwnPublicKey() -> str:
-    global public_signing_key
-    return base64.b64encode(public_signing_key.encode(RawEncoder)).decode('utf-8')
+    keyObj = {
+        "publicSigningKey": publicSigningKey.encode(encoder=HexEncoder).decode('utf-8'),
+        "publicEncryptionKey": publicEncryptionKey.encode(encoder=HexEncoder).decode('utf-8')
+    }
+
+    return json.dumps(keyObj)
 
 
 def crypto_signMessage(message: str) -> str:
     # Sign the message
-    signed_message = private_key_signing_key_object.sign(message.encode('utf-8'))
+    signedMessage = privateSigningKey.sign(message.encode('utf-8'))
 
     # Encode the signature in base64
-    signature = base64.b64encode(signed_message.signature).decode('utf-8')
+    signature = base64.b64encode(signedMessage.signature).decode('utf-8')
 
     return signature
 
 
-def crypto_verifyMessage(message: str, signature: str, originAddress: str) -> bool:
+def crypto_encryptMessage(message: str, destAddress: str) -> str:
+    # Get the public key from the destination address
+    public_key_hex = operator_getPublicKeyFromAddress(destAddress)["publicEncryptionKey"]
 
-    # Get the public key from the origin address
-    public_key = base64.b64decode(operator_getPublicKeyFromAddress(originAddress))
+    public_key = PublicKey(public_key_hex, encoder=HexEncoder)
+
+    # Create a SealedBox object for encryption
+    sealed_box = SealedBox(public_key)
+
+    # Encrypt the message
+    encrypted_message = sealed_box.encrypt(message.encode('utf-8'))
+
+    # Encode the encrypted message in base64
+    encrypted_message_b64 = base64.b64encode(encrypted_message).decode('utf-8')
+
+    return encrypted_message_b64
+
+
+def crypto_decryptMessage(encryptedMessage: str) -> str:
+    public_keys = json.loads(crypto_getOwnPublicKey())
+    public_signing_key = base64.b64decode(public_keys["publicSigningKey"])
+
+    # Create a SealedBox object for decryption
+    box = SealedBox(privateEncryptionKey)
+
+    # Decode the encrypted message from base64
+    encrypted_message = base64.b64decode(encryptedMessage)
+
+    # Decrypt the message
+    decrypted_message = box.decrypt(encrypted_message)
+
+    return decrypted_message.decode('utf-8')
+
+
+def crypto_verifyMessage(message: str, signature: str, originAddress: str) -> bool:
+    public_key_hex = operator_getPublicKeyFromAddress(originAddress)["publicSigningKey"]
 
     # Create a VerifyKey object from the public key
-    verify_key = VerifyKey(public_key)
+    verify_key = VerifyKey(public_key_hex, encoder=HexEncoder)
 
     # Decode the signature from base64
     signature_bytes = base64.b64decode(signature)
@@ -85,9 +120,23 @@ def crypto_generateTorAddress(public_key: bytes) -> str:
     return onion_address
 
 
+def crypto_test():
+    message = "Hello, world!"
+
+    signature = crypto_signMessage(message)
+
+    print(f"Signature: {signature}")
+
+    result = crypto_verifyMessage(message, signature, "pudim.com.br")
+
+    print(f"Verification result: {result}")
+
+    
+
+
 # Function to read the hs_ed25519_public_key and hs_ed25519_secret_key files and return the onion address
 def crypto_initializeTorKeys():
-    global private_key_seed, public_tor_key, public_signing_key, address, private_key_signing_key_object
+    global privateSigningKey, privateEncryptionKey, publicSigningKey, publicEncryptionKey, address
     try:
         # Read the private key
         with open(TOR_PRIVATE_KEY_FILE, 'rb') as f:
@@ -99,7 +148,7 @@ def crypto_initializeTorKeys():
             if len(privkey_seed) != 32:
                 raise ValueError("Invalid private key length in the file.")
             private_key_seed = privkey_seed
-        
+
         # Read the public key
         with open(TOR_PUBLIC_KEY_FILE, 'rb') as f:
             # skip the first 32 bytes
@@ -111,10 +160,13 @@ def crypto_initializeTorKeys():
                 raise ValueError("Invalid public key length in the file.")
             public_tor_key = public_key
 
-        priv_key_array = bytearray(private_key_seed)
         address = crypto_generateTorAddress(public_tor_key)
-        private_key_signing_key_object = SigningKey(private_key_seed)
-        public_signing_key = private_key_signing_key_object.verify_key
+
+        privateSigningKey = SigningKey(private_key_seed)
+        privateEncryptionKey = PrivateKey(private_key_seed)
+        publicSigningKey = privateSigningKey.verify_key
+        publicEncryptionKey = privateEncryptionKey.public_key
+        
     except Exception as e:
         print(f"Error: {e}")
         return None

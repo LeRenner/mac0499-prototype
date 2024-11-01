@@ -58,13 +58,18 @@ def privEndpoint_sendMessage():
 
     # check is message can be sent locally
     if p2p_getFriendConnectionStatus()["status"] == "1":
-        middlewarePort = p2p_getFriendConnectionStatus()["middlewarePort"]
+        print("ARRIVED HERE")
+
+        middlewarePort = p2p_getFriendConnectionStatus()["localhost_friendMiddlewarePort"]
+
+        print("Middleware port is", middlewarePort)
+
         hostname = f"http://localhost:{middlewarePort}/pubEndpoint_receiveMessage"
         proxies = None
     
 
     if p2p_getFriendConnectionStatus()["status"] == "2" or p2p_getFriendConnectionStatus()["status"] == "3":
-        p2p_sendMessageToFriend(packedMessageContainer)
+        p2p_sendMessageToFriend(packedMessageContainer, destination)
         message_to_store = {key: value for key, value in message.items() if key != "sender"}
         operator_storeSentMessage(json.dumps(message_to_store), destination)
         return json.dumps({"message": "Message sent!"})

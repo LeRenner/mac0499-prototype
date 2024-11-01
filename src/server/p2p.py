@@ -198,7 +198,7 @@ def p2p_friendUpdateThread():
 def p2p_localhostConnection():
     global p2p_status
 
-    friendConnectionStatus = 1
+    p2p_status["friendConnectionStatus"] = 1
     p2p_status["general_clientConnectionMessage"] = "Connected on localhost!"
 
     while True:
@@ -207,7 +207,7 @@ def p2p_localhostConnection():
 
         try:
             requestMethod = {
-                "hostname": f"http://localhost:{friendConnectionDetails['general_localMiddlewarePort']}/pubEndpoint_receiveGenericFriendRequest",
+                "hostname": f"http://localhost:{p2p_status['localhost_friendMiddlewarePort']}/pubEndpoint_receiveGenericFriendRequest",
                 "proxy": None
             }
             isFocused = friends_checkIsFocusedFriend(p2p_status["general_currentFocusedFriend"], requestMethod)
@@ -225,7 +225,6 @@ def p2p_localhostConnection():
 def p2p_localNetworkConnection():
     global p2p_status
 
-    friendConnectionStatus = 2
     p2p_status["general_clientConnectionMessage"] = "Connecting on local network..."
 
     # Determine which peer will host the connection
@@ -240,7 +239,6 @@ def p2p_localNetworkConnection():
 def p2p_UPnPConnection():
     global p2p_status
 
-    friendConnectionStatus = 3
     p2p_status["general_clientConnectionMessage"] = "On different networks! Will try to UPNP port forward."
 
     upnp_cleanupPortForwardingRules()
@@ -330,17 +328,23 @@ def p2p_handleReceivedMessage(conn):
 
         print("RECEIVED LOCAL NETWORK MESSAGE: ", data.decode('utf-8'))
 
+        decryptedMessage = crypto_decryptMessage(data.decode('utf-8'))
+
+        print("UNENCRYPTED MESSAGE: ", decryptedMessage)
+
         if data.decode('utf-8') == "exit":
             return 0
         
-        p2p_forwardToMiddleware(data.decode('utf-8'))
+        p2p_forwardToMiddleware(decryptedMessage)
 
 
-def p2p_sendMessageToFriend(message):
+def p2p_sendMessageToFriend(message, destination):
     global p2p_status
 
+    encryptedMessage = crypto_encryptMessage(message, destination)
+
     friendSocket = p2p_status["directConnectionSocket"]
-    friendSocket.sendall(message.encode('utf-8'))
+    friendSocket.sendall(encryptedMessage.encode('utf-8'))
 
 
 def p2p_localNetworkHostServer():
@@ -552,10 +556,13 @@ def p2p_getFriendConnectionStatus():
 
     friendConnectionStatus = p2p_status["friendConnectionStatus"]
 
+    print("Friend connection status is: ", friendConnectionStatus)
+
     if friendConnectionStatus == 0:
         return {"status": "0"}
     
     if friendConnectionStatus == 1:
+        print("returning : ", {"status": "1", "localhost_friendMiddlewarePort": p2p_status["localhost_friendMiddlewarePort"]})
         return {"status": "1", "localhost_friendMiddlewarePort": p2p_status["localhost_friendMiddlewarePort"]}
 
     elif friendConnectionStatus == 2 or friendConnectionStatus == 3:
