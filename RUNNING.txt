@@ -3,11 +3,17 @@
 - pacote miniupnpc
 - venv com o requirements.txt instalado
 
-[Inicializando o venv]
+[Como inicializar o venv com os requisitos instalados]
+Na pasta raiz do repositório, rodar os seguintes comandos:
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements
 
-[Rodando, dentro do diretório src]
-make run
+[Como rodar o programa]
+Para rodar o programa, basta entrar na pasta src e rodar o comando "make run".
+O programa vai mostrar alguns parâmetros iniciais, como as portas que ele está
+utilizando. Note em qual porta ele fala que o HTTP está rodando. Depois disso,
+basta abrir o navegador e acessar o endereço http://localhost:PORTA_HTTP/web
 
+Caso queira limpar todos os arquivos gerados pelo programa, basta rodar o
+comando "make clean" na pasta src.
