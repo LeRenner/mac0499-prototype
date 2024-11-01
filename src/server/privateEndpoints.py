@@ -58,12 +58,7 @@ def privEndpoint_sendMessage():
 
     # check is message can be sent locally
     if p2p_getFriendConnectionStatus()["status"] == "1":
-        print("ARRIVED HERE")
-
         middlewarePort = p2p_getFriendConnectionStatus()["localhost_friendMiddlewarePort"]
-
-        print("Middleware port is", middlewarePort)
-
         hostname = f"http://localhost:{middlewarePort}/pubEndpoint_receiveMessage"
         proxies = None
     
@@ -166,7 +161,6 @@ def privEndpoint_updatePublicKeyRecords(peerAddress: str) -> bool:
 
     for attempt in range(3):
         try:
-            print("[updatePublicKeyRecords] Starting request to:", f"http://{peerAddress}/pubEndpoint_getPublicKeyBase64", "with proxies", proxies)
             response = requests.get(f"http://{peerAddress}/pubEndpoint_getPublicKeyBase64", proxies=proxies, timeout=15)
 
             public_key_base64 = response.json().get("public_key")

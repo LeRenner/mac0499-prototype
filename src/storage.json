@@ -1,39 +1,43 @@
 {
     "receivedMessages": {
-        "vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion": [
+        "th2xhx44d64tjhjyqrds77qqjmr55e4tbcjhfur4sff56ie6gego4lyd.onion": [
             {
-                "message": "{\"sender\": \"vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion\", \"content\": \"haha\", \"timestamp\": 1730437817}",
-                "signature": "XXGtGmAD82SFr18CD8hUaNrvMfzBeY/DRgN4NO1ZLWB2UaEy5un0pbwI0Q77Tw4j/8A2u/nZldU4x24OmrtCCg=="
+                "message": "{\"sender\": \"th2xhx44d64tjhjyqrds77qqjmr55e4tbcjhfur4sff56ie6gego4lyd.onion\", \"content\": \"haha\", \"timestamp\": 1730442152}",
+                "signature": "CgGvxzTiwYJ3VXkGYZYmhBJtssp4qx5lwJXAqLeMhh/J8DE3cQtc+5tEGkScl25GOkUnNGNHARxQmG8Iamt3Ag=="
             },
             {
-                "message": "{\"sender\": \"vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion\", \"content\": \"haha\", \"timestamp\": 1730437866}",
-                "signature": "voj2VqEt9EG5k+Kgur9iuRCJDcTN3u9p4EIJcqR9TxcN6WyRl2vcR6RC4ncLsK18VoD9cLFkQZsifu0gxTmuDw=="
+                "message": "{\"sender\": \"th2xhx44d64tjhjyqrds77qqjmr55e4tbcjhfur4sff56ie6gego4lyd.onion\", \"content\": \"hehe\", \"timestamp\": 1730442332}",
+                "signature": "7NGixjRJisq+oD8QfZg2nGstCK8uGzUoP0IneYJCYcOiwUweY8uQATzIlCtmDIPslPE3vJUUKyZl1qxyp9RUCg=="
             }
         ]
     },
     "sentMessages": {
-        "vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion": [
+        "th2xhx44d64tjhjyqrds77qqjmr55e4tbcjhfur4sff56ie6gego4lyd.onion": [
             {
                 "content": "hehe",
-                "timestamp": 1730437805
+                "timestamp": 1730442140
             },
             {
-                "content": "hehe",
-                "timestamp": 1730437863
+                "content": "omg",
+                "timestamp": 1730442193
+            },
+            {
+                "content": "asdasd",
+                "timestamp": 1730442592
             }
         ]
     },
     "friends": [
         {
-            "address": "vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion",
-            "alias": "haha"
+            "address": "th2xhx44d64tjhjyqrds77qqjmr55e4tbcjhfur4sff56ie6gego4lyd.onion",
+            "alias": "thx"
         }
     ],
     "peerList": [
         {
-            "address": "vlqxqzai7ehz2slnvslyanhwv2g4km4fz7mnm4h4wn6blr52u6nmpxyd.onion",
-            "publicSigningKey": "dacefda365535684c7f17bda64c336478c9461aa6c8d0f11960796bc9e662c5e",
-            "publicEncryptionKey": "5eb2d5448854051c834a38de0a2012290ccff4be47f8471d3dc0da3ea81d8d7f"
+            "address": "th2xhx44d64tjhjyqrds77qqjmr55e4tbcjhfur4sff56ie6gego4lyd.onion",
+            "publicSigningKey": "9e56bd453a8273a6510f43fb97a5cb0a5a524b98f689d7e5fdcc27ac909c873a",
+            "publicEncryptionKey": "2266bab5557bf9c2a89117004e028b873addebfa0f47029bcb4a2fd07b1f2267"
         }
     ],
     "firstContact": []

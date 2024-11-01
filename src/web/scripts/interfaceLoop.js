@@ -20,7 +20,7 @@ function changeInterfaceState(newState) {
     interfaceState = newState;
     
     if (newState === 0) {
-        request_changeFocusedFriend('00000000000000000000000000000000000000000000000000000000.onion');
+        request_changeFocusedFriend('0');
         shouldRunUpdateFriendConnectionStatus = false;
         document.getElementById('senderList').style.display = 'block';
         document.getElementById('chat').style.display = 'none';
@@ -30,7 +30,7 @@ function changeInterfaceState(newState) {
         document.getElementById('chat').style.display = 'block';
         document.getElementById('friends').style.display = 'none';
     } else if (newState === 2) {
-        request_changeFocusedFriend('00000000000000000000000000000000000000000000000000000000.onion');
+        request_changeFocusedFriend('0');
         shouldRunUpdateFriendConnectionStatus = false;
         document.getElementById('senderList').style.display = 'none';
         document.getElementById('chat').style.display = 'none';

@@ -120,20 +120,6 @@ def crypto_generateTorAddress(public_key: bytes) -> str:
     return onion_address
 
 
-def crypto_test():
-    message = "Hello, world!"
-
-    signature = crypto_signMessage(message)
-
-    print(f"Signature: {signature}")
-
-    result = crypto_verifyMessage(message, signature, "pudim.com.br")
-
-    print(f"Verification result: {result}")
-
-    
-
-
 # Function to read the hs_ed25519_public_key and hs_ed25519_secret_key files and return the onion address
 def crypto_initializeTorKeys():
     global privateSigningKey, privateEncryptionKey, publicSigningKey, publicEncryptionKey, address

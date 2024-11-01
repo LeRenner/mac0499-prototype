@@ -182,6 +182,10 @@ def friends_receiveGetLocalConnectionPort(request_object_json: str) -> bool:
 def friends_sendGenericRequest(requestKind: str, destAddress: str, connectionMethod: dict = None) -> bool:
     global localSocksPort
 
+    if len(destAddress) < 5:
+        print("Not focused.")
+        return
+
     request = friends_craftGenericFriendRequest(destAddress, requestKind)
 
     proxies = {
@@ -251,6 +255,9 @@ def friends_getFriendIpAddress(friendAddress: str) -> str:
 
 
 def friends_checkIsFocusedFriend(friendAddress: str, connectionMethod: dict = None) -> bool:
+    if len(friendAddress) < 5:
+        return False
+
     request_response = friends_sendGenericRequest("isFocused", friendAddress, connectionMethod)
 
     if request_response is False:

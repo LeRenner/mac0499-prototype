@@ -12,6 +12,7 @@ from .serverCrypto import *
 from .jsonOperator import *
 from .friends import *
 from .upnp import *
+import multiprocessing
 
 global p2p_status
 
@@ -52,7 +53,8 @@ def p2p_initializeVariables(rcvSocksPort, rcvLocalMiddlewarePort):
 
         # threads that manage peer-to-peer connections
         "friendUpdateThread": threading.Thread(target=p2p_friendUpdateThread),
-        "friendConnectionThread": None
+        "friendConnectionThread": None,
+        "socketConnectionProcess": None
     }
     p2p_status["friendUpdateThread"].start()
 
@@ -96,50 +98,42 @@ def p2p_tryConnecting():
     friends_resetConnectionVariables()
     p2p_resetConnectionVariables()
 
-
-    if p2p_status["general_currentFocusedFriend"] == "00000000000000000000000000000000000000000000000000000000.onion":
+    if len(p2p_status["general_currentFocusedFriend"]) < 5:
         p2p_status["general_clientConnectionMessage"] = "None."
         return -1
 
     # check if connection thread should die
     if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
+    # check if friend is mutual
     p2p_status["general_clientConnectionMessage"] = "Checking if friend is mutual..."
-
     focusedFriendIsMutual = friends_checkIsMutualFriend(p2p_status["general_currentFocusedFriend"])
-
-    # check if connection thread should die
-    if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
-
     if focusedFriendIsMutual == False:
         print("Friend is not mutual.")
         p2p_status["general_clientConnectionMessage"] = "Friend is not mutual."
         return 20
 
-    p2p_status["general_clientConnectionMessage"] = "Waiting for friend to focus on you..."
+    # check if connection thread should die
+    if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
+    # check if friend is focused
+    p2p_status["general_clientConnectionMessage"] = "Waiting for friend to focus on you..."
     while friends_checkIsFocusedFriend(p2p_status["general_currentFocusedFriend"]) == False:
         # check if connection thread should die
         if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
-
-        print(".", end="")
         sleep(5)
-    
 
     # check if connection thread should die
     if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
-
 
     p2p_status["general_clientConnectionMessage"] = "Getting friend's IP addresses..."
-
     friendIPs = friends_getFriendIpAddress(p2p_status["general_currentFocusedFriend"])
-
-    # check if connection thread should die
-    if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
-
     p2p_status["localhost_friendMiddlewarePort"] = friendIPs["middlewarePort"]
     p2p_status["friendPublicAddress"] = friendIPs["public"]
     p2p_status["friendLocalAddress"] = friendIPs["local"]
+
+    # check if connection thread should die
+    if p2p_status["general_shouldKillConnectionThread"]: return p2p_connectionThreadDying()
 
     # if users are on the same machine, friendConnectionStatus = 1
     if friendIPs["public"] == p2p_getPublicIP() and friendIPs["local"] == friends_getLocalIP():
@@ -153,7 +147,6 @@ def p2p_tryConnecting():
     if friendIPs["public"] != p2p_getPublicIP():
         return p2p_UPnPConnection()
 
-    print("REACHED END OF TRYCONNECTING. EXITING.")
     return -1
 
 
@@ -163,32 +156,18 @@ def p2p_friendUpdateThread():
     pastFocusedFriend = None
 
     while True:
-        print("=============================================")
-        print("Started! p2p_status[focusedFriend]: ", p2p_status["general_currentFocusedFriend"])
 
         while p2p_status["general_currentFocusedFriend"] == pastFocusedFriend:
             sleep(1)
         
         pastFocusedFriend = p2p_status["general_currentFocusedFriend"]
 
-        if p2p_status["general_currentFocusedFriend"] is None or "00000000000000000000000000000000000000000" in p2p_status["general_currentFocusedFriend"]:
-            try:
-                print("Killing thread.")
-                p2p_status["friendConnectionThread"].terminate()
-            except AttributeError:
-                print("No thread to terminate.")
-
-            except AttributeError:
-                print("No thread to join.")
+        if p2p_status["general_currentFocusedFriend"] is None or len(p2p_status["general_currentFocusedFriend"]) < 5:
+            if p2p_status["friendConnectionThread"] is not None and p2p_status["friendConnectionThread"].is_alive():
+                p2p_status["general_shouldKillConnectionThread"] = True
         else:
-            print("Starting new thread.")
-            # start friend connection thread
             p2p_status["friendConnectionThread"] = threading.Thread(target=p2p_friendConnectionThread)
             p2p_status["friendConnectionThread"].start()
-        
-        print("Reached the end???????????")
-
-        sleep(1)
 
 
 #####################################################
@@ -319,18 +298,12 @@ def p2p_forwardToMiddleware(message):
 
 
 def p2p_handleReceivedMessage(conn):
-    global p2p_status
-
     while True:
         data = conn.recv(1024)
         if not data:
             break
 
-        print("RECEIVED LOCAL NETWORK MESSAGE: ", data.decode('utf-8'))
-
         decryptedMessage = crypto_decryptMessage(data.decode('utf-8'))
-
-        print("UNENCRYPTED MESSAGE: ", decryptedMessage)
 
         if data.decode('utf-8') == "exit":
             return 0
@@ -356,8 +329,6 @@ def p2p_localNetworkHostServer():
     friends_setLocalNetworkPort(localConnectionPort)
     p2p_status["localConnectionPort"] = localConnectionPort
 
-    print(f"Hosting server on port {localConnectionPort}")
-
     localSocket.bind(('0.0.0.0', localConnectionPort))
     localSocket.listen(1)
 
@@ -368,9 +339,14 @@ def p2p_localNetworkHostServer():
     p2p_status["general_clientConnectionMessage"] = "P2P connected to friend on local network!"
     p2p_status["friendConnectionStatus"] = 2
 
-    p2p_handleReceivedMessage(conn)
+    p2p_status["socketConnectionProcess"] = multiprocessing.Process(target=p2p_handleReceivedMessage, args=(conn,))
+    p2p_status["socketConnectionProcess"].start()
+
+    while friends_checkIsFocusedFriend(p2p_status["general_currentFocusedFriend"]):
+        sleep(5)
 
     p2p_status["general_clientConnectionMessage"] = "Friend exited the chat. Returning to tor..."
+    p2p_status["socketConnectionProcess"].terminate()
 
     return 0
 
@@ -397,12 +373,16 @@ def p2p_upnpHostServer():
     p2p_status["general_clientConnectionMessage"] = "P2P connected to friend with UPnP!"
     p2p_status["friendConnectionStatus"] = 3
 
-    p2p_handleReceivedMessage(conn)
+    p2p_status["socketConnectionProcess"] = multiprocessing.Process(target=p2p_handleReceivedMessage, args=(conn,))
+    p2p_status["socketConnectionProcess"].start()
+
+    while friends_checkIsFocusedFriend(p2p_status["general_currentFocusedFriend"]):
+        sleep(5)
 
     p2p_status["general_clientConnectionMessage"] = "Friend exited the chat. Returning to tor..."
+    p2p_status["socketConnectionProcess"].terminate()
 
     return 0
-
 
 
 def p2p_localNetworkConnectToServer():
@@ -425,9 +405,14 @@ def p2p_localNetworkConnectToServer():
     p2p_status["general_clientConnectionMessage"] = "P2P connected to friend on local network!"
     p2p_status["friendConnectionStatus"] = 2
 
-    p2p_handleReceivedMessage(friendSocket)
+    p2p_status["socketConnectionProcess"] = multiprocessing.Process(target=p2p_handleReceivedMessage, args=(friendSocket,))
+    p2p_status["socketConnectionProcess"].start()
+
+    while friends_checkIsFocusedFriend(p2p_status["general_currentFocusedFriend"]):
+        sleep(5)
 
     p2p_status["general_clientConnectionMessage"] = "Friend exited the chat. Returning to tor..."
+    p2p_status["socketConnectionProcess"].terminate()
 
     return 0
 
@@ -450,15 +435,18 @@ def p2p_upnpConnectToServer():
 
     p2p_status["directConnectionSocket"] = friendSocket
     p2p_status["general_clientConnectionMessage"] = "P2P connected to friend with UPnP!"
-
     p2p_status["friendConnectionStatus"] = 3
 
-    p2p_handleReceivedMessage(friendSocket)
+    p2p_status["socketConnectionProcess"] = multiprocessing.Process(target=p2p_handleReceivedMessage, args=(friendSocket,))
+    p2p_status["socketConnectionProcess"].start()
+
+    while friends_checkIsFocusedFriend(p2p_status["general_currentFocusedFriend"]):
+        sleep(5)
 
     p2p_status["general_clientConnectionMessage"] = "Friend exited the chat. Returning to tor..."
+    p2p_status["socketConnectionProcess"].terminate()
 
     return 0
-    
 
 
 def p2p_processFirstContact(address):
@@ -555,8 +543,6 @@ def p2p_getFriendConnectionStatus():
     global p2p_status
 
     friendConnectionStatus = p2p_status["friendConnectionStatus"]
-
-    print("Friend connection status is: ", friendConnectionStatus)
 
     if friendConnectionStatus == 0:
         return {"status": "0"}
