@@ -1,0 +1,29 @@
+{
+    "receivedMessages": {},
+    "sentMessages": {
+        "g2z2oven7mxtsyaw4jscoohcjsav637om5v2hkoucgowf5jmu3usqbyd.onion": [
+            {
+                "content": "ahsdiaohsidohaosd omg hiiiii",
+                "timestamp": 1733266089
+            },
+            {
+                "content": "hidoashdioahsiod fast",
+                "timestamp": 1733266322
+            }
+        ]
+    },
+    "friends": [
+        {
+            "address": "g2z2oven7mxtsyaw4jscoohcjsav637om5v2hkoucgowf5jmu3usqbyd.onion",
+            "alias": "asdjosajdopajsdasd"
+        }
+    ],
+    "peerList": [
+        {
+            "address": "g2z2oven7mxtsyaw4jscoohcjsav637om5v2hkoucgowf5jmu3usqbyd.onion",
+            "publicSigningKey": "9799b326ccfe4d78350973b741e820dfc1c82efe6370bba5e01548c9bffb029b",
+            "publicEncryptionKey": "c85dced727cb358509244d247955a510ba158933806983daab210dde809ad274"
+        }
+    ],
+    "firstContact": []
+}
